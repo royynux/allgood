@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>All Good Adventure Architecture</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: #172033;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: #0f1b2d;
+  line-height: 1.2;
+  page-break-after: avoid;
+}
+h1 {
+  font-size: 25pt;
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #e8490f;
+}
+h2 {
+  font-size: 17pt;
+  margin: 28px 0 10px;
+  padding-top: 6px;
+  border-top: 1px solid #dfe4ea;
+}
+h3 { font-size: 13pt; margin: 20px 0 8px; }
+h4 { font-size: 11.5pt; margin: 16px 0 6px; }
+p { margin: 7px 0 10px; }
+ul { margin: 6px 0 12px 20px; padding: 0; }
+li { margin: 3px 0; }
+pre {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  background: #f6f7f9;
+  border: 1px solid #dfe4ea;
+  border-left: 4px solid #e8490f;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  page-break-inside: avoid;
+}
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 9.3pt;
+}
+p code, li code {
+  background: #fff0eb;
+  color: #c93d0a;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+strong { color: #0f1b2d; }
+</style>
+</head>
+<body>
+<h1>All Good Adventure Architecture</h1>
+<h2>Goal</h2>
+<p>Convert the current static HTML prototype into a production-ready booking platform with:</p>
+<ul>
+<li>A customer-facing frontend</li>
+<li>A Laravel backend API</li>
+<li>Filament as the admin panel</li>
+<li>PostgreSQL as the database</li>
+</ul>
+<p>The current HTML design should become the visual reference for the frontend pages and booking flow.</p>
+<h2>Recommended Stack</h2>
+<h3>Frontend</h3>
+<p>Use one of these:</p>
+<ul>
+<li>React + Vite</li>
+<li>Next.js</li>
+<li>Vue / Nuxt</li>
+<li>Laravel Inertia + React</li>
+</ul>
+<p>Recommended option for fastest full-stack development:</p>
+<pre><code class="language-text">Laravel + Inertia + React + Filament + PostgreSQL</code></pre>
+<p>Recommended option for cleaner frontend/backend separation:</p>
+<pre><code class="language-text">React or Next.js frontend
+Laravel API backend
+Filament admin panel
+PostgreSQL database</code></pre>
+<h2>High-Level Architecture</h2>
+<pre><code class="language-text">Customer Frontend
+        |
+        | HTTP / API requests
+        v
+Laravel Backend
+        |
+        | Eloquent ORM
+        v
+PostgreSQL Database
+        ^
+        |
+Filament Admin Panel</code></pre>
+<h2>Main Applications</h2>
+<h3>Customer Frontend</h3>
+<p>The frontend contains the public website and customer booking experience.</p>
+<p>Pages:</p>
+<ul>
+<li>Home / Beranda</li>
+<li>Catalog / Katalog</li>
+<li>Destination detail</li>
+<li>Booking flow</li>
+<li>Tour guide list</li>
+<li>Tour guide detail</li>
+<li>About / Tentang</li>
+<li>Login</li>
+<li>Register</li>
+<li>OTP verification</li>
+<li>Profile</li>
+<li>Booking history</li>
+</ul>
+<h3>Laravel Backend</h3>
+<p>The backend owns the business logic and database access.</p>
+<p>Responsibilities:</p>
+<ul>
+<li>Authentication</li>
+<li>Destination data</li>
+<li>Tour guide data</li>
+<li>Booking submission</li>
+<li>Booking status management</li>
+<li>User profile data</li>
+<li>Price calculation</li>
+<li>Notifications later, such as WhatsApp or email</li>
+</ul>
+<h3>Filament Admin Panel</h3>
+<p>Filament is used by internal staff/admin.</p>
+<p>Admin can manage:</p>
+<ul>
+<li>Destinations</li>
+<li>Trip types</li>
+<li>Tour guides</li>
+<li>Bookings</li>
+<li>Customers/users</li>
+<li>Testimonials</li>
+<li>Gallery images</li>
+<li>Categories</li>
+<li>Admin roles and permissions</li>
+</ul>
+<h2>Main Business Rules</h2>
+<h3>Trip Types</h3>
+<pre><code class="language-text">One Day Trip
+- Customer chooses one destination
+- Customer chooses one guide
+- Customer selects one departure date
+- Duration is fixed to 1 day
+- Price is calculated directly
+
+Rinjani Trip
+- Destination is fixed to Pendakian Rinjani
+- Customer chooses one guide
+- Customer selects one departure date
+- Return date is automatically departure date + 2 days
+- Duration is fixed to 3 days 2 nights
+- Price is calculated directly
+
+Custom Trip
+- Customer can choose multiple destinations
+- Customer chooses one guide
+- Customer enters estimated duration
+- Customer selects estimated departure date
+- Price is confirmed manually by admin</code></pre>
+<h3>Guide Pricing</h3>
+<p>Tour guide cost is included in the destination/trip price.</p>
+<p>Do not calculate guide as a separate cost.</p>
+<pre><code class="language-text">Guide price = included
+Additional guide fee = 0</code></pre>
+<h3>Price Calculation</h3>
+<pre><code class="language-text">One Day Trip:
+total = destination.price * participants_count
+
+Rinjani Trip:
+total = rinjani.price * participants_count
+
+Custom Trip:
+total = null
+admin confirms final price later</code></pre>
+<h2>Booking Flow</h2>
+<pre><code class="language-text">Step 1: Choose trip type
+Step 2: Choose destination
+Step 3: Choose tour guide
+Step 4: Enter trip details
+Step 5: Enter customer data and participant names
+Step 6: Review summary and submit</code></pre>
+<p>Detailed flow:</p>
+<pre><code class="language-text">1. Customer selects trip type
+   - One Day
+   - Rinjani
+   - Custom
+
+2. Customer selects destination
+   - One Day: one destination
+   - Rinjani: fixed Rinjani destination
+   - Custom: multiple destinations
+
+3. Customer selects guide
+   - Guide is required
+   - Guide does not add extra cost
+
+4. Customer enters trip details
+   - One Day: departure date + participant count
+   - Rinjani: departure date + participant count
+   - Custom: estimated duration + departure date + participant count
+
+5. Customer enters contact data
+   - Name
+   - Phone
+   - Email
+   - Notes
+   - Participant names based on participant count
+
+6. Customer reviews summary
+   - Destination
+   - Guide
+   - Dates
+   - Duration
+   - Participants
+   - Total price or admin-confirmation message</code></pre>
+<h2>Database Design</h2>
+<h3>users</h3>
+<p>Stores customers and admins.</p>
+<pre><code class="language-text">id
+name
+email
+phone
+password
+role
+email_verified_at
+created_at
+updated_at</code></pre>
+<h3>trip_types</h3>
+<p>Stores available trip types.</p>
+<pre><code class="language-text">id
+name
+slug
+description
+is_active
+created_at
+updated_at</code></pre>
+<p>Example data:</p>
+<pre><code class="language-text">one-day
+rinjani
+custom</code></pre>
+<h3>categories</h3>
+<p>Stores destination categories.</p>
+<pre><code class="language-text">id
+name
+slug
+created_at
+updated_at</code></pre>
+<p>Example data:</p>
+<pre><code class="language-text">Mountain
+Beach
+Island
+Culture</code></pre>
+<h3>destinations</h3>
+<p>Stores trip destinations and packages.</p>
+<pre><code class="language-text">id
+trip_type_id
+category_id
+name
+slug
+city
+price
+duration_days
+duration_nights
+description
+status
+image
+is_active
+created_at
+updated_at</code></pre>
+<p>Notes:</p>
+<ul>
+<li><code>price</code> is used for One Day and Rinjani trips.</li>
+<li>For Custom Trip destinations, <code>price</code> can be nullable or 0 if admin confirms later.</li>
+</ul>
+<h3>destination_highlights</h3>
+<p>Stores highlight cards for each destination.</p>
+<pre><code class="language-text">id
+destination_id
+icon
+title
+subtitle
+sort_order
+created_at
+updated_at</code></pre>
+<h3>destination_itineraries</h3>
+<p>Stores itinerary days.</p>
+<pre><code class="language-text">id
+destination_id
+day_number
+title
+sort_order
+created_at
+updated_at</code></pre>
+<h3>destination_itinerary_items</h3>
+<p>Stores activities inside each itinerary day.</p>
+<pre><code class="language-text">id
+destination_itinerary_id
+time
+activity
+sort_order
+created_at
+updated_at</code></pre>
+<h3>guides</h3>
+<p>Stores tour guide profiles.</p>
+<pre><code class="language-text">id
+name
+location
+specialty
+specialty_label
+bio
+avatar
+cover_image
+rating
+review_count
+trips_done
+years_experience
+languages
+is_active
+created_at
+updated_at</code></pre>
+<p>Important:</p>
+<ul>
+<li>No guide price column is needed.</li>
+<li>Guide is included in the trip price.</li>
+</ul>
+<h3>guide_certifications</h3>
+<p>Stores guide certifications.</p>
+<pre><code class="language-text">id
+guide_id
+name
+created_at
+updated_at</code></pre>
+<h3>guide_destinations</h3>
+<p>Pivot table connecting guides and destinations.</p>
+<pre><code class="language-text">guide_id
+destination_id</code></pre>
+<h3>guide_availabilities</h3>
+<p>Stores guide availability schedule.</p>
+<pre><code class="language-text">id
+guide_id
+day
+start_time
+end_time
+is_available
+created_at
+updated_at</code></pre>
+<h3>bookings</h3>
+<p>Stores booking requests.</p>
+<pre><code class="language-text">id
+user_id nullable
+booking_code
+trip_type_id
+destination_id nullable
+guide_id
+start_date
+end_date nullable
+duration_days
+participants_count
+meeting_point
+customer_name
+customer_phone
+customer_email
+notes
+status
+estimated_total nullable
+confirmed_total nullable
+created_at
+updated_at</code></pre>
+<p>Booking status examples:</p>
+<pre><code class="language-text">pending
+confirmed
+cancelled
+completed</code></pre>
+<h3>booking_participants</h3>
+<p>Stores participant names.</p>
+<pre><code class="language-text">id
+booking_id
+name
+created_at
+updated_at</code></pre>
+<h3>booking_destinations</h3>
+<p>Used mainly for Custom Trip because one booking can have multiple destinations.</p>
+<pre><code class="language-text">id
+booking_id
+destination_id
+created_at
+updated_at</code></pre>
+<p>For One Day and Rinjani, the main <code>destination_id</code> on <code>bookings</code> is enough.</p>
+<p>For Custom Trip, use <code>booking_destinations</code>.</p>
+<h3>testimonials</h3>
+<p>Stores public testimonials.</p>
+<pre><code class="language-text">id
+customer_name
+customer_role
+rating
+message
+avatar
+is_active
+created_at
+updated_at</code></pre>
+<h3>gallery_images</h3>
+<p>Stores gallery images shown on the frontend.</p>
+<pre><code class="language-text">id
+title
+image
+alt_text
+sort_order
+is_active
+created_at
+updated_at</code></pre>
+<h2>API Design</h2>
+<h3>Public APIs</h3>
+<pre><code class="language-text">GET /api/destinations
+GET /api/destinations/{slug}
+GET /api/guides
+GET /api/guides/{id}
+GET /api/testimonials
+GET /api/gallery
+POST /api/bookings</code></pre>
+<h3>Auth APIs</h3>
+<pre><code class="language-text">POST /api/register
+POST /api/login
+POST /api/logout
+POST /api/otp/verify
+GET  /api/me</code></pre>
+<h3>Customer APIs</h3>
+<pre><code class="language-text">GET /api/profile
+PUT /api/profile
+GET /api/profile/bookings
+GET /api/profile/bookings/{booking_code}</code></pre>
+<h2>Booking API Payload</h2>
+<h3>One Day Trip</h3>
+<pre><code class="language-json">{
+  &quot;trip_type&quot;: &quot;one-day&quot;,
+  &quot;destination_id&quot;: 1,
+  &quot;guide_id&quot;: 2,
+  &quot;start_date&quot;: &quot;2026-05-10&quot;,
+  &quot;participants_count&quot;: 2,
+  &quot;participant_names&quot;: [&quot;Andi&quot;, &quot;Budi&quot;],
+  &quot;meeting_point&quot;: &quot;Bandara Lombok International&quot;,
+  &quot;customer_name&quot;: &quot;Andi&quot;,
+  &quot;customer_phone&quot;: &quot;+62 812 3456 7890&quot;,
+  &quot;customer_email&quot;: &quot;andi@email.com&quot;,
+  &quot;notes&quot;: &quot;Tidak ada&quot;
+}</code></pre>
+<h3>Rinjani Trip</h3>
+<pre><code class="language-json">{
+  &quot;trip_type&quot;: &quot;rinjani&quot;,
+  &quot;destination_id&quot;: 4,
+  &quot;guide_id&quot;: 1,
+  &quot;start_date&quot;: &quot;2026-05-10&quot;,
+  &quot;participants_count&quot;: 3,
+  &quot;participant_names&quot;: [&quot;Andi&quot;, &quot;Budi&quot;, &quot;Citra&quot;],
+  &quot;meeting_point&quot;: &quot;Sembalun Lawang&quot;,
+  &quot;customer_name&quot;: &quot;Andi&quot;,
+  &quot;customer_phone&quot;: &quot;+62 812 3456 7890&quot;,
+  &quot;customer_email&quot;: &quot;andi@email.com&quot;,
+  &quot;notes&quot;: &quot;Butuh porter tambahan&quot;
+}</code></pre>
+<p>Backend should automatically set:</p>
+<pre><code class="language-text">end_date = start_date + 2 days
+duration_days = 3</code></pre>
+<h3>Custom Trip</h3>
+<pre><code class="language-json">{
+  &quot;trip_type&quot;: &quot;custom&quot;,
+  &quot;destination_ids&quot;: [5, 6, 9],
+  &quot;guide_id&quot;: 3,
+  &quot;start_date&quot;: &quot;2026-05-10&quot;,
+  &quot;duration_days&quot;: 4,
+  &quot;participants_count&quot;: 2,
+  &quot;participant_names&quot;: [&quot;Andi&quot;, &quot;Budi&quot;],
+  &quot;meeting_point&quot;: &quot;Hotel di Mataram&quot;,
+  &quot;customer_name&quot;: &quot;Andi&quot;,
+  &quot;customer_phone&quot;: &quot;+62 812 3456 7890&quot;,
+  &quot;customer_email&quot;: &quot;andi@email.com&quot;,
+  &quot;notes&quot;: &quot;Ingin itinerary santai&quot;
+}</code></pre>
+<h2>Filament Admin Resources</h2>
+<p>Create these Filament resources:</p>
+<pre><code class="language-text">DestinationResource
+GuideResource
+BookingResource
+UserResource
+TripTypeResource
+CategoryResource
+TestimonialResource
+GalleryImageResource</code></pre>
+<h3>BookingResource</h3>
+<p>Admin should be able to:</p>
+<ul>
+<li>View booking details</li>
+<li>See customer contact</li>
+<li>See participant names</li>
+<li>See selected destination(s)</li>
+<li>See selected guide</li>
+<li>Change booking status</li>
+<li>Add confirmed total for Custom Trip</li>
+<li>Add internal notes</li>
+</ul>
+<h3>DestinationResource</h3>
+<p>Admin should be able to:</p>
+<ul>
+<li>Create/edit destinations</li>
+<li>Upload image</li>
+<li>Set city</li>
+<li>Set category</li>
+<li>Set trip type</li>
+<li>Set price</li>
+<li>Set duration</li>
+<li>Add highlights</li>
+<li>Add itinerary days and activities</li>
+<li>Activate/deactivate destination</li>
+</ul>
+<h3>GuideResource</h3>
+<p>Admin should be able to:</p>
+<ul>
+<li>Create/edit guide profile</li>
+<li>Upload avatar and cover image</li>
+<li>Set specialty</li>
+<li>Set languages</li>
+<li>Add certifications</li>
+<li>Connect guide to destinations</li>
+<li>Manage availability</li>
+<li>Activate/deactivate guide</li>
+</ul>
+<h2>Frontend Component Plan</h2>
+<p>Convert the current HTML into components.</p>
+<p>Suggested components:</p>
+<pre><code class="language-text">Layout
+Navbar
+MobileDrawer
+BottomNav
+Footer
+Toast
+
+HomeHero
+DestinationCard
+DestinationModal
+CatalogFilters
+TripTypeTabs
+
+BookingTripTypeSelector
+BookingStepBar
+BookingDestinationStep
+BookingGuideStep
+BookingDetailStep
+BookingCustomerStep
+BookingSummaryStep
+ParticipantNameFields
+
+GuideCard
+GuideModal
+ProfileTabs
+AuthLayout</code></pre>
+<h2>Suggested Folder Structure</h2>
+<p>For Laravel + Inertia + React:</p>
+<pre><code class="language-text">app/
+  Models/
+  Http/
+    Controllers/
+      Api/
+      Web/
+  Filament/
+    Resources/
+
+database/
+  migrations/
+  seeders/
+
+resources/
+  js/
+    Components/
+    Layouts/
+    Pages/
+      Home.jsx
+      Catalog.jsx
+      Booking.jsx
+      TourGuides.jsx
+      About.jsx
+      Profile.jsx
+
+routes/
+  web.php
+  api.php
+
+storage/
+  app/public/</code></pre>
+<p>For separate React frontend + Laravel API:</p>
+<pre><code class="language-text">frontend/
+  src/
+    components/
+    pages/
+    services/
+    hooks/
+    styles/
+
+backend/
+  app/
+  database/
+  routes/
+  config/</code></pre>
+<h2>Implementation Roadmap</h2>
+<h3>Phase 1: Backend Foundation</h3>
+<p>1. Create Laravel project. 2. Configure PostgreSQL. 3. Create migrations. 4. Create models and relationships. 5. Seed sample destinations and guides from the current HTML data.</p>
+<h3>Phase 2: Filament Admin</h3>
+<p>1. Install Filament. 2. Create admin user. 3. Create resources for destinations, guides, bookings, categories, trip types. 4. Add file upload for images. 5. Add booking status management.</p>
+<h3>Phase 3: Frontend Conversion</h3>
+<p>1. Break the HTML into reusable components. 2. Rebuild the pages using frontend framework. 3. Replace hardcoded arrays with API calls. 4. Keep the current visual design as close as possible.</p>
+<h3>Phase 4: Booking Integration</h3>
+<p>1. Submit booking form to backend. 2. Store booking in PostgreSQL. 3. Store participant names. 4. Store custom trip destinations. 5. Return booking code after successful submit.</p>
+<h3>Phase 5: Customer Account</h3>
+<p>1. Add register/login. 2. Add profile page. 3. Add booking history. 4. Add OTP later if needed.</p>
+<h3>Phase 6: Notifications</h3>
+<p>1. Email admin after new booking. 2. Email customer booking confirmation. 3. Add WhatsApp notification integration later.</p>
+<h2>Important Notes</h2>
+<ul>
+<li>Do not store guide pricing.</li>
+<li>Guide is included in the trip price.</li>
+<li>Rinjani is fixed to 3 days 2 nights unless the business later supports more packages.</li>
+<li>Custom Trip pricing should be confirmed manually by admin.</li>
+<li>Participant names should be stored separately in <code>booking_participants</code>.</li>
+<li>Custom Trip destinations should be stored in <code>booking_destinations</code>.</li>
+</ul>
+</body>
+</html>

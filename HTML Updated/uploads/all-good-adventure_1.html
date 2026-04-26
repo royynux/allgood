@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Good Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#E8490F; --primary-dark:#C93D0A; --primary-light:#FFF0EB;
+  --dark:#0F1B2D; --dark-2:#1D2A3A; --body:#4B5563; --body-2:#9CA3AF;
+  --stroke:#DFE4EA; --bg:#F8F9FB; --white:#FFFFFF;
+  --success:#16A34A; --warning:#D97706; --danger:#DC2626;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px;
+  --sh-sm:0 1px 3px rgba(0,0,0,.08);
+  --sh-md:0 4px 16px rgba(0,0,0,.10);
+  --sh-lg:0 8px 32px rgba(0,0,0,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--dark)}
+
+/* ── PAGE ROUTER ── */
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+
+/* ── NAVBAR ── */
+.navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--stroke);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px}
+.navbar-logo{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;color:var(--dark);text-decoration:none;cursor:pointer;flex-shrink:0}
+.logo-mark{width:38px;height:38px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.navbar-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.navbar-links a{font-size:13.5px;font-weight:500;color:var(--body);text-decoration:none;padding:8px 11px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s;white-space:nowrap}
+.navbar-links a:hover,.navbar-links a.active{color:var(--primary);background:var(--primary-light)}
+.navbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-ghost{background:none;border:1.5px solid var(--stroke);color:var(--dark);font-family:var(--font);font-size:13.5px;font-weight:600;padding:8px 18px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+.btn-primary{background:var(--primary);border:none;color:#fff;font-family:var(--font);font-size:13.5px;font-weight:700;padding:9px 20px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,73,15,.35)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+.hamburger span{display:block;width:22px;height:2.5px;background:var(--dark);border-radius:2px;transition:all .3s}
+
+/* ── DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;right:-320px;top:0;bottom:0;width:290px;background:var(--white);z-index:201;padding:20px;transition:right .3s ease;overflow-y:auto}
+.drawer.open{right:0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.drawer-close{background:none;border:1px solid var(--stroke);width:32px;height:32px;border-radius:8px;font-size:16px;cursor:pointer;color:var(--body)}
+.drawer-links{display:flex;flex-direction:column;gap:3px}
+.drawer-links a{font-size:15px;font-weight:500;color:var(--dark);text-decoration:none;padding:12px 14px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:10px}
+.drawer-links a:hover{background:var(--bg);color:var(--primary)}
+.drawer-btns{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid var(--stroke)}
+.drawer-btns button{width:100%;padding:12px}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--stroke);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.bottom-nav-inner{display:flex;justify-content:space-around}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 10px;color:var(--body-2);font-family:var(--font);font-size:10.5px;font-weight:500;transition:color .2s}
+.bnav-item.active{color:var(--primary)}
+.bnav-icon{font-size:19px;line-height:1}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:14px 20px;border-radius:var(--r-sm);font-size:14px;font-weight:600;z-index:999;display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;box-shadow:var(--sh-lg)}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ══════════════════════════════════════
+   PAGE: BERANDA
+══════════════════════════════════════ */
+.hero{min-height:640px;position:relative;overflow:hidden;display:flex;align-items:center}
+.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&q=80');background-size:cover;background-position:center;opacity:.38}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,27,45,.97) 35%,rgba(15,27,45,.25) 100%)}
+.hero-content{position:relative;z-index:1;padding:90px 5%;max-width:660px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,73,15,.18);border:1px solid rgba(232,73,15,.4);color:#FF8A65;padding:6px 14px;border-radius:50px;font-size:12.5px;font-weight:700;margin-bottom:22px;letter-spacing:.3px}
+.hero h1{font-size:clamp(34px,5vw,62px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:20px}
+.hero h1 span{color:var(--primary)}
+.hero p{font-size:16.5px;color:rgba(255,255,255,.72);line-height:1.75;margin-bottom:34px;max-width:460px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-hero{background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:15.5px;font-weight:700;padding:14px 28px;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:all .2s}
+.btn-hero:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,73,15,.4)}
+.btn-hero-ol{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);font-family:var(--font);font-size:15.5px;font-weight:600;padding:14px 28px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
+.btn-hero-ol:hover{background:rgba(255,255,255,.18)}
+.hero-stats{display:flex;gap:36px;margin-top:48px;flex-wrap:wrap}
+.hs-num{font-size:28px;font-weight:800;color:#fff}
+.hs-label{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+
+/* sections */
+.section{padding:80px 5%}
+.sec-label{font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.sec-title{font-size:clamp(24px,3.5vw,38px);font-weight:800;color:var(--dark);line-height:1.2}
+.sec-sub{font-size:16px;color:var(--body);line-height:1.75;margin-top:14px}
+.sec-hdr{margin-bottom:52px}
+.sec-hdr-flex{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:16px}
+
+/* why */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.why-imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wi{border-radius:var(--r-lg);overflow:hidden}
+.wi img{width:100%;height:195px;object-fit:cover;display:block}
+.wi.tall img{height:248px;margin-top:38px}
+.why-list{display:flex;flex-direction:column;gap:22px}
+.why-item{display:flex;gap:14px;align-items:flex-start}
+.why-icon{width:46px;height:46px;background:var(--primary-light);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.why-item h4{font-size:15.5px;font-weight:700;color:var(--dark);margin-bottom:5px}
+.why-item p{font-size:13.5px;color:var(--body);line-height:1.65}
+
+/* toggle tabs */
+.bg-gray{background:var(--bg)}
+.toggle-wrap{display:inline-flex;background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-sm);padding:4px;margin-bottom:36px}
+.ttab{padding:10px 26px;border-radius:6px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--body);transition:all .2s}
+.ttab.active{background:var(--primary);color:#fff}
+.trips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:22px}
+
+/* trip card */
+.trip-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);overflow:hidden;transition:all .25s;cursor:pointer}
+.trip-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:transparent}
+.tc-img{position:relative;height:195px;overflow:hidden}
+.tc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.trip-card:hover .tc-img img{transform:scale(1.06)}
+.tc-badge-status{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px;color:#fff}
+.tc-badge-dur{position:absolute;top:12px;right:12px;background:rgba(15,27,45,.8);color:#fff;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:50px}
+.tc-body{padding:16px}
+.tc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;background:var(--bg);color:var(--body);border:1px solid var(--stroke)}
+.tc-title{font-size:15.5px;font-weight:700;color:var(--dark);margin-bottom:9px}
+.tc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:11px;border-top:1px solid var(--stroke)}
+.tc-price{font-size:15.5px;font-weight:800;color:var(--primary)}
+.tc-price span{font-size:11.5px;font-weight:500;color:var(--body-2)}
+.btn-book{background:var(--primary-light);color:var(--primary);border:none;font-family:var(--font);font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
+.btn-book:hover{background:var(--primary);color:#fff}
+
+/* steps */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:26px 22px;transition:all .25s}
+.step-card:hover{box-shadow:var(--sh-md);border-color:var(--primary)}
+.step-num{width:42px;height:42px;background:var(--primary);color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;margin-bottom:14px}
+.step-card h4{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:7px}
+.step-card p{font-size:13px;color:var(--body);line-height:1.65}
+
+/* gallery */
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.gal-item{border-radius:var(--r-md);overflow:hidden}
+.gal-item img{width:100%;height:178px;object-fit:cover;display:block;transition:transform .4s}
+.gal-item:hover img{transform:scale(1.07)}
+.gal-item.tall img{height:366px}
+
+/* testimonials */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.testi-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:26px}
+.testi-stars{color:#F59E0B;font-size:15px;margin-bottom:13px}
+.testi-text{font-size:13.5px;color:var(--body);line-height:1.75;margin-bottom:18px}
+.testi-author{display:flex;align-items:center;gap:11px}
+.testi-av{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.testi-av img{width:100%;height:100%;object-fit:cover}
+.testi-name{font-size:13.5px;font-weight:700;color:var(--dark)}
+.testi-role{font-size:12px;color:var(--body-2)}
+
+/* footer */
+.footer{background:var(--dark);color:rgba(255,255,255,.65);padding:64px 5% 32px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px}
+.footer-brand h3{color:#fff;font-size:19px;font-weight:800;margin-bottom:13px}
+.footer-brand p{font-size:13.5px;line-height:1.75;margin-bottom:22px}
+.btn-wa{background:#25D366;color:#fff;border:none;font-family:var(--font);font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.footer-col h4{color:#fff;font-size:13.5px;font-weight:700;margin-bottom:14px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-col ul li a{color:rgba(255,255,255,.55);text-decoration:none;font-size:13.5px;cursor:pointer;transition:color .2s}
+.footer-col ul li a:hover{color:#fff}
+.footer-btm{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;flex-wrap:wrap;gap:10px}
+
+/* ══════════════════════════════════════
+   PAGE: KATALOG (LISTING)
+══════════════════════════════════════ */
+.breadcrumb{padding:16px 5%;background:var(--bg);border-bottom:1px solid var(--stroke)}
+.breadcrumb span{font-size:13px;color:var(--body-2)}
+.breadcrumb a{color:var(--primary);cursor:pointer;text-decoration:none}
+.listing-layout{display:grid;grid-template-columns:272px 1fr;gap:28px;padding:36px 5%;max-width:1440px;margin:0 auto}
+.filter-sidebar{position:sticky;top:86px;height:fit-content}
+.filter-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:22px}
+.filter-card h3{font-size:15.5px;font-weight:700;color:var(--dark);margin-bottom:18px;padding-bottom:13px;border-bottom:1px solid var(--stroke)}
+.fg{margin-bottom:20px}
+.fg label{display:block;font-size:12.5px;font-weight:600;color:var(--dark);margin-bottom:7px}
+.fi{width:100%;padding:10px 13px;border:1.5px solid var(--stroke);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--dark);background:var(--white);transition:border-color .2s;outline:none}
+.fi:focus{border-color:var(--primary)}
+.pill-group{display:flex;flex-wrap:wrap;gap:7px}
+.pill{padding:7px 13px;border:1.5px solid var(--stroke);border-radius:50px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--body);transition:all .2s;background:var(--white);font-family:var(--font)}
+.pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pill:hover:not(.active){border-color:var(--primary);color:var(--primary)}
+.btn-apply{width:100%;background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:13.5px;font-weight:700;padding:12px;border-radius:var(--r-sm);cursor:pointer;margin-top:6px;transition:background .2s}
+.btn-apply:hover{background:var(--primary-dark)}
+.listing-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.listing-hdr h2{font-size:21px;font-weight:800;color:var(--dark)}
+.listing-count{font-size:13px;color:var(--body-2);margin-top:2px}
+.trips-grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:18px}
+
+/* ══════════════════════════════════════
+   PAGE: PRIVATE TRIP BOOKING
+══════════════════════════════════════ */
+.form-page{padding:36px 5%;max-width:1060px;margin:0 auto}
+.form-page h2{font-size:26px;font-weight:800;color:var(--dark);margin-bottom:6px}
+.form-page .subtitle{font-size:14.5px;color:var(--body);margin-bottom:28px}
+.info-banner{background:var(--primary-light);border:1px solid rgba(232,73,15,.22);border-radius:var(--r-md);padding:14px 18px;margin-bottom:24px;display:flex;align-items:flex-start;gap:12px;font-size:13.5px;color:#9A3412}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--dark);margin-bottom:7px}
+.req{color:var(--primary)}
+.iw{position:relative}
+.iw .ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--body-2);pointer-events:none}
+.iw input,.iw textarea,.iw select{width:100%;padding:11px 13px 11px 40px;border:1.5px solid var(--stroke);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--dark);background:var(--white);outline:none;transition:border-color .2s}
+.iw input:focus,.iw textarea:focus,.iw select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,73,15,.08)}
+.iw textarea{padding-top:11px;resize:vertical;min-height:96px}
+.date-range{display:flex;align-items:center;gap:8px}
+.date-range .iw{flex:1}
+.arrow-ico{font-size:17px;color:var(--body-2);flex-shrink:0}
+
+/* tour guide selection within booking */
+.guide-section{background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:22px;margin-top:6px}
+.guide-section h3{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:6px}
+.guide-section .gs-sub{font-size:13px;color:var(--body-2);margin-bottom:16px}
+.guide-cards-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.guide-card-mini{background:var(--white);border:2px solid var(--stroke);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all .2s;position:relative}
+.guide-card-mini.selected{border-color:var(--primary);background:var(--primary-light)}
+.guide-card-mini:hover:not(.selected){border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--sh-sm)}
+.gcm-av{width:48px;height:48px;border-radius:50%;overflow:hidden;margin-bottom:10px}
+.gcm-av img{width:100%;height:100%;object-fit:cover}
+.gcm-name{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:3px}
+.gcm-loc{font-size:12px;color:var(--body-2);margin-bottom:6px}
+.gcm-price{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:6px}
+.gcm-rating{font-size:12px;color:var(--body-2)}
+.gcm-check{position:absolute;top:10px;right:10px;width:20px;height:20px;background:var(--primary);border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:11px}
+.guide-card-mini.selected .gcm-check{display:flex}
+
+.trip-type-box{background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:22px;margin-top:8px}
+.trip-type-box h3{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:14px}
+.radio-group{display:flex;gap:18px;flex-wrap:wrap}
+.radio-item{display:flex;align-items:center;gap:8px;cursor:pointer}
+.radio-item input{accent-color:var(--primary);width:15px;height:15px}
+.radio-item span{font-size:13.5px;font-weight:500;color:var(--dark)}
+.form-submit-area{margin-top:28px;padding-top:22px;border-top:1px solid var(--stroke);display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.btn-outline{background:none;border:1.5px solid var(--stroke);color:var(--body);font-family:var(--font);font-size:13.5px;font-weight:600;padding:11px 24px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-submit{background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:14.5px;font-weight:700;padding:12px 32px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-submit:hover{background:var(--primary-dark)}
+
+/* ══════════════════════════════════════
+   PAGE: TOUR GUIDE
+══════════════════════════════════════ */
+.tg-hero{background:linear-gradient(135deg,#0F1B2D 0%,#1a3a5c 100%);padding:60px 5% 52px;position:relative;overflow:hidden}
+.tg-hero::before{content:'';position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=80');background-size:cover;background-position:center;opacity:.18}
+.tg-hero-inner{position:relative;z-index:1;max-width:700px}
+.tg-hero h1{font-size:clamp(28px,4vw,46px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:12px}
+.tg-hero p{font-size:15.5px;color:rgba(255,255,255,.7);line-height:1.75;max-width:520px}
+.tg-stats{display:flex;gap:36px;margin-top:30px;flex-wrap:wrap}
+.tg-stat-num{font-size:26px;font-weight:800;color:#fff}
+.tg-stat-label{font-size:12px;color:rgba(255,255,255,.55)}
+
+.tg-filters{padding:24px 5%;background:var(--white);border-bottom:1px solid var(--stroke);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.tg-filter-label{font-size:13px;font-weight:600;color:var(--dark);white-space:nowrap}
+.tg-filter-pills{display:flex;gap:8px;flex-wrap:wrap}
+
+.tg-grid-wrap{padding:40px 5%;max-width:1440px;margin:0 auto}
+.tg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:24px}
+
+/* tour guide card */
+.guide-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);overflow:hidden;transition:all .25s;cursor:pointer}
+.guide-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:transparent}
+.gc-cover{height:140px;position:relative;overflow:hidden;background:linear-gradient(135deg,#1D2A3A,#0F1B2D)}
+.gc-cover img{width:100%;height:100%;object-fit:cover;opacity:.6}
+.gc-specialty-badge{position:absolute;bottom:12px;left:12px;background:rgba(232,73,15,.9);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px}
+.gc-body{padding:18px}
+.gc-header{display:flex;align-items:flex-start;gap:12px;margin-top:-38px;margin-bottom:12px}
+.gc-avatar{width:64px;height:64px;border-radius:50%;border:3px solid #fff;overflow:hidden;flex-shrink:0;background:var(--bg)}
+.gc-avatar img{width:100%;height:100%;object-fit:cover}
+.gc-verified{width:18px;height:18px;background:var(--success);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;margin-left:4px;vertical-align:middle}
+.gc-name{font-size:16px;font-weight:800;color:var(--dark);margin-bottom:2px}
+.gc-location{font-size:12.5px;color:var(--body-2)}
+.gc-rating-row{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.gc-stars{color:#F59E0B;font-size:13px}
+.gc-rating-num{font-size:13px;font-weight:700;color:var(--dark)}
+.gc-rating-count{font-size:12px;color:var(--body-2)}
+.gc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.gc-bio{font-size:13px;color:var(--body);line-height:1.65;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gc-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;padding:14px;background:var(--bg);border-radius:var(--r-sm)}
+.gc-stat-item{text-align:center}
+.gc-stat-val{font-size:14px;font-weight:800;color:var(--dark)}
+.gc-stat-lbl{font-size:11px;color:var(--body-2);margin-top:2px}
+.gc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--stroke)}
+.gc-price{font-size:18px;font-weight:800;color:var(--primary)}
+.gc-price span{font-size:12px;font-weight:400;color:var(--body-2)}
+.gc-languages{font-size:12px;color:var(--body-2);margin-bottom:12px}
+.btn-hire{background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:13px;font-weight:700;padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
+.btn-hire:hover{background:var(--primary-dark)}
+
+/* guide detail modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--white);border-radius:var(--r-xl);max-width:680px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-cover{height:180px;position:relative;overflow:hidden}
+.modal-cover img{width:100%;height:100%;object-fit:cover}
+.modal-cover-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent)}
+.modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;background:rgba(0,0,0,.5);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:24px 28px}
+.modal-avatar-row{display:flex;align-items:flex-end;gap:16px;margin-top:-48px;margin-bottom:16px}
+.modal-avatar{width:80px;height:80px;border-radius:50%;border:4px solid #fff;overflow:hidden;flex-shrink:0}
+.modal-avatar img{width:100%;height:100%;object-fit:cover}
+.modal-name{font-size:22px;font-weight:800;color:var(--dark)}
+.modal-loc{font-size:13.5px;color:var(--body-2)}
+.modal-section-title{font-size:14px;font-weight:700;color:var(--dark);margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--stroke)}
+.modal-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.modal-badge{padding:5px 12px;border-radius:50px;font-size:12px;font-weight:600;background:var(--bg);color:var(--body);border:1px solid var(--stroke)}
+.modal-schedule{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.schedule-item{background:var(--bg);border-radius:var(--r-sm);padding:12px 14px}
+.schedule-day{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:3px}
+.schedule-time{font-size:12px;color:var(--body-2)}
+.modal-cta{display:flex;gap:12px;margin-top:22px;padding-top:20px;border-top:1px solid var(--stroke)}
+.btn-modal-wa{background:#25D366;color:#fff;border:none;font-family:var(--font);font-size:13.5px;font-weight:700;padding:12px 20px;border-radius:var(--r-sm);cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-modal-hire{background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:13.5px;font-weight:700;padding:12px 20px;border-radius:var(--r-sm);cursor:pointer;flex:1;transition:all .2s}
+.btn-modal-hire:hover{background:var(--primary-dark)}
+
+/* ══════════════════════════════════════
+   PAGE: TENTANG KAMI
+══════════════════════════════════════ */
+.about-hero{background:linear-gradient(155deg,#0F1B2D 0%,#1a3a5c 60%,#0F1B2D 100%);padding:80px 5% 72px;position:relative;overflow:hidden;text-align:center}
+.about-hero::before{content:'';position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1527004013197-933c4bb611b3?w=1200&q=80');background-size:cover;background-position:center;opacity:.15}
+.about-hero-inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
+.about-hero h1{font-size:clamp(30px,4.5vw,52px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:16px}
+.about-hero h1 span{color:var(--primary)}
+.about-hero p{font-size:16px;color:rgba(255,255,255,.72);line-height:1.8;max-width:560px;margin:0 auto 36px}
+.about-stats-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.as-num{font-size:36px;font-weight:800;color:#fff}
+.as-label{font-size:13px;color:rgba(255,255,255,.55);margin-top:4px}
+
+.about-story{padding:80px 5%}
+.about-story-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.about-story-img{border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-lg)}
+.about-story-img img{width:100%;display:block;object-fit:cover;height:420px}
+.about-story h2{font-size:clamp(26px,3.5vw,36px);font-weight:800;color:var(--dark);line-height:1.25;margin-bottom:16px}
+.about-story p{font-size:15px;color:var(--body);line-height:1.85;margin-bottom:18px}
+
+.about-values{background:var(--bg);padding:80px 5%}
+.values-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;margin-top:48px}
+.value-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:28px 24px;text-align:center;transition:all .25s}
+.value-card:hover{transform:translateY(-4px);box-shadow:var(--sh-md)}
+.value-icon{font-size:36px;margin-bottom:14px}
+.value-card h4{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:8px}
+.value-card p{font-size:13.5px;color:var(--body);line-height:1.65}
+
+.about-team{padding:80px 5%}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;margin-top:48px}
+.team-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);overflow:hidden;text-align:center;padding-bottom:22px;transition:all .25s}
+.team-card:hover{transform:translateY(-4px);box-shadow:var(--sh-md)}
+.team-cover{height:100px;position:relative;overflow:hidden}
+.team-cover img{width:100%;height:100%;object-fit:cover}
+.team-av{width:72px;height:72px;border-radius:50%;border:3px solid #fff;overflow:hidden;margin:-36px auto 12px;position:relative}
+.team-av img{width:100%;height:100%;object-fit:cover}
+.team-name{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.team-role{font-size:12.5px;color:var(--primary);font-weight:600;margin-bottom:8px}
+.team-bio{font-size:12.5px;color:var(--body);line-height:1.6;padding:0 16px}
+
+.about-cta{background:var(--primary);padding:64px 5%;text-align:center}
+.about-cta h2{font-size:clamp(24px,3.5vw,38px);font-weight:800;color:#fff;margin-bottom:14px}
+.about-cta p{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:30px}
+.btn-cta-white{background:#fff;color:var(--primary);border:none;font-family:var(--font);font-size:15px;font-weight:700;padding:14px 32px;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+
+/* ══════════════════════════════════════
+   AUTH PAGES
+══════════════════════════════════════ */
+.auth-layout{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.auth-visual{background:linear-gradient(160deg,#0F1B2D,#1a3a5c);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:48px}
+.auth-visual-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80');background-size:cover;background-position:center;opacity:.28}
+.auth-visual-logo{position:absolute;top:32px;left:48px;z-index:1;display:flex;align-items:center;gap:10px;color:#fff;font-size:19px;font-weight:800}
+.auth-visual-content{position:relative;z-index:1}
+.auth-visual h2{color:#fff;font-size:30px;font-weight:800;line-height:1.25;margin-bottom:10px}
+.auth-visual p{color:rgba(255,255,255,.68);font-size:14.5px;line-height:1.7}
+.auth-visual-stats{display:flex;gap:28px;margin-top:28px}
+.avs-num{color:#fff;font-size:22px;font-weight:800}
+.avs-label{color:rgba(255,255,255,.55);font-size:11.5px;margin-top:2px}
+.auth-panel{display:flex;align-items:center;justify-content:center;padding:48px;background:var(--white)}
+.auth-inner{width:100%;max-width:390px}
+.auth-inner h1{font-size:34px;font-weight:800;color:var(--dark);margin-bottom:7px}
+.auth-sub{font-size:14.5px;color:var(--body);line-height:1.65;margin-bottom:32px}
+.aig{margin-bottom:17px}
+.aig label{display:block;font-size:12.5px;font-weight:600;color:var(--dark);margin-bottom:6px}
+.auth-input{width:100%;padding:12px 15px;border:1.5px solid var(--stroke);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--dark);outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,73,15,.08)}
+.btn-auth{width:100%;background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:14.5px;font-weight:700;padding:13px;border-radius:var(--r-sm);cursor:pointer;margin-top:6px;transition:all .2s}
+.btn-auth:hover{background:var(--primary-dark)}
+.auth-switch{text-align:center;margin-top:18px;font-size:13.5px;color:var(--body)}
+.auth-switch a{color:var(--primary);font-weight:600;cursor:pointer;text-decoration:none}
+.otp-inputs{display:flex;gap:11px;margin:26px 0}
+.otp-input{flex:1;height:68px;text-align:center;font-size:30px;font-weight:800;border:2px solid var(--stroke);border-radius:var(--r-md);font-family:var(--font);color:var(--dark);outline:none;transition:border-color .2s;background:var(--bg)}
+.otp-input:focus{border-color:var(--primary);background:var(--white);box-shadow:0 0 0 3px rgba(232,73,15,.08)}
+
+/* ══════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════ */
+.profile-layout{display:grid;grid-template-columns:272px 1fr;gap:28px;padding:36px 5%;max-width:1060px;margin:0 auto}
+.prof-sidebar{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:26px 18px;position:sticky;top:86px;height:fit-content}
+.prof-av-wrap{text-align:center;padding-bottom:22px;border-bottom:1px solid var(--stroke);margin-bottom:18px}
+.prof-av{width:76px;height:76px;border-radius:50%;overflow:hidden;margin:0 auto 11px;border:3px solid var(--primary-light)}
+.prof-av img{width:100%;height:100%;object-fit:cover}
+.prof-name{font-size:16px;font-weight:700;color:var(--dark)}
+.prof-email{font-size:12.5px;color:var(--body-2);margin-top:4px}
+.prof-menu{display:flex;flex-direction:column;gap:3px}
+.pmi{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:var(--r-sm);cursor:pointer;font-size:13.5px;font-weight:500;color:var(--body);transition:all .2s;border:none;background:none;font-family:var(--font);width:100%;text-align:left}
+.pmi:hover{background:var(--bg);color:var(--dark)}
+.pmi.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.pmi.danger{color:var(--danger)}
+.pmi.danger:hover{background:#FEF2F2}
+.pmi-ico{font-size:17px;width:22px;text-align:center}
+.prof-content{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:28px}
+.prof-content h2{font-size:19px;font-weight:800;color:var(--dark);margin-bottom:5px}
+.pcss{font-size:13.5px;color:var(--body-2);margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--stroke)}
+.pir{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--stroke);flex-wrap:wrap;gap:8px}
+.pir:last-child{border-bottom:none}
+.pir-label{font-size:12.5px;color:var(--body-2)}
+.pir-value{font-size:13.5px;font-weight:600;color:var(--dark)}
+
+/* skeleton */
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--r-sm)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* empty state */
+.empty-state{text-align:center;padding:72px 20px}
+.empty-icon{font-size:58px;margin-bottom:18px}
+.empty-state h3{font-size:19px;font-weight:700;color:var(--dark);margin-bottom:9px}
+.empty-state p{font-size:14.5px;color:var(--body);max-width:300px;margin:0 auto 22px}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media(max-width:1024px){
+  .why-grid{grid-template-columns:1fr}
+  .why-imgs{display:none}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .steps-grid{grid-template-columns:repeat(2,1fr)}
+  .gallery-grid{grid-template-columns:repeat(3,1fr)}
+  .about-story-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .navbar-links,.navbar-actions{display:none}
+  .hamburger{display:flex}
+  .bottom-nav{display:block}
+  body{padding-bottom:68px}
+  .hero{min-height:520px}
+  .hero-content{padding:60px 5%}
+  .section{padding:52px 5%}
+  .trips-grid{grid-template-columns:1fr 1fr}
+  .steps-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .gal-item.tall img{height:178px}
+  .testi-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .listing-layout{grid-template-columns:1fr}
+  .filter-sidebar{position:static}
+  .form-grid{grid-template-columns:1fr}
+  .auth-layout{grid-template-columns:1fr}
+  .auth-visual{display:none}
+  .auth-panel{padding:32px 22px;min-height:100vh;align-items:flex-start;padding-top:52px}
+  .profile-layout{grid-template-columns:1fr}
+  .prof-sidebar{position:static}
+  .form-submit-area{flex-direction:column}
+  .btn-submit,.btn-outline{width:100%;text-align:center;justify-content:center}
+  .modal-schedule{grid-template-columns:1fr}
+  .modal-cta{flex-direction:column}
+  .about-stats-row{gap:28px}
+}
+@media(max-width:480px){
+  .trips-grid{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+  .hero-actions{flex-direction:column}
+  .btn-hero,.btn-hero-ol{width:100%;text-align:center;justify-content:center}
+  .otp-inputs{gap:7px}
+  .otp-input{height:58px;font-size:26px}
+  .guide-cards-mini{grid-template-columns:1fr 1fr}
+  .tg-grid{grid-template-columns:1fr}
+  .team-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">✓ Request berhasil dikirim! Kami akan menghubungi kamu dalam 1×24 jam.</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div style="display:flex;align-items:center;gap:10px"><div class="logo-mark">🏔️</div><span style="font-weight:800;font-size:15px">All Good Adventure</span></div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-links">
+    <a onclick="nav('beranda');closeDrawer()">🏠 Beranda</a>
+    <a onclick="nav('katalog');closeDrawer()">🗺️ Katalog</a>
+    <a onclick="nav('booking');closeDrawer()">🎒 Layanan Private Trip</a>
+    <a onclick="nav('tourguide');closeDrawer()">👤 Tour Guide</a>
+    <a onclick="nav('tentang');closeDrawer()">ℹ️ Tentang Kami</a>
+  </div>
+  <div class="drawer-btns">
+    <button class="btn-ghost" onclick="nav('login');closeDrawer()">Login</button>
+    <button class="btn-primary" onclick="nav('register');closeDrawer()">✨ Register</button>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div class="modal-overlay" id="guideModal" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: BERANDA
+════════════════════════════════════════════════ -->
+<div class="page active" id="page-beranda">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a class="active" onclick="nav('beranda')">Beranda</a>
+      <a onclick="nav('katalog')">Katalog</a>
+      <a onclick="nav('booking')">Layanan Private Trip</a>
+      <a onclick="nav('tourguide')">Tour Guide</a>
+      <a onclick="nav('tentang')">Tentang Kami</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn-ghost" onclick="nav('register')">Register</button>
+      <button class="btn-primary" onclick="nav('login')">Login →</button>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div><div class="hero-grad"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🌄 Platform Trip Adventure #1 Indonesia</div>
+      <h1>Kamu Pusing?<br><span>Yuk Healing</span><br>Bareng Kami!</h1>
+      <p>Temukan ratusan pilihan trip seru — dari pendakian gunung, island hopping, hingga private getaway eksklusif untuk kamu dan orang-orang terkasih.</p>
+      <div class="hero-actions">
+        <button class="btn-hero" onclick="nav('katalog')">Lihat Semua Trip →</button>
+        <button class="btn-hero-ol" onclick="nav('booking')">Private Trip</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hs-num">500+</div><div class="hs-label">Trip Tersedia</div></div>
+        <div><div class="hs-num">10K+</div><div class="hs-label">Traveler Puas</div></div>
+        <div><div class="hs-num">50+</div><div class="hs-label">Destinasi</div></div>
+        <div><div class="hs-num">48</div><div class="hs-label">Tour Guide Aktif</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="why-grid">
+      <div>
+        <div class="sec-label">Kenapa Kami</div>
+        <div class="sec-title">Kenapa Memilih<br>All Good Adventure?</div>
+        <div class="sec-sub">Kami hadir untuk memastikan setiap perjalananmu penuh kenangan, aman, dan menyenangkan bersama tour guide terbaik kami.</div>
+        <div class="why-list" style="margin-top:32px">
+          <div class="why-item"><div class="why-icon">🗺️</div><div><h4>Banyak Pilihan Destinasi</h4><p>Dari Sabang sampai Merauke, ratusan destinasi menakjubkan dengan pemandu berpengalaman siap menemani.</p></div></div>
+          <div class="why-item"><div class="why-icon">👤</div><div><h4>Tour Guide Bersertifikat</h4><p>Semua guide kami telah tersertifikasi, berpengalaman, dan siap membuat perjalananmu luar biasa.</p></div></div>
+          <div class="why-item"><div class="why-icon">💰</div><div><h4>Harga Transparan</h4><p>Tidak ada biaya tersembunyi. Harga sudah termasuk akomodasi, transportasi, dan jasa guide.</p></div></div>
+          <div class="why-item"><div class="why-icon">🛡️</div><div><h4>Keamanan Terjamin</h4><p>Semua trip dilengkapi asuransi perjalanan dan pemandu berlisensi resmi dari BNSP.</p></div></div>
+        </div>
+      </div>
+      <div class="why-imgs">
+        <div><div class="wi"><img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80" alt="gunung"></div></div>
+        <div><div class="wi tall"><img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=80" alt="pendakian"></div></div>
+        <div><div class="wi"><img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&q=80" alt="pantai"></div></div>
+        <div><div class="wi"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="puncak"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-gray">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="sec-label" style="display:block;text-align:center">Pilih Tripmu</div>
+      <div class="sec-title">Pilihan Trip untuk Kamu</div>
+    </div>
+    <div style="display:flex;justify-content:center;margin-bottom:36px">
+      <div class="toggle-wrap">
+        <button class="ttab active" id="tab-open" onclick="switchHomeTab('open')">Open Trip</button>
+        <button class="ttab" id="tab-private" onclick="switchHomeTab('private')">Private Trip</button>
+      </div>
+    </div>
+    <div class="trips-grid" id="home-trips"></div>
+    <div style="text-align:center;margin-top:36px">
+      <button class="btn-primary" onclick="nav('katalog')">Lihat Semua Trip →</button>
+    </div>
+  </section>
+
+  <section class="section bg-gray" style="background:var(--white)">
+    <div style="text-align:center" class="sec-hdr">
+      <div class="sec-label" style="display:block;text-align:center">Cara Pesan</div>
+      <div class="sec-title">Cara Pesan Trip Mudah & Cepat</div>
+      <div class="sec-sub" style="margin:14px auto 0;max-width:520px;text-align:center">Hanya 6 langkah sederhana untuk memulai petualanganmu bersama kami.</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">1</div><h4>Pilih Trip</h4><p>Browse ratusan pilihan trip dari menu katalog atau gunakan fitur pencarian dan filter.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h4>Cek Ketersediaan</h4><p>Klik cek ketersediaan untuk memilih tanggal keberangkatan yang masih ada seat-nya.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h4>Pilih Tour Guide</h4><p>Pilih tour guide favoritmu dari daftar guide bersertifikat kami sesuai spesialisasi dan budget.</p></div>
+      <div class="step-card"><div class="step-num">4</div><h4>Isi Data Peserta</h4><p>Lengkapi form data diri, jumlah peserta, dan tentukan meeting point terdekat.</p></div>
+      <div class="step-card"><div class="step-num">5</div><h4>Pilih Pembayaran</h4><p>Bayar menggunakan poin, wallet, transfer bank, atau metode lainnya.</p></div>
+      <div class="step-card"><div class="step-num">6</div><h4>Siap Berangkat! 🎉</h4><p>Selesaikan pembayaran sebelum batas waktu dan bersiaplah untuk petualangan tak terlupakan!</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-hdr-flex">
+      <div><div class="sec-label">Galeri</div><div class="sec-title">Mereka yang Pernah Ikut<br>Private Trip Kami</div></div>
+      <button class="btn-outline" onclick="nav('katalog')">Lihat Semua Trip</button>
+    </div>
+    <div class="gallery-grid">
+      <div class="gal-item tall"><img src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?w=400&q=80" alt="trip"></div>
+      <div><div class="gal-item" style="margin-bottom:11px"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" alt="trip"></div><div class="gal-item"><img src="https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=400&q=80" alt="trip"></div></div>
+      <div><div class="gal-item" style="margin-bottom:11px"><img src="https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=400&q=80" alt="trip"></div><div class="gal-item"><img src="https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=400&q=80" alt="trip"></div></div>
+      <div class="gal-item tall"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80" alt="bali"></div>
+    </div>
+  </section>
+
+  <section class="section bg-gray">
+    <div class="sec-hdr" style="text-align:center">
+      <div class="sec-label" style="display:block;text-align:center">Testimoni</div>
+      <div class="sec-title">Apa Kata Mereka Tentang<br>All Good Adventure?</div>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Trip ke Rinjani bersama AGA luar biasa! Guide sangat profesional, semua aman dan terjadwal dengan baik. Pengalaman yang tidak akan pernah saya lupakan!"</p><div class="testi-author"><div class="testi-av"><img src="https://i.pravatar.cc/100?img=1" alt="user"></div><div><div class="testi-name">Andi Pratama</div><div class="testi-role">Trip Rinjani — Jan 2025</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Private trip buat ulang tahun pacar jadi sangat spesial. Tim AGA sangat detail memperhatikan semua permintaan kami. Guide-nya juga asik banget. 10/10!"</p><div class="testi-author"><div class="testi-av"><img src="https://i.pravatar.cc/100?img=5" alt="user"></div><div><div class="testi-name">Sari Dewi</div><div class="testi-role">Private Trip Bali — Feb 2025</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★☆</div><p class="testi-text">"Company outing kami berjalan sangat lancar dan semua karyawan senang. Koordinasi dengan tim AGA sangat mudah, semua permintaan dipenuhi dengan cepat."</p><div class="testi-author"><div class="testi-av"><img src="https://i.pravatar.cc/100?img=8" alt="user"></div><div><div class="testi-name">Budi Santoso</div><div class="testi-role">Company Outing — Mar 2025</div></div></div></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>🏔️ All Good Adventure</h3>
+        <p>Platform trip adventure terpercaya di Indonesia. Kami hadir untuk membuat setiap perjalananmu tak terlupakan bersama guide terbaik.</p>
+        <button class="btn-wa">📱 Hubungi via WhatsApp</button>
+      </div>
+      <div class="footer-col"><h4>Layanan</h4><ul><li><a onclick="nav('katalog')">Katalog Trip</a></li><li><a onclick="nav('booking')">Layanan Private Trip</a></li><li><a onclick="nav('tourguide')">Tour Guide</a></li><li><a onclick="nav('tentang')">Tentang Kami</a></li></ul></div>
+      <div class="footer-col"><h4>Perusahaan</h4><ul><li><a onclick="nav('tentang')">Profil Perusahaan</a></li><li><a>Blog & Artikel</a></li><li><a>Karir</a></li><li><a>Kemitraan</a></li></ul></div>
+      <div class="footer-col"><h4>Bantuan</h4><ul><li><a>FAQ</a></li><li><a>Hubungi Kami</a></li><li><a>Syarat & Ketentuan</a></li><li><a>Kebijakan Privasi</a></li></ul></div>
+    </div>
+    <div class="footer-btm"><span>© 2025 All Good Adventure. Hak cipta dilindungi.</span><span>Dibuat dengan ❤️ di Indonesia</span></div>
+  </footer>
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item active" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item" onclick="nav('profile')"><span class="bnav-icon">👤</span>Profil</button>
+  </div></div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: KATALOG
+════════════════════════════════════════════════ -->
+<div class="page" id="page-katalog">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a onclick="nav('beranda')">Beranda</a>
+      <a class="active" onclick="nav('katalog')">Katalog</a>
+      <a onclick="nav('booking')">Layanan Private Trip</a>
+      <a onclick="nav('tourguide')">Tour Guide</a>
+      <a onclick="nav('tentang')">Tentang Kami</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn-ghost" onclick="nav('register')">Register</button>
+      <button class="btn-primary" onclick="nav('login')">Login →</button>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="breadcrumb"><span><a onclick="nav('beranda')">Beranda</a> › Katalog Trip</span></div>
+  <div class="listing-layout">
+    <aside class="filter-sidebar">
+      <div class="filter-card">
+        <h3>🔍 Filter Trip</h3>
+        <div class="fg"><label>Nama Trip</label><input type="text" class="fi" placeholder="Cari nama trip..." id="searchFilter" oninput="filterTrips()"></div>
+        <div class="fg"><label>Kota</label><select class="fi" id="kotaFilter" onchange="filterTrips()"><option>Semua Kota</option><option>Lombok</option><option>Bali</option><option>Yogyakarta</option><option>Raja Ampat</option><option>Labuan Bajo</option></select></div>
+        <div class="fg"><label>Kategori</label><select class="fi" id="kategoriFilter" onchange="filterTrips()"><option>Semua Kategori</option><option>Mountain</option><option>Beach</option><option>Island</option><option>Culture</option></select></div>
+        <div class="fg"><label>Jenis Trip</label><div class="pill-group"><button class="pill active" id="pill-all" onclick="setJenis('all')">Semua</button><button class="pill" id="pill-open" onclick="setJenis('open')">Open</button><button class="pill" id="pill-private" onclick="setJenis('private')">Private</button></div></div>
+        <div class="fg"><label>Durasi Trip</label><div class="pill-group"><button class="pill active" id="dur-all" onclick="setDurasi('all')">Semua</button><button class="pill" id="dur-1" onclick="setDurasi('1')">1 Hari</button><button class="pill" id="dur-2" onclick="setDurasi('2')">2 Hari</button><button class="pill" id="dur-3" onclick="setDurasi('3')">3 Hari</button><button class="pill" id="dur-4" onclick="setDurasi('4')">4 Hari</button></div></div>
+        <button class="btn-apply" onclick="filterTrips()">TERAPKAN FILTER</button>
+        <button onclick="resetFilters()" style="width:100%;background:none;border:none;color:var(--body);font-family:var(--font);font-size:12.5px;padding:9px;cursor:pointer;margin-top:7px">Reset Filter</button>
+      </div>
+    </aside>
+    <div>
+      <div class="listing-hdr">
+        <div><h2>Semua Trip</h2><div class="listing-count" id="listingCount">Menampilkan 8 trip</div></div>
+        <select class="fi" style="width:auto;padding:8px 13px"><option>Terbaru</option><option>Harga Terendah</option><option>Harga Tertinggi</option><option>Terpopuler</option></select>
+      </div>
+      <div class="trips-grid-2" id="listingGrid"></div>
+    </div>
+  </div>
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item active" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item" onclick="nav('profile')"><span class="bnav-icon">👤</span>Profil</button>
+  </div></div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: BOOKING PRIVATE TRIP
+════════════════════════════════════════════════ -->
+<div class="page" id="page-booking">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a onclick="nav('beranda')">Beranda</a>
+      <a onclick="nav('katalog')">Katalog</a>
+      <a class="active" onclick="nav('booking')">Layanan Private Trip</a>
+      <a onclick="nav('tourguide')">Tour Guide</a>
+      <a onclick="nav('tentang')">Tentang Kami</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn-ghost" onclick="nav('register')">Register</button>
+      <button class="btn-primary" onclick="nav('login')">Login →</button>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="breadcrumb"><span><a onclick="nav('beranda')">Beranda</a> › <a onclick="nav('katalog')">Katalog</a> › Layanan Private Trip</span></div>
+  <div class="form-page">
+    <h2>Booking Layanan Private Trip</h2>
+    <p class="subtitle">Isi detail perjalanan privatmu dan tim kami akan menghubungimu dalam 1×24 jam.</p>
+    <div class="info-banner"><span style="font-size:19px;flex-shrink:0">ℹ️</span><span><strong>Layanan Private Trip</strong> — Perjalanan eksklusif yang dirancang khusus sesuai keinginan kamu. Minimal 2 orang, harga disesuaikan dengan destinasi, durasi, dan pilihan tour guide.</span></div>
+    <form onsubmit="submitBooking(event)">
+      <!-- STEP 1: PILIH DESTINASI -->
+      <div style="margin-bottom:22px;padding:18px 20px;background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r-lg)">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:4px">LANGKAH 1</div>
+        <div style="font-size:16px;font-weight:700;color:var(--dark);margin-bottom:14px">Pilih Destinasi Trip</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px" id="destinasiGrid">
+          <!-- filled by js -->
+        </div>
+      </div>
+
+      <!-- STEP 2: PILIH TOUR GUIDE -->
+      <div class="guide-section">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:4px">LANGKAH 2</div>
+        <h3>Pilih Tour Guide</h3>
+        <p class="gs-sub">Pilih tour guide terbaik yang sesuai dengan destinasi dan preferensimu.</p>
+        <div class="guide-cards-mini" id="guideGridMini"></div>
+        <div id="selectedGuideInfo" style="display:none;margin-top:14px;padding:14px 16px;background:var(--white);border:1.5px solid var(--primary);border-radius:var(--r-md);font-size:13.5px;color:var(--dark)"></div>
+      </div>
+
+      <!-- STEP 3: DATA PEMESANAN -->
+      <div style="margin-top:22px;padding:18px 20px;background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r-lg)">
+        <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:4px">LANGKAH 3</div>
+        <div style="font-size:16px;font-weight:700;color:var(--dark);margin-bottom:20px">Data Pemesanan</div>
+        <div class="form-grid">
+          <div>
+            <div class="form-group"><label>Nama Pemesan <span class="req">*</span></label><div class="iw"><span class="ico">👤</span><input type="text" placeholder="Nama lengkap kamu" required></div></div>
+            <div class="form-group"><label>Nomor Ponsel <span class="req">*</span></label><div class="iw"><span class="ico">📱</span><input type="tel" placeholder="+62 812 3456 7890" required></div></div>
+            <div class="form-group"><label>Email <span class="req">*</span></label><div class="iw"><span class="ico">✉️</span><input type="email" placeholder="nama@email.com" required></div></div>
+            <div class="form-group"><label>Jumlah Peserta <span class="req">*</span></label><div class="iw"><span class="ico">👥</span><input type="number" placeholder="Minimal 2 orang" min="2" required></div></div>
+            <div class="form-group"><label>Total Budget (opsional)</label><div class="iw"><span class="ico">💵</span><input type="text" placeholder="Rp 0.000.000"></div></div>
+          </div>
+          <div>
+            <div class="form-group"><label>Tanggal Berangkat & Pulang <span class="req">*</span></label><div class="date-range"><div class="iw"><span class="ico">📅</span><input type="date" required></div><span class="arrow-ico">→</span><div class="iw"><span class="ico">📅</span><input type="date" required></div></div></div>
+            <div class="form-group"><label>Meeting Point</label><div class="iw"><span class="ico">📍</span><input type="text" placeholder="Contoh: Bandara Lombok International"></div></div>
+            <div class="form-group"><label>Catatan / Permintaan Khusus</label><div class="iw" style="position:relative"><span class="ico" style="top:14px;transform:none">📝</span><textarea placeholder="Ceritakan keinginan trip impianmu di sini..." style="width:100%;padding:11px 13px 11px 40px;border:1.5px solid var(--stroke);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--dark);outline:none;resize:vertical;min-height:110px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--stroke)'"></textarea></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trip-type-box">
+        <h3>Jenis Trip</h3>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="tripType" value="private" checked><span>🎒 Private Trip</span></label>
+          <label class="radio-item"><input type="radio" name="tripType" value="open"><span>🗺️ Open Trip</span></label>
+          <label class="radio-item"><input type="radio" name="tripType" value="company"><span>🏢 Company Outing</span></label>
+        </div>
+      </div>
+      <div class="form-submit-area">
+        <button type="button" class="btn-outline" onclick="nav('beranda')">Batal</button>
+        <button type="submit" class="btn-submit">Kirim Permintaan ✈️</button>
+      </div>
+    </form>
+  </div>
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item active" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item" onclick="nav('profile')"><span class="bnav-icon">👤</span>Profil</button>
+  </div></div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: TOUR GUIDE
+════════════════════════════════════════════════ -->
+<div class="page" id="page-tourguide">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a onclick="nav('beranda')">Beranda</a>
+      <a onclick="nav('katalog')">Katalog</a>
+      <a onclick="nav('booking')">Layanan Private Trip</a>
+      <a class="active" onclick="nav('tourguide')">Tour Guide</a>
+      <a onclick="nav('tentang')">Tentang Kami</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn-ghost" onclick="nav('register')">Register</button>
+      <button class="btn-primary" onclick="nav('login')">Login →</button>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="tg-hero">
+    <div class="tg-hero-inner">
+      <div class="hero-badge" style="margin-bottom:18px">👤 Tim Profesional Kami</div>
+      <h1>Tour Guide Bersertifikat &amp; Berpengalaman</h1>
+      <p>Kenali guide-guide terbaik kami yang siap menemani dan memastikan setiap detik perjalananmu aman, menyenangkan, dan tak terlupakan.</p>
+      <div class="tg-stats">
+        <div><div class="tg-stat-num">48</div><div class="tg-stat-label">Guide Aktif</div></div>
+        <div><div class="tg-stat-num">4.9★</div><div class="tg-stat-label">Rata-rata Rating</div></div>
+        <div><div class="tg-stat-num">1.200+</div><div class="tg-stat-label">Trip Diselesaikan</div></div>
+        <div><div class="tg-stat-num">15+</div><div class="tg-stat-label">Tahun Pengalaman</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tg-filters">
+    <span class="tg-filter-label">Filter:</span>
+    <div class="tg-filter-pills">
+      <button class="pill active" id="tgf-all" onclick="filterGuides('all')">Semua</button>
+      <button class="pill" id="tgf-mountain" onclick="filterGuides('mountain')">Gunung</button>
+      <button class="pill" id="tgf-beach" onclick="filterGuides('beach')">Pantai &amp; Laut</button>
+      <button class="pill" id="tgf-culture" onclick="filterGuides('culture')">Budaya</button>
+      <button class="pill" id="tgf-island" onclick="filterGuides('island')">Island Hopping</button>
+    </div>
+    <input type="text" class="fi" placeholder="Cari nama guide..." id="guideSearch" oninput="filterGuides(currentGuideFilter)" style="width:220px;margin-left:auto">
+  </div>
+
+  <div class="tg-grid-wrap">
+    <div class="tg-grid" id="guideGrid"></div>
+  </div>
+
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item active" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item" onclick="nav('profile')"><span class="bnav-icon">👤</span>Profil</button>
+  </div></div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE: TENTANG KAMI
+════════════════════════════════════════════════ -->
+<div class="page" id="page-tentang">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a onclick="nav('beranda')">Beranda</a>
+      <a onclick="nav('katalog')">Katalog</a>
+      <a onclick="nav('booking')">Layanan Private Trip</a>
+      <a onclick="nav('tourguide')">Tour Guide</a>
+      <a class="active" onclick="nav('tentang')">Tentang Kami</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn-ghost" onclick="nav('register')">Register</button>
+      <button class="btn-primary" onclick="nav('login')">Login →</button>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="about-hero">
+    <div class="about-hero-inner">
+      <div class="hero-badge" style="margin:0 auto 20px">🏔️ Sejak 2018</div>
+      <h1>Kami adalah <span>All Good</span><br>Adventure</h1>
+      <p>Berawal dari kecintaan terhadap alam dan petualangan, kami hadir untuk menjadi teman terpercaya dalam setiap perjalananmu di seluruh Nusantara.</p>
+      <div class="about-stats-row">
+        <div><div class="as-num">7+</div><div class="as-label">Tahun Berpengalaman</div></div>
+        <div><div class="as-num">10K+</div><div class="as-label">Traveler Puas</div></div>
+        <div><div class="as-num">50+</div><div class="as-label">Destinasi</div></div>
+        <div><div class="as-num">48</div><div class="as-label">Guide Aktif</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-story">
+    <div class="about-story-grid">
+      <div class="about-story-img"><img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80" alt="tim aga"></div>
+      <div>
+        <div class="sec-label">Cerita Kami</div>
+        <h2>Dari Hobi Menjadi Misi</h2>
+        <p>All Good Adventure lahir pada tahun 2018 dari sebuah grup pendakian kecil di Lombok. Kami adalah sekumpulan anak muda yang percaya bahwa setiap orang berhak merasakan keajaiban alam Indonesia — tanpa kerumitan, tanpa rasa khawatir.</p>
+        <p>Selama 7 tahun, kami telah menemani lebih dari 10.000 traveler dari seluruh Indonesia dan dunia untuk menjelajahi keindahan alam Nusantara — dari puncak Rinjani, kedalaman Raja Ampat, hingga budaya tersembunyi di pelosok Jawa.</p>
+        <p>Hari ini, AGA hadir dengan platform digital yang memudahkan siapa saja untuk memesan trip impian mereka, memilih guide terbaik, dan membayar dengan aman — semuanya dalam satu tempat.</p>
+        <div style="display:flex;gap:14px;margin-top:24px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="nav('katalog')">Jelajahi Trip →</button>
+          <button class="btn-outline" onclick="nav('tourguide')">Kenali Guide Kami</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-values">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="sec-label" style="display:block;text-align:center">Nilai Kami</div>
+      <div class="sec-title">Yang Kami Pegang Teguh</div>
+    </div>
+    <div class="values-grid">
+      <div class="value-card"><div class="value-icon">🌿</div><h4>Cinta Lingkungan</h4><p>Setiap trip kami dirancang untuk menghormati dan menjaga kelestarian alam dan budaya lokal.</p></div>
+      <div class="value-card"><div class="value-icon">🛡️</div><h4>Keselamatan Utama</h4><p>Standar keselamatan ketat diterapkan di setiap trip, didukung asuransi dan guide bersertifikat.</p></div>
+      <div class="value-card"><div class="value-icon">🤝</div><h4>Komunitas Lokal</h4><p>Kami memberdayakan guide dan pelaku wisata lokal untuk menciptakan dampak ekonomi positif.</p></div>
+      <div class="value-card"><div class="value-icon">⭐</div><h4>Pengalaman Terbaik</h4><p>Setiap detail dirancang untuk memberikan kenangan terbaik yang tidak akan terlupakan seumur hidup.</p></div>
+    </div>
+  </div>
+
+  <div class="about-team">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="sec-label" style="display:block;text-align:center">Tim Kami</div>
+      <div class="sec-title">Orang-orang di Balik AGA</div>
+      <div class="sec-sub" style="text-align:center;max-width:480px;margin:14px auto 0">Tim kami terdiri dari para pecinta alam yang berdedikasi untuk menghadirkan pengalaman trip terbaik bagi setiap traveler.</div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-cover"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" alt="cover"></div><div class="team-av"><img src="https://i.pravatar.cc/200?img=11" alt="team"></div><div class="team-name">Reza Mahendra</div><div class="team-role">Founder & CEO</div><div class="team-bio">Pendaki berpengalaman dengan 200+ summit. Membangun AGA dari nol dengan semangat berbagi keindahan alam.</div></div>
+      <div class="team-card"><div class="team-cover"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80" alt="cover"></div><div class="team-av"><img src="https://i.pravatar.cc/200?img=9" alt="team"></div><div class="team-name">Dita Rahayu</div><div class="team-role">Head of Operations</div><div class="team-bio">Mantan manajer resort Bali yang kini memastikan setiap operasional trip AGA berjalan sempurna.</div></div>
+      <div class="team-card"><div class="team-cover"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="cover"></div><div class="team-av"><img src="https://i.pravatar.cc/200?img=15" alt="team"></div><div class="team-name">Agus Setiawan</div><div class="team-role">Head of Guide Training</div><div class="team-bio">Instruktur BNSP tersertifikasi yang melatih dan mensertifikasi seluruh tour guide AGA.</div></div>
+      <div class="team-card"><div class="team-cover"><img src="https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=400&q=80" alt="cover"></div><div class="team-av"><img src="https://i.pravatar.cc/200?img=20" alt="team"></div><div class="team-name">Putri Handayani</div><div class="team-role">Customer Experience</div><div class="team-bio">Berdedikasi memastikan setiap pelanggan AGA mendapatkan pelayanan terbaik dari awal hingga akhir.</div></div>
+    </div>
+  </div>
+
+  <div class="about-cta">
+    <h2>Siap Memulai Petualanganmu?</h2>
+    <p>Bergabunglah dengan 10.000+ traveler yang sudah mempercayai All Good Adventure.</p>
+    <button class="btn-cta-white" onclick="nav('katalog')">Jelajahi Trip Sekarang →</button>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand"><h3>🏔️ All Good Adventure</h3><p>Platform trip adventure terpercaya di Indonesia.</p><button class="btn-wa">📱 Hubungi via WhatsApp</button></div>
+      <div class="footer-col"><h4>Layanan</h4><ul><li><a onclick="nav('katalog')">Katalog Trip</a></li><li><a onclick="nav('booking')">Layanan Private Trip</a></li><li><a onclick="nav('tourguide')">Tour Guide</a></li></ul></div>
+      <div class="footer-col"><h4>Perusahaan</h4><ul><li><a onclick="nav('tentang')">Tentang Kami</a></li><li><a>Blog</a></li><li><a>Karir</a></li></ul></div>
+      <div class="footer-col"><h4>Bantuan</h4><ul><li><a>FAQ</a></li><li><a>Hubungi Kami</a></li><li><a>Kebijakan Privasi</a></li></ul></div>
+    </div>
+    <div class="footer-btm"><span>© 2025 All Good Adventure.</span><span>Dibuat dengan ❤️ di Indonesia</span></div>
+  </footer>
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item active" onclick="nav('tentang')"><span class="bnav-icon">ℹ️</span>Tentang</button>
+  </div></div>
+</div>
+
+<!-- ════ AUTH PAGES ════ -->
+<div class="page" id="page-register">
+  <div class="auth-layout">
+    <div class="auth-visual"><div class="auth-visual-bg"></div><div class="auth-visual-logo"><div class="logo-mark">🏔️</div>All Good Adventure</div><div class="auth-visual-content"><h2>Mulai Petualanganmu Hari Ini</h2><p>Bergabung dengan 10.000+ traveler yang sudah mempercayai All Good Adventure.</p><div class="auth-visual-stats"><div><div class="avs-num">500+</div><div class="avs-label">Trip Aktif</div></div><div><div class="avs-num">4.9★</div><div class="avs-label">Rating</div></div><div><div class="avs-num">10K+</div><div class="avs-label">Traveler</div></div></div></div></div>
+    <div class="auth-panel"><div class="auth-inner">
+      <p style="font-size:12.5px;color:var(--body-2);margin-bottom:7px">✈️ Bergabung sekarang</p>
+      <h1>Halo! 👋</h1>
+      <p class="auth-sub">Daftar dan rasakan kemudahan berlibur bersama kami!</p>
+      <div class="aig"><label>Nama Lengkap</label><input type="text" class="auth-input" placeholder="Nama lengkap kamu"></div>
+      <div class="aig"><label>Nomor Ponsel atau Email</label><input type="text" class="auth-input" placeholder="+62 atau email@kamu.com"></div>
+      <div class="aig"><label>Kata Sandi</label><input type="password" class="auth-input" placeholder="Minimal 8 karakter"></div>
+      <button class="btn-auth" onclick="nav('otp')">Daftar Sekarang →</button>
+      <p class="auth-switch">Sudah punya akun? <a onclick="nav('login')">Login Sekarang</a></p>
+    </div></div>
+  </div>
+</div>
+
+<div class="page" id="page-login">
+  <div class="auth-layout">
+    <div class="auth-visual"><div class="auth-visual-bg"></div><div class="auth-visual-logo"><div class="logo-mark">🏔️</div>All Good Adventure</div><div class="auth-visual-content"><h2>Selamat Datang Kembali, Traveler!</h2><p>Login dan lanjutkan petualanganmu bersama ribuan traveler Indonesia.</p><div class="auth-visual-stats"><div><div class="avs-num">500+</div><div class="avs-label">Destinasi</div></div><div><div class="avs-num">4.9★</div><div class="avs-label">Rating</div></div><div><div class="avs-num">10K+</div><div class="avs-label">Traveler</div></div></div></div></div>
+    <div class="auth-panel"><div class="auth-inner">
+      <p style="font-size:12.5px;color:var(--body-2);margin-bottom:7px">👋 Masuk ke akun kamu</p>
+      <h1>Halo!</h1>
+      <p class="auth-sub">Masuk untuk melihat booking dan riwayat tripmu.</p>
+      <div class="aig"><label>Nomor Ponsel atau Email</label><input type="text" class="auth-input" placeholder="+62 atau email@kamu.com"></div>
+      <div class="aig"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label style="margin:0">Kata Sandi</label><a href="#" style="font-size:12.5px;color:var(--primary);font-weight:600">Lupa Kata Sandi?</a></div><input type="password" class="auth-input" placeholder="Kata sandi kamu"></div>
+      <button class="btn-auth" onclick="nav('profile')">Login →</button>
+      <p class="auth-switch">Belum punya akun? <a onclick="nav('register')">Daftar Sekarang</a></p>
+    </div></div>
+  </div>
+</div>
+
+<div class="page" id="page-otp">
+  <div class="auth-layout">
+    <div class="auth-visual"><div class="auth-visual-bg"></div><div class="auth-visual-logo"><div class="logo-mark">🏔️</div>All Good Adventure</div><div class="auth-visual-content"><h2>Satu Langkah Lagi!</h2><p>Verifikasi akunmu untuk mulai menikmati semua fitur All Good Adventure.</p></div></div>
+    <div class="auth-panel"><div class="auth-inner">
+      <div style="font-size:46px;text-align:center;margin-bottom:18px">🔐</div>
+      <h1 style="text-align:center;font-size:28px">Verifikasi</h1>
+      <p class="auth-sub" style="text-align:center">Kode OTP telah dikirimkan ke nomor <strong>+62 812 ****7890</strong>. Masukkan kode di bawah ini.</p>
+      <div class="otp-inputs">
+        <input type="text" class="otp-input" maxlength="1" oninput="otpNext(this,0)" id="otp0">
+        <input type="text" class="otp-input" maxlength="1" oninput="otpNext(this,1)" id="otp1">
+        <input type="text" class="otp-input" maxlength="1" oninput="otpNext(this,2)" id="otp2">
+        <input type="text" class="otp-input" maxlength="1" oninput="otpNext(this,3)" id="otp3">
+      </div>
+      <button class="btn-auth" onclick="nav('profile')">Verifikasi & Masuk →</button>
+      <p style="text-align:center;margin-top:14px;font-size:13.5px;color:var(--body)">Tidak menerima kode? <a href="#" style="color:var(--primary);font-weight:600" onclick="startResendTimer()">Kirim Ulang OTP</a></p>
+      <p style="text-align:center;font-size:12.5px;color:var(--body-2);margin-top:7px" id="resendTimer"></p>
+      <p style="text-align:center;margin-top:18px"><a onclick="nav('register')" style="font-size:13.5px;color:var(--body);cursor:pointer">← Kembali ke Daftar</a></p>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ PROFILE ════ -->
+<div class="page" id="page-profile">
+  <nav class="navbar">
+    <a class="navbar-logo" onclick="nav('beranda')"><div class="logo-mark">🏔️</div>All Good Adventure</a>
+    <div class="navbar-links">
+      <a onclick="nav('beranda')">Beranda</a><a onclick="nav('katalog')">Katalog</a><a onclick="nav('booking')">Layanan Private Trip</a><a onclick="nav('tourguide')">Tour Guide</a>
+    </div>
+    <div class="navbar-actions">
+      <span style="font-size:13.5px;color:var(--body);margin-right:6px">Halo, <strong>Indra</strong>!</span>
+      <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid var(--primary-light)"><img src="https://i.pravatar.cc/100?img=12" style="width:100%;height:100%;object-fit:cover"></div>
+    </div>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="profile-layout">
+    <aside>
+      <div class="prof-sidebar">
+        <div class="prof-av-wrap"><div class="prof-av"><img src="https://i.pravatar.cc/200?img=12" alt="user"></div><div class="prof-name">Indra</div><div class="prof-email">Indra@gmail.com</div><div class="prof-email" style="margin-top:3px">+62 812 3456 7890</div></div>
+        <div class="prof-menu">
+          <button class="pmi active" onclick="showProfTab('akun')"><span class="pmi-ico">👤</span>Akun</button>
+          <button class="pmi" onclick="showProfTab('history')"><span class="pmi-ico">🗺️</span>Riwayat Trip</button>
+          <button class="pmi" onclick="showProfTab('wallet')"><span class="pmi-ico">💳</span>Wallet &amp; Poin</button>
+          <button class="pmi" onclick="showProfTab('keamanan')"><span class="pmi-ico">🛡️</span>Keamanan</button>
+          <button class="pmi" onclick="showProfTab('bantuan')"><span class="pmi-ico">❓</span>Bantuan</button>
+          <div style="height:1px;background:var(--stroke);margin:10px 0"></div>
+          <button class="pmi danger" onclick="nav('login')"><span class="pmi-ico">🚪</span>Keluar</button>
+        </div>
+      </div>
+    </aside>
+    <div>
+      <div id="ptab-akun" class="prof-content">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;flex-wrap:wrap;gap:10px"><div><h2>Informasi Akun</h2><p class="pcss">Kelola informasi profil dan kontak kamu</p></div><button style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--stroke);color:var(--dark);font-family:var(--font);font-size:13px;font-weight:600;padding:8px 14px;border-radius:var(--r-sm);cursor:pointer">✏️ Edit Profil</button></div>
+        <div class="pir"><span class="pir-label">Nama Lengkap</span><span class="pir-value">indra</span></div>
+        <div class="pir"><span class="pir-label">Email</span><span class="pir-value">Indra@gmail.com</span></div>
+        <div class="pir"><span class="pir-label">Nomor Ponsel</span><span class="pir-value">+62 812 3456 7890</span></div>
+        <div class="pir"><span class="pir-label">Anggota Sejak</span><span class="pir-value">Januari 2024</span></div>
+        <div class="pir"><span class="pir-label">Status Akun</span><span style="background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:50px;font-size:12px;font-weight:700">✓ Terverifikasi</span></div>
+      </div>
+      <div id="ptab-history" style="display:none" class="prof-content">
+        <h2>Riwayat Trip</h2><p class="pcss">Semua perjalanan yang pernah kamu lakukan</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--stroke);border-radius:var(--r-md);align-items:center;flex-wrap:wrap"><img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=120&q=80" style="width:76px;height:76px;border-radius:var(--r-sm);object-fit:cover;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:var(--dark)">Trip Gunung Rinjani</div><div style="font-size:12.5px;color:var(--body-2);margin-top:4px">📅 12–15 Jan 2025 &nbsp;•&nbsp; 👥 4 orang</div></div><span style="background:#DCFCE7;color:#16A34A;padding:4px 11px;border-radius:50px;font-size:11.5px;font-weight:700;white-space:nowrap">✓ Selesai</span></div>
+          <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--stroke);border-radius:var(--r-md);align-items:center;flex-wrap:wrap"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=120&q=80" style="width:76px;height:76px;border-radius:var(--r-sm);object-fit:cover;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:var(--dark)">Private Trip Bali</div><div style="font-size:12.5px;color:var(--body-2);margin-top:4px">📅 20–23 Mar 2025 &nbsp;•&nbsp; 👥 2 orang</div></div><span style="background:#FEF3C7;color:#D97706;padding:4px 11px;border-radius:50px;font-size:11.5px;font-weight:700;white-space:nowrap">⏳ Akan Datang</span></div>
+        </div>
+      </div>
+      <div id="ptab-wallet" style="display:none" class="prof-content">
+        <h2>Wallet &amp; Poin</h2><p class="pcss">Saldo dan poin reward kamu</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+          <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:var(--r-lg);padding:22px;color:#fff"><div style="font-size:12.5px;opacity:.8;margin-bottom:7px">Saldo Wallet</div><div style="font-size:26px;font-weight:800">Rp 250.000</div></div>
+          <div style="background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:22px"><div style="font-size:12.5px;color:var(--body-2);margin-bottom:7px">Total Poin</div><div style="font-size:26px;font-weight:800;color:var(--dark)">1.250 <span style="font-size:13px;color:var(--body-2);font-weight:500">poin</span></div></div>
+        </div>
+        <div class="empty-state"><div class="empty-icon">📋</div><h3>Belum ada transaksi</h3><p>Riwayat transaksi wallet dan penggunaan poin akan muncul di sini.</p></div>
+      </div>
+      <div id="ptab-keamanan" style="display:none" class="prof-content">
+        <h2>Keamanan</h2><p class="pcss">Kelola kata sandi dan keamanan akun kamu</p>
+        <div class="form-group"><label>Kata Sandi Lama</label><div class="iw"><span class="ico">🔒</span><input type="password" placeholder="Kata sandi saat ini"></div></div>
+        <div class="form-group"><label>Kata Sandi Baru</label><div class="iw"><span class="ico">🔑</span><input type="password" placeholder="Kata sandi baru"></div></div>
+        <div class="form-group"><label>Konfirmasi Kata Sandi Baru</label><div class="iw"><span class="ico">✓</span><input type="password" placeholder="Ulangi kata sandi baru"></div></div>
+        <button class="btn-submit" style="margin-top:8px">Simpan Perubahan</button>
+      </div>
+      <div id="ptab-bantuan" style="display:none" class="prof-content">
+        <h2>Bantuan</h2><p class="pcss">Ada yang bisa kami bantu?</p>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="padding:16px;border:1px solid var(--stroke);border-radius:var(--r-md);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--stroke)'"><div style="font-weight:700;color:var(--dark);margin-bottom:5px">📞 Hubungi Customer Support</div><div style="font-size:13px;color:var(--body)">Tersedia Senin–Sabtu, 08.00–20.00 WIB</div></div>
+          <div style="padding:16px;border:1px solid var(--stroke);border-radius:var(--r-md);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--stroke)'"><div style="font-weight:700;color:var(--dark);margin-bottom:5px">💬 Chat via WhatsApp</div><div style="font-size:13px;color:var(--body)">Respons cepat via WhatsApp Business</div></div>
+          <div style="padding:16px;border:1px solid var(--stroke);border-radius:var(--r-md);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--stroke)'"><div style="font-weight:700;color:var(--dark);margin-bottom:5px">❓ Pertanyaan Umum (FAQ)</div><div style="font-size:13px;color:var(--body)">Temukan jawaban untuk pertanyaan yang sering ditanyakan</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav"><div class="bottom-nav-inner">
+    <button class="bnav-item" onclick="nav('beranda')"><span class="bnav-icon">🏠</span>Beranda</button>
+    <button class="bnav-item" onclick="nav('katalog')"><span class="bnav-icon">🔍</span>Katalog</button>
+    <button class="bnav-item" onclick="nav('booking')"><span class="bnav-icon">🎒</span>Booking</button>
+    <button class="bnav-item" onclick="nav('tourguide')"><span class="bnav-icon">👤</span>Guide</button>
+    <button class="bnav-item active" onclick="nav('profile')"><span class="bnav-icon">👤</span>Profil</button>
+  </div></div>
+</div>
+
+<script>
+/* ── DATA ── */
+const TRIPS = [
+  {id:1,name:'Trip Gunung Rinjani',city:'Lombok',cat:'Mountain',tags:['Gunung','Petualangan'],dur:3,price:'750.000',img:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80',type:'open',status:'Tersedia'},
+  {id:2,name:'Private Bali Getaway',city:'Bali',cat:'Beach',tags:['Pantai','Budaya'],dur:4,price:'1.200.000',img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80',type:'private',status:'Tersedia'},
+  {id:3,name:'Pendakian Semeru',city:'Malang',cat:'Mountain',tags:['Gunung','Ekstrem'],dur:4,price:'850.000',img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80',type:'open',status:'Penuh'},
+  {id:4,name:'Raja Ampat Explorer',city:'Raja Ampat',cat:'Island',tags:['Pulau','Snorkeling'],dur:5,price:'2.500.000',img:'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&q=80',type:'private',status:'Tersedia'},
+  {id:5,name:'Labuan Bajo Komodo',city:'Labuan Bajo',cat:'Island',tags:['Pulau','Satwa Liar'],dur:3,price:'1.800.000',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',type:'open',status:'Tersedia'},
+  {id:6,name:'Bromo Sunrise Tour',city:'Malang',cat:'Mountain',tags:['Gunung','Foto'],dur:2,price:'450.000',img:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=400&q=80',type:'open',status:'Tersedia'},
+  {id:7,name:'Company Outing Jogja',city:'Yogyakarta',cat:'Culture',tags:['Budaya','Team Building'],dur:2,price:'600.000',img:'https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=400&q=80',type:'company',status:'Tersedia'},
+  {id:8,name:'Gili Islands Escape',city:'Lombok',cat:'Beach',tags:['Pantai','Pulau'],dur:3,price:'950.000',img:'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=400&q=80',type:'private',status:'Tersedia'},
+];
+
+const GUIDES = [
+  {id:1,name:'Bima Arjuna',location:'Lombok, NTB',specialty:'mountain',specialtyLabel:'Gunung & Trekking',cover:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=11',rating:4.9,reviewCount:187,price:'450.000',priceNote:'/ hari',tripsDone:312,yearsExp:8,languages:'Indonesia, Inggris',bio:'Spesialis pendakian gunung-gunung tinggi Indonesia. Telah memandu lebih dari 300 ekspedisi ke Rinjani, Semeru, dan Kerinci. Bersertifikat BNSP dan SAR.',certifications:['BNSP Level 3','SAR Bersertifikat','P3K Gunung'],destinations:['Rinjani','Semeru','Kerinci','Agung','Merapi'],availability:{Senin:'08.00 – 18.00',Selasa:'08.00 – 18.00',Rabu:'Tidak tersedia',Kamis:'08.00 – 18.00',Jumat:'08.00 – 18.00',Sabtu:'07.00 – 20.00',Minggu:'07.00 – 20.00'}},
+  {id:2,name:'Dewi Lestari',location:'Bali, Bali',specialty:'beach',specialtyLabel:'Pantai & Budaya',cover:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=9',rating:4.8,reviewCount:243,price:'380.000',priceNote:'/ hari',tripsDone:418,yearsExp:10,languages:'Indonesia, Inggris, Jepang',bio:'Pemandu wisata Bali berpengalaman 10 tahun. Spesialisasi tur budaya, pura, dan wisata pantai premium. Fasih berbahasa Jepang untuk tamu dari Jepang.',certifications:['Sertifikat HPI','Guide Pariwisata Bali','Bahasa Jepang N2'],destinations:['Ubud','Seminyak','Kuta','Nusa Penida','Tanah Lot'],availability:{Senin:'09.00 – 17.00',Selasa:'09.00 – 17.00',Rabu:'09.00 – 17.00',Kamis:'Tidak tersedia',Jumat:'09.00 – 17.00',Sabtu:'08.00 – 20.00',Minggu:'08.00 – 20.00'}},
+  {id:3,name:'Eko Prasetyo',location:'Raja Ampat, Papua',specialty:'island',specialtyLabel:'Island Hopping',cover:'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=15',rating:5.0,reviewCount:92,price:'600.000',priceNote:'/ hari',tripsDone:156,yearsExp:6,languages:'Indonesia, Inggris',bio:'Putra asli Raja Ampat yang bangga memperkenalkan keindahan bawah laut dan alam Papua Barat. Instruktur selam bersertifikat PADI Open Water.',certifications:['PADI Open Water Instructor','Marine Guide Bersertifikat','First Aid & CPR'],destinations:['Raja Ampat','Sorong','Misool','Wayag','Pianemo'],availability:{Senin:'07.00 – 18.00',Selasa:'07.00 – 18.00',Rabu:'07.00 – 18.00',Kamis:'07.00 – 18.00',Jumat:'Tidak tersedia',Sabtu:'07.00 – 18.00',Minggu:'07.00 – 18.00'}},
+  {id:4,name:'Sinta Maharani',location:'Yogyakarta, DIY',specialty:'culture',specialtyLabel:'Budaya & Heritage',cover:'https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=20',rating:4.7,reviewCount:316,price:'320.000',priceNote:'/ hari',tripsDone:521,yearsExp:12,languages:'Indonesia, Inggris, Belanda',bio:'Pemandu senior dengan pengalaman 12 tahun di Yogyakarta dan Jawa Tengah. Ahli sejarah Candi Borobudur dan Prambanan. Berbicara dalam 3 bahasa.',certifications:['Sertifikat HPI Nasional','Ahli Sejarah Kebudayaan','Guide Internasional'],destinations:['Borobudur','Prambanan','Keraton','Dieng','Solo'],availability:{Senin:'09.00 – 17.00',Selasa:'09.00 – 17.00',Rabu:'09.00 – 17.00',Kamis:'09.00 – 17.00',Jumat:'Tidak tersedia',Sabtu:'08.00 – 19.00',Minggu:'08.00 – 19.00'}},
+  {id:5,name:'Fajar Nugroho',location:'Labuan Bajo, NTT',specialty:'island',specialtyLabel:'Island Hopping',cover:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=33',rating:4.9,reviewCount:128,price:'550.000',priceNote:'/ hari',tripsDone:203,yearsExp:7,languages:'Indonesia, Inggris',bio:'Spesialis wisata Komodo dan Flores. Pengetahuan mendalam tentang ekosistem komodo dan alam bawah laut Labuan Bajo yang menakjubkan.',certifications:['PADI Divemaster','Komodo Guide Bersertifikat','Wilderness First Aid'],destinations:['Komodo','Labuan Bajo','Flores','Pink Beach','Padar'],availability:{Senin:'07.00 – 18.00',Selasa:'07.00 – 18.00',Rabu:'07.00 – 18.00',Kamis:'07.00 – 18.00',Jumat:'07.00 – 18.00',Sabtu:'07.00 – 18.00',Minggu:'Tidak tersedia'}},
+  {id:6,name:'Nur Aini',location:'Malang, Jawa Timur',specialty:'mountain',specialtyLabel:'Gunung & Trekking',cover:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=600&q=80',avatar:'https://i.pravatar.cc/200?img=47',rating:4.8,reviewCount:174,price:'400.000',priceNote:'/ hari',tripsDone:287,yearsExp:9,languages:'Indonesia, Inggris',bio:'Satu-satunya perempuan di tim guide gunung AGA. Pendaki wanita inspiratif yang telah menaklukkan 7 puncak tertinggi di Jawa dan Lombok.',certifications:['BNSP Level 2','Instruktur Pendakian','SAR & P3K'],destinations:['Semeru','Bromo','Arjuno','Welirang','Ijen'],availability:{Senin:'08.00 – 17.00',Selasa:'08.00 – 17.00',Rabu:'Tidak tersedia',Kamis:'08.00 – 17.00',Jumat:'08.00 – 17.00',Sabtu:'07.00 – 19.00',Minggu:'07.00 – 19.00'}},
+];
+
+const DESTINASI = [
+  {id:1,name:'Gunung Rinjani',loc:'Lombok',icon:'🏔️'},
+  {id:2,name:'Pantai Bali',loc:'Bali',icon:'🏖️'},
+  {id:3,name:'Raja Ampat',loc:'Papua Barat',icon:'🐠'},
+  {id:4,name:'Labuan Bajo',loc:'NTT',icon:'🦎'},
+  {id:5,name:'Gunung Semeru',loc:'Jawa Timur',icon:'🌋'},
+  {id:6,name:'Bromo Tengger',loc:'Jawa Timur',icon:'🌅'},
+  {id:7,name:'Borobudur & Jogja',loc:'Yogyakarta',icon:'🏛️'},
+  {id:8,name:'Gili Islands',loc:'Lombok',icon:'🏝️'},
+];
+
+let activeJenis='all', activeDurasi='all', homeTab='open', currentGuideFilter='all', selectedDestId=null, selectedGuideId=null;
+
+/* ── TRIP CARD ── */
+function tripCard(t){
+  const sc=t.status==='Tersedia'?'rgba(22,163,74,.9)':'rgba(220,38,38,.9)';
+  return `<div class="trip-card" onclick="nav('booking')">
+    <div class="tc-img"><img src="${t.img}" alt="${t.name}" loading="lazy">
+      <div class="tc-badge-status" style="background:${sc}">${t.status}</div>
+      <div class="tc-badge-dur">${t.dur}H</div>
+    </div>
+    <div class="tc-body">
+      <div class="tc-tags">${t.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+      <div class="tc-title">${t.name}</div>
+      <div style="font-size:12.5px;color:var(--body-2);margin-bottom:9px">📍 ${t.city}</div>
+      <div class="tc-foot"><div class="tc-price">Rp ${t.price}<br><span>/ orang</span></div><button class="btn-book">Booking →</button></div>
+    </div></div>`;
+}
+
+/* ── HOME TAB ── */
+function switchHomeTab(tab){
+  homeTab=tab;
+  document.getElementById('tab-open').className='ttab'+(tab==='open'?' active':'');
+  document.getElementById('tab-private').className='ttab'+(tab==='private'?' active':'');
+  const f=TRIPS.filter(t=>tab==='open'?t.type==='open':t.type==='private');
+  document.getElementById('home-trips').innerHTML=f.slice(0,4).map(tripCard).join('');
+}
+
+/* ── KATALOG FILTERS ── */
+function setJenis(j){
+  activeJenis=j;
+  ['all','open','private'].forEach(x=>document.getElementById('pill-'+x).className='pill'+(x===j?' active':''));
+  filterTrips();
+}
+function setDurasi(d){
+  activeDurasi=d;
+  ['all','1','2','3','4'].forEach(x=>document.getElementById('dur-'+x).className='pill'+(x===d?' active':''));
+  filterTrips();
+}
+function filterTrips(){
+  const s=document.getElementById('searchFilter').value.toLowerCase();
+  const k=document.getElementById('kotaFilter').value;
+  const kat=document.getElementById('kategoriFilter').value;
+  const r=TRIPS.filter(t=>{
+    if(s&&!t.name.toLowerCase().includes(s))return false;
+    if(k!=='Semua Kota'&&t.city!==k)return false;
+    if(kat!=='Semua Kategori'&&t.cat!==kat)return false;
+    if(activeJenis!=='all'&&t.type!==activeJenis)return false;
+    if(activeDurasi!=='all'&&t.dur!==parseInt(activeDurasi))return false;
+    return true;
+  });
+  const g=document.getElementById('listingGrid');
+  const c=document.getElementById('listingCount');
+  if(!r.length){g.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><h3>Trip tidak ditemukan</h3><p>Coba ubah filter atau kata kunci pencarian.</p><button class="btn-primary" onclick="resetFilters()">Reset Filter</button></div>`;c.textContent='0 trip ditemukan';}
+  else{g.innerHTML=r.map(tripCard).join('');c.textContent=`Menampilkan ${r.length} trip`;}
+}
+function resetFilters(){
+  document.getElementById('searchFilter').value='';
+  document.getElementById('kotaFilter').value='Semua Kota';
+  document.getElementById('kategoriFilter').value='Semua Kategori';
+  setJenis('all');setDurasi('all');
+}
+
+/* ── GUIDE GRID (full page) ── */
+function guideCard(g){
+  const stars='★'.repeat(Math.floor(g.rating))+'☆'.repeat(5-Math.floor(g.rating));
+  return `<div class="guide-card" onclick="openGuideModal(${g.id})">
+    <div class="gc-cover"><img src="${g.cover}" alt="${g.name}"><div class="gc-specialty-badge">${g.specialtyLabel}</div></div>
+    <div class="gc-body">
+      <div class="gc-header">
+        <div class="gc-avatar"><img src="${g.avatar}" alt="${g.name}"></div>
+        <div style="margin-top:38px">
+          <div class="gc-name">${g.name}<span class="gc-verified">✓</span></div>
+          <div class="gc-location">📍 ${g.location}</div>
+        </div>
+      </div>
+      <div class="gc-rating-row"><span class="gc-stars">${stars}</span><span class="gc-rating-num">${g.rating}</span><span class="gc-rating-count">(${g.reviewCount} ulasan)</span></div>
+      <div class="gc-bio">${g.bio}</div>
+      <div class="gc-tags">${g.certifications.slice(0,2).map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+      <div class="gc-languages" style="font-size:12px;color:var(--body-2);margin-bottom:14px">🌐 ${g.languages}</div>
+      <div class="gc-stats-row">
+        <div class="gc-stat-item"><div class="gc-stat-val">${g.tripsDone}+</div><div class="gc-stat-lbl">Trip</div></div>
+        <div class="gc-stat-item"><div class="gc-stat-val">${g.yearsExp} Thn</div><div class="gc-stat-lbl">Pengalaman</div></div>
+        <div class="gc-stat-item"><div class="gc-stat-val">${g.rating}</div><div class="gc-stat-lbl">Rating</div></div>
+      </div>
+      <div class="gc-footer">
+        <div><div class="gc-price">Rp ${g.price}<span>${g.priceNote}</span></div></div>
+        <button class="btn-hire" onclick="event.stopPropagation();nav('booking')">Pesan Guide →</button>
+      </div>
+    </div></div>`;
+}
+function filterGuides(f){
+  currentGuideFilter=f;
+  ['all','mountain','beach','culture','island'].forEach(x=>document.getElementById('tgf-'+x).className='pill'+(x===f?' active':''));
+  const s=document.getElementById('guideSearch')?.value.toLowerCase()||'';
+  const r=GUIDES.filter(g=>{
+    if(f!=='all'&&g.specialty!==f)return false;
+    if(s&&!g.name.toLowerCase().includes(s))return false;
+    return true;
+  });
+  document.getElementById('guideGrid').innerHTML=r.length?r.map(guideCard).join(''):`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><h3>Guide tidak ditemukan</h3><p>Coba ubah filter atau kata kunci.</p></div>`;
+}
+
+/* ── GUIDE MODAL ── */
+function openGuideModal(id){
+  const g=GUIDES.find(x=>x.id===id);
+  if(!g)return;
+  const days=Object.entries(g.availability);
+  const schedHtml=days.map(([d,t])=>`<div class="schedule-item"><div class="schedule-day">${d}</div><div class="schedule-time" style="color:${t==='Tidak tersedia'?'var(--danger)':'var(--success)'}">${t}</div></div>`).join('');
+  const stars='★'.repeat(Math.floor(g.rating))+'☆'.repeat(5-Math.floor(g.rating));
+  document.getElementById('modalBox').innerHTML=`
+    <div class="modal-cover"><img src="${g.cover}" alt="${g.name}"><div class="modal-cover-grad"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-avatar-row">
+        <div class="modal-avatar"><img src="${g.avatar}" alt="${g.name}"></div>
+        <div><div class="modal-name">${g.name}<span class="gc-verified" style="margin-left:6px">✓</span></div><div class="modal-loc">📍 ${g.location}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="color:#F59E0B;font-size:16px">${stars}</span><span style="font-weight:700">${g.rating}</span><span style="font-size:13px;color:var(--body-2)">(${g.reviewCount} ulasan)</span></div>
+      <div style="font-size:14px;color:var(--body);line-height:1.75;margin-bottom:4px">${g.bio}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;padding:14px;background:var(--bg);border-radius:var(--r-md)">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--dark)">${g.tripsDone}+</div><div style="font-size:12px;color:var(--body-2)">Trip Selesai</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--dark)">${g.yearsExp} Thn</div><div style="font-size:12px;color:var(--body-2)">Pengalaman</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--dark)">${g.rating}</div><div style="font-size:12px;color:var(--body-2)">Rating</div></div>
+      </div>
+      <div class="modal-section-title">🏅 Sertifikasi</div>
+      <div class="modal-badges">${g.certifications.map(c=>`<span class="modal-badge">${c}</span>`).join('')}</div>
+      <div class="modal-section-title">📍 Destinasi Unggulan</div>
+      <div class="modal-badges">${g.destinations.map(d=>`<span class="modal-badge">🗺️ ${d}</span>`).join('')}</div>
+      <div class="modal-section-title">🌐 Bahasa</div>
+      <div style="font-size:14px;color:var(--body);margin-bottom:4px">${g.languages}</div>
+      <div class="modal-section-title">📅 Jadwal Ketersediaan</div>
+      <div class="modal-schedule">${schedHtml}</div>
+      <div style="background:var(--bg);border-radius:var(--r-md);padding:14px 16px;margin-top:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div style="font-size:12.5px;color:var(--body-2)">Harga jasa guide</div><div style="font-size:22px;font-weight:800;color:var(--primary)">Rp ${g.price}<span style="font-size:13px;font-weight:400;color:var(--body-2)">${g.priceNote}</span></div></div>
+        <div style="font-size:12px;color:var(--body-2)">*Belum termasuk biaya transportasi &amp; akomodasi</div>
+      </div>
+      <div class="modal-cta">
+        <button class="btn-modal-wa">📱 Chat WhatsApp</button>
+        <button class="btn-modal-hire" onclick="nav('booking')">Pesan Guide Ini →</button>
+      </div>
+    </div>`;
+  document.getElementById('guideModal').classList.add('open');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('guideModal'))document.getElementById('guideModal').classList.remove('open');
+}
+
+/* ── BOOKING: DESTINASI + GUIDE MINI ── */
+function renderDestinasiGrid(){
+  const el=document.getElementById('destinasiGrid');
+  if(!el)return;
+  el.innerHTML=DESTINASI.map(d=>`
+    <div id="dest-${d.id}" onclick="selectDest(${d.id})" style="padding:14px 12px;border:2px solid var(--stroke);border-radius:var(--r-md);cursor:pointer;text-align:center;transition:all .2s;background:var(--white)" onmouseover="if(${selectedDestId}!==${d.id})this.style.borderColor='var(--primary)'" onmouseout="if(${selectedDestId}!==${d.id})this.style.borderColor='var(--stroke)'">
+      <div style="font-size:26px;margin-bottom:6px">${d.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--dark)">${d.name}</div>
+      <div style="font-size:11.5px;color:var(--body-2)">📍 ${d.loc}</div>
+    </div>`).join('');
+}
+function selectDest(id){
+  selectedDestId=id;
+  DESTINASI.forEach(d=>{
+    const el=document.getElementById('dest-'+d.id);
+    if(!el)return;
+    if(d.id===id){el.style.borderColor='var(--primary)';el.style.background='var(--primary-light)';}
+    else{el.style.borderColor='var(--stroke)';el.style.background='var(--white)';}
+  });
+  renderGuidesMini();
+}
+function renderGuidesMini(){
+  const el=document.getElementById('guideGridMini');
+  if(!el)return;
+  el.innerHTML=GUIDES.map(g=>`
+    <div class="guide-card-mini" id="gmini-${g.id}" onclick="selectGuideMini(${g.id})">
+      <div class="gcm-check">✓</div>
+      <div class="gcm-av"><img src="${g.avatar}" alt="${g.name}"></div>
+      <div class="gcm-name">${g.name}</div>
+      <div class="gcm-loc">📍 ${g.location}</div>
+      <div class="gcm-price">Rp ${g.price}${g.priceNote}</div>
+      <div class="gcm-rating">⭐ ${g.rating} (${g.reviewCount} ulasan)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${g.certifications.slice(0,1).map(c=>`<span class="tag" style="font-size:10.5px">${c}</span>`).join('')}</div>
+    </div>`).join('');
+}
+function selectGuideMini(id){
+  selectedGuideId=id;
+  GUIDES.forEach(g=>{
+    const el=document.getElementById('gmini-'+g.id);
+    if(el)el.className='guide-card-mini'+(g.id===id?' selected':'');
+  });
+  const g=GUIDES.find(x=>x.id===id);
+  const info=document.getElementById('selectedGuideInfo');
+  if(g&&info){
+    info.style.display='flex';
+    info.style.alignItems='center';
+    info.style.gap='12px';
+    info.innerHTML=`<img src="${g.avatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)"><div><div style="font-weight:700;color:var(--dark)">${g.name} dipilih ✓</div><div style="font-size:12.5px;color:var(--body-2);margin-top:3px">Harga: Rp ${g.price}${g.priceNote} &nbsp;•&nbsp; ⭐ ${g.rating} &nbsp;•&nbsp; ${g.specialtyLabel}</div></div>`;
+  }
+}
+
+/* ── NAVIGATION ── */
+function nav(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='beranda')switchHomeTab(homeTab);
+  if(page==='katalog'){setTimeout(filterTrips,50);}
+  if(page==='tourguide'){setTimeout(()=>filterGuides('all'),50);}
+  if(page==='booking'){setTimeout(()=>{renderDestinasiGrid();renderGuidesMini();},50);}
+}
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+
+/* ── BOOKING SUBMIT ── */
+function submitBooking(e){
+  e.preventDefault();
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');nav('beranda');},3500);
+}
+
+/* ── PROFILE TABS ── */
+function showProfTab(tab){
+  ['akun','history','wallet','keamanan','bantuan'].forEach(t=>{
+    document.getElementById('ptab-'+t).style.display=t===tab?'block':'none';
+  });
+  const tabs=['akun','history','wallet','keamanan','bantuan'];
+  document.querySelectorAll('.pmi:not(.danger)').forEach((el,i)=>{
+    el.className='pmi'+(tabs[i]===tab?' active':'');
+  });
+}
+
+/* ── OTP ── */
+function otpNext(inp,idx){if(inp.value.length===1&&idx<3)document.getElementById('otp'+(idx+1)).focus();}
+let resendInterval;
+function startResendTimer(){
+  let s=60;
+  resendInterval=setInterval(()=>{s--;document.getElementById('resendTimer').textContent=`Kirim ulang dalam ${s} detik`;
+    if(s<=0){clearInterval(resendInterval);document.getElementById('resendTimer').textContent='';}},1000);
+}
+
+/* ── INIT ── */
+switchHomeTab('open');
+</script>
+</body>
+</html>

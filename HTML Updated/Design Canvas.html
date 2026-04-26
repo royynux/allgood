@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Canvas — All Good Adventure</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; background: #f0eee9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  height: 48px; background: rgba(22,18,14,0.97);
+  backdrop-filter: blur(14px);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 18px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.tb-logo { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; }
+.tb-logo-mark { width: 28px; height: 28px; background: #E8490F; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.tb-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+.tb-page { font-size: 12.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+.tb-sub { font-size: 11.5px; color: rgba(255,255,255,0.4); }
+.tb-spacer { flex: 1; }
+.tb-hint { font-size: 11px; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 10px; }
+.tb-hint kbd { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 1px 7px; font-size: 10.5px; color: rgba(255,255,255,0.45); font-family: inherit; }
+.tb-count { background: #E8490F; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 11px; border-radius: 50px; letter-spacing: .2px; }
+.tb-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.8); font-family: inherit; font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 7px; cursor: pointer; transition: all .15s; }
+.tb-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+.tb-btn.primary { background: #E8490F; border-color: #E8490F; color: #fff; }
+.tb-btn.primary:hover { background: #C93D0A; }
+
+/* Zoom controls */
+.zoom-controls { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; align-items: center; gap: 2px; background: rgba(22,18,14,0.92); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px; backdrop-filter: blur(10px); }
+.zoom-btn { width: 32px; height: 32px; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 16px; cursor: pointer; border-radius: 7px; display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: inherit; }
+.zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.zoom-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); padding: 0 8px; min-width: 42px; text-align: center; }
+
+/* Page indicator dots */
+.page-dots { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; gap: 8px; align-items: center; background: rgba(22,18,14,0.88); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; padding: 8px 16px; backdrop-filter: blur(10px); }
+.dot-item { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 2px 6px; border-radius: 50px; transition: background .15s; }
+.dot-item:hover { background: rgba(255,255,255,0.08); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: all .2s; }
+.dot.active { background: #E8490F; transform: scale(1.25); }
+.dot-label { font-size: 11px; color: rgba(255,255,255,0.45); white-space: nowrap; display: none; }
+
+#root { padding-top: 48px; height: 100vh; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tb-logo" onclick="openApp()">
+    <div class="tb-logo-mark">🏔️</div>
+    All Good Adventure
+  </div>
+  <div class="tb-sep"></div>
+  <div>
+    <div class="tb-page">UI Design Canvas</div>
+    <div class="tb-sub">All screens overview</div>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="tb-hint">
+    <span><kbd>scroll</kbd> pan</span>
+    <span><kbd>ctrl+scroll</kbd> zoom</span>
+    <span><kbd>drag</kbd> pan</span>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-count">9 Screens</div>
+  <button class="tb-btn primary" onclick="openApp()">Open App →</button>
+</div>
+
+<!-- ZOOM CONTROLS -->
+<div class="zoom-controls">
+  <button class="zoom-btn" id="zoomOut" title="Zoom out">−</button>
+  <div class="zoom-label" id="zoomLabel">55%</div>
+  <button class="zoom-btn" id="zoomIn" title="Zoom in">+</button>
+  <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);margin:0 2px"></div>
+  <button class="zoom-btn" id="zoomFit" title="Fit to screen" style="font-size:13px">⊞</button>
+</div>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const SCREENS = [
+  // Row 0 — Main pages
+  { id:'beranda',   num:'01', label:'Beranda',         sub:'Landing page utama',       img:'screenshots/beranda.png',   flow:'main',   color:'#E8490F' },
+  { id:'katalog',   num:'02', label:'Katalog Trip',    sub:'Daftar & filter trip',     img:'screenshots/katalog.png',   flow:'main',   color:'#2563EB' },
+  { id:'booking',   num:'03', label:'Booking Private', sub:'Form private trip',        img:'screenshots/booking.png',   flow:'main',   color:'#7C3AED' },
+  { id:'tourguide', num:'04', label:'Tour Guide',      sub:'Daftar & profil guide',    img:'screenshots/tourguide.png', flow:'main',   color:'#0891B2' },
+  { id:'tentang',   num:'05', label:'Tentang Kami',    sub:'About + team',             img:'screenshots/tentang.png',   flow:'main',   color:'#059669' },
+  // Row 1 — Auth & Profile
+  { id:'login',     num:'06', label:'Login',           sub:'Masuk ke akun',            img:'screenshots/login.png',     flow:'auth',   color:'#D97706' },
+  { id:'register',  num:'07', label:'Register',        sub:'Buat akun baru',           img:'screenshots/register.png',  flow:'auth',   color:'#D97706' },
+  { id:'otp',       num:'08', label:'Verifikasi OTP',  sub:'Kode 4-digit',             img:'screenshots/otp.png',       flow:'auth',   color:'#D97706' },
+  { id:'profile',   num:'09', label:'Profile',         sub:'Dashboard pengguna',       img:'screenshots/profile.png',   flow:'auth',   color:'#E8490F' },
+];
+
+const MAIN = SCREENS.filter(s => s.flow === 'main');
+const AUTH = SCREENS.filter(s => s.flow === 'auth');
+
+// Artboard size
+const AW = 620, AH = 400;
+
+function ScreenCard({ screen, onClick }) {
+  const [hovered, setHovered] = React.useState(false);
+  return (
+    <DCArtboard
+      label={`${screen.num} — ${screen.label}`}
+      width={AW}
+      height={AH}
+      style={{
+        borderRadius: 10,
+        cursor: 'pointer',
+        outline: hovered ? `2.5px solid ${screen.color}` : '2.5px solid transparent',
+        transition: 'outline .15s, box-shadow .15s',
+        boxShadow: hovered
+          ? `0 0 0 4px ${screen.color}22, 0 8px 32px rgba(0,0,0,0.18)`
+          : '0 2px 8px rgba(0,0,0,0.1), 0 6px 24px rgba(0,0,0,0.08)',
+      }}
+    >
+      <div
+        style={{ width: AW, height: AH, position: 'relative', overflow: 'hidden' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={() => onClick(screen)}
+      >
+        {/* Screenshot image */}
+        <img
+          src={screen.img}
+          alt={screen.label}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block', transition: 'transform .3s', transform: hovered ? 'scale(1.015)' : 'scale(1)' }}
+          draggable={false}
+        />
+
+        {/* Gradient overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(10,8,6,0.72) 100%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Screen number chip */}
+        <div style={{
+          position: 'absolute', top: 12, left: 12,
+          background: screen.color,
+          color: '#fff', fontSize: 11, fontWeight: 800,
+          padding: '3px 10px', borderRadius: 50,
+          fontFamily: 'sans-serif', letterSpacing: '.3px',
+        }}>{screen.num}</div>
+
+        {/* Bottom label */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: '12px 14px 14px',
+          pointerEvents: 'none',
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2, fontFamily: 'sans-serif' }}>{screen.label}</div>
+          <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.6)', fontFamily: 'sans-serif' }}>{screen.sub}</div>
+        </div>
+
+        {/* Hover: open button */}
+        {hovered && (
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'rgba(0,0,0,0.75)',
+            color: '#fff', fontSize: 13, fontWeight: 700,
+            padding: '9px 20px', borderRadius: 50,
+            fontFamily: 'sans-serif',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}>
+            Open →
+          </div>
+        )}
+      </div>
+    </DCArtboard>
+  );
+}
+
+function FlowArrow() {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center',
+      alignSelf: 'center',
+      color: 'rgba(80,60,40,0.35)',
+      fontSize: 22, fontWeight: 300,
+      marginTop: -60,
+      flexShrink: 0,
+    }}>→</div>
+  );
+}
+
+function App() {
+  const [selected, setSelected] = React.useState(null);
+
+  const handleClick = (screen) => {
+    setSelected(screen);
+  };
+
+  const handleOpenApp = (pageId) => {
+    localStorage.setItem('aga-page', pageId);
+    window.open('All Good Adventure.html', '_blank');
+  };
+
+  return (
+    <>
+      <DesignCanvas minScale={0.08} maxScale={4}>
+
+        {/* ── ROW 1: Main pages ── */}
+        <DCSection
+          title="Halaman Utama"
+          subtitle="5 screens · Main navigation flow · Desktop responsive"
+          gap={48}
+        >
+          {MAIN.map((screen, i) => (
+            <React.Fragment key={screen.id}>
+              <ScreenCard screen={screen} onClick={handleClick} />
+              {i < MAIN.length - 1 && <FlowArrow />}
+            </React.Fragment>
+          ))}
+        </DCSection>
+
+        {/* ── ROW 2: Auth + Profile ── */}
+        <DCSection
+          title="Autentikasi & Akun"
+          subtitle="4 screens · Register → OTP → Login → Profile"
+          gap={48}
+        >
+          {AUTH.map((screen, i) => (
+            <React.Fragment key={screen.id}>
+              <ScreenCard screen={screen} onClick={handleClick} />
+              {i < AUTH.length - 1 && <FlowArrow />}
+            </React.Fragment>
+          ))}
+        </DCSection>
+
+        {/* Post-it notes */}
+        <DCPostIt top={-36} left={60} rotate={-1.5} width={190}>
+          🏔️ <strong>All Good Adventure</strong><br/>
+          UI Design · 9 Screens<br/>
+          April 2025 ✅
+        </DCPostIt>
+
+        <DCPostIt top={-36} left={310} rotate={1} width={200}>
+          🎒 Main Flow<br/>
+          Beranda → Katalog → Booking → Guide
+        </DCPostIt>
+
+        <DCPostIt top={580} left={60} rotate={2} width={210}>
+          🔐 Auth Flow<br/>
+          Register → OTP → Login → Profile
+        </DCPostIt>
+
+        <DCPostIt top={580} left={330} rotate={-1} width={195}>
+          💡 Tip: Hover artboard lalu klik "Open →" untuk buka halaman itu langsung!
+        </DCPostIt>
+
+      </DesignCanvas>
+
+      {/* ── DETAIL MODAL ── */}
+      {selected && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, z: 99999,
+            background: 'rgba(0,0,0,0.72)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(6px)',
+            zIndex: 99999,
+            animation: 'fadeIn .18s ease',
+          }}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            style={{
+              background: '#fff', borderRadius: 16,
+              width: 780, maxWidth: '92vw',
+              overflow: 'hidden',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+              animation: 'slideUp .22s cubic-bezier(.34,1.56,.64,1)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px',
+              borderBottom: '1px solid #eee',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ background: selected.color, color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 50, letterSpacing: '.3px' }}>{selected.num}</div>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#0F1B2D' }}>{selected.label}</div>
+                  <div style={{ fontSize: 12.5, color: '#9CA3AF' }}>{selected.sub}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={() => handleOpenApp(selected.id)}
+                  style={{ background: selected.color, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, padding: '8px 18px', borderRadius: 8, cursor: 'pointer' }}
+                >
+                  Buka Halaman →
+                </button>
+                <button
+                  onClick={() => setSelected(null)}
+                  style={{ background: '#f3f4f6', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, padding: '8px 14px', borderRadius: 8, cursor: 'pointer', color: '#6B7280' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            {/* Screenshot preview */}
+            <img
+              src={selected.img}
+              alt={selected.label}
+              style={{ width: '100%', display: 'block', maxHeight: '62vh', objectFit: 'cover', objectPosition: 'top' }}
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
+      <style>{`
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+      `}</style>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+// Zoom control wiring
+function getCanvasState() {
+  // Read tf from the world element's transform
+  const world = document.querySelector('.design-canvas > div');
+  if (!world) return null;
+  const t = world.style.transform;
+  const m = t.match(/translate3d\(([^,]+)px,\s*([^,]+)px/);
+  const s = t.match(/scale\(([^)]+)\)/);
+  return { x: m ? parseFloat(m[1]) : 0, y: m ? parseFloat(m[2]) : 0, scale: s ? parseFloat(s[1]) : 1 };
+}
+
+function setCanvasScale(newScale, cx, cy) {
+  const vp = document.querySelector('.design-canvas');
+  const world = document.querySelector('.design-canvas > div');
+  if (!vp || !world) return;
+  const t = world.style.transform;
+  const mx = t.match(/translate3d\(([^,]+)px,\s*([^,]+)px/);
+  const ms = t.match(/scale\(([^)]+)\)/);
+  const x = mx ? parseFloat(mx[1]) : 0;
+  const y = mx ? parseFloat(mx[2]) : 0;
+  const scale = ms ? parseFloat(ms[1]) : 1;
+  const r = vp.getBoundingClientRect();
+  const px = cx ?? (r.width / 2), py = cy ?? (r.height / 2);
+  const k = newScale / scale;
+  const nx = px - (px - x) * k;
+  const ny = py - (py - y) * k;
+  world.style.transform = `translate3d(${nx}px,${ny}px,0) scale(${newScale})`;
+  document.getElementById('zoomLabel').textContent = Math.round(newScale * 100) + '%';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    // Set initial zoom to fit nicely
+    setCanvasScale(0.55);
+
+    document.getElementById('zoomIn').onclick = () => {
+      const s = getCanvasState();
+      if (s) setCanvasScale(Math.min(4, s.scale * 1.25));
+    };
+    document.getElementById('zoomOut').onclick = () => {
+      const s = getCanvasState();
+      if (s) setCanvasScale(Math.max(0.08, s.scale / 1.25));
+    };
+    document.getElementById('zoomFit').onclick = () => {
+      const world = document.querySelector('.design-canvas > div');
+      if (world) {
+        world.style.transform = 'translate3d(60px,60px,0) scale(0.42)';
+        document.getElementById('zoomLabel').textContent = '42%';
+      }
+    };
+
+    // Sync zoom label on wheel
+    const vp = document.querySelector('.design-canvas');
+    if (vp) {
+      const orig = vp.onwheel;
+      vp.addEventListener('wheel', () => {
+        requestAnimationFrame(() => {
+          const s = getCanvasState();
+          if (s) document.getElementById('zoomLabel').textContent = Math.round(s.scale * 100) + '%';
+        });
+      }, { passive: true });
+    }
+  }, 400);
+});
+</script>
+</body>
+</html>
