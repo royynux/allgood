@@ -546,6 +546,48 @@ textarea.form-input{resize:vertical;min-height:100px}
 .custom-trip-katalog-note.show{display:block}
 .custom-trip-katalog-note p{font-size:13px;color:rgba(255,255,255,.82);line-height:1.65}
 
+/* VIRAL BADGE on cards */
+.tc-badge-viral{position:absolute;top:10px;left:10px;background:rgba(232,73,15,.92);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:50px;z-index:2;box-shadow:0 2px 8px rgba(232,73,15,.35);backdrop-filter:blur(2px)}
+
+/* TRENDING SECTION */
+.trending-card{background:var(--white);border:1px solid var(--stroke);border-radius:var(--r-lg);overflow:hidden;transition:all .25s;cursor:pointer}
+.trending-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:transparent}
+
+/* DEST MODAL TABS */
+.dest-modal-tabs{display:flex;border-bottom:1px solid var(--stroke);flex-shrink:0;padding:0 4px;background:var(--white)}
+.dmt{flex:1;padding:12px 6px;border:none;background:transparent;border-bottom:2.5px solid transparent;color:var(--body);font-family:var(--font);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.dmt.active{color:var(--primary);font-weight:700;border-bottom-color:var(--primary)}
+.dest-tab-content{display:none}.dest-tab-content.active{display:block}
+.meeting-point-item{display:flex;gap:14px;padding:14px 16px;background:var(--bg);border-radius:var(--r-md);border:1px solid var(--stroke);margin-bottom:10px;align-items:flex-start}
+.mp-icon{width:36px;height:36px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.review-item{padding:16px;background:var(--bg);border-radius:var(--r-md);border:1px solid var(--stroke);margin-bottom:12px}
+.review-stars{color:#F59E0B;font-size:13px;margin-bottom:4px}
+.review-comment{font-size:13px;color:var(--body);line-height:1.65;margin-bottom:8px}
+.review-meta{font-size:12px;color:var(--body-2);font-weight:600}
+.includes-list{display:flex;flex-direction:column;gap:7px;margin-bottom:0}
+.includes-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--body)}
+.inc-check{color:var(--success);font-weight:800;flex-shrink:0}.exc-check{color:var(--danger);flex-shrink:0}
+
+/* STEP SUCCESS MODAL */
+.step-ok-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:600;align-items:center;justify-content:center}
+.step-ok-overlay.open{display:flex}
+.step-ok-box{background:var(--white);border-radius:20px;padding:36px 44px;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.16);animation:slideUp .3s cubic-bezier(.34,1.56,.64,1)}
+.step-ok-icon{width:56px;height:56px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;color:#fff}
+.step-ok-title{font-size:17px;font-weight:800;color:var(--dark);margin-bottom:8px}
+.step-ok-desc{font-size:13.5px;color:var(--body);line-height:1.65}
+
+/* EDIT BTN in summary */
+.btn-os-edit{background:none;border:1.5px solid var(--stroke);color:var(--primary);font-family:var(--font);font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.btn-os-edit:hover{border-color:var(--primary);background:var(--primary-light)}
+.os-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--stroke);gap:12px}
+
+/* PRICE RANGE FILTER */
+.price-range{display:flex;gap:8px;align-items:center}
+.price-range .fi{width:50%;min-width:0;font-size:12.5px;padding:9px 10px}
+
+/* TRIP TYPE SELECTOR 2-col */
+.trip-type-selector-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+
 /* CUSTOM SUBMIT BOX */
 .custom-price-box{background:var(--bg);border:1.5px dashed var(--stroke);border-radius:var(--r-lg);padding:20px 22px;text-align:center;margin-bottom:0}
 .custom-price-box .cpb-icon{font-size:36px;margin-bottom:8px}
@@ -595,6 +637,15 @@ textarea.form-input{resize:vertical;min-height:100px}
 <body>
 
 <div class="toast" id="toast"></div>
+
+<!-- STEP SUCCESS MODAL -->
+<div class="step-ok-overlay" id="stepOkOverlay">
+  <div class="step-ok-box">
+    <div class="step-ok-icon">✓</div>
+    <div class="step-ok-title">Langkah Selesai!</div>
+    <div class="step-ok-desc" id="stepOkDesc">Berhasil diisi. Melanjutkan ke langkah berikutnya...</div>
+  </div>
+</div>
 
 <!-- DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
@@ -682,6 +733,19 @@ textarea.form-input{resize:vertical;min-height:100px}
         <div><div class="wi"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="pantai" loading="lazy"></div></div>
         <div><div class="wi"><img src="https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=400&q=80" alt="lombok" loading="lazy"></div></div>
       </div>
+    </div>
+  </section>
+
+  <!-- TRIP LAGI VIRAL -->
+  <section class="section" style="background:var(--white);display:none" id="trendingSection">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="sec-label" style="display:block;text-align:center">Sedang Trending</div>
+      <div class="sec-title">Trip Lagi Viral 🔥</div>
+      <div class="sec-sub" style="max-width:480px;margin:12px auto 0;text-align:center">Destinasi yang paling banyak dipesan minggu ini — jangan sampai kehabisan slot!</div>
+    </div>
+    <div class="trips-grid" id="trending-trips"></div>
+    <div style="text-align:center;margin-top:36px">
+      <button class="btn-primary" onclick="nav('katalog')">Lihat Semua Destinasi →</button>
     </div>
   </section>
 
@@ -791,6 +855,15 @@ textarea.form-input{resize:vertical;min-height:100px}
           </select>
         </div>
         <div class="fg">
+          <label>Rentang Harga (Rp)</label>
+          <div class="price-range">
+            <input type="number" class="fi" id="priceMin" placeholder="Min" min="0" oninput="filterTrips()">
+            <span style="font-size:12px;color:var(--body-2);flex-shrink:0">—</span>
+            <input type="number" class="fi" id="priceMax" placeholder="Max" min="0" oninput="filterTrips()">
+          </div>
+          <div id="priceRangeLabel" style="font-size:11.5px;color:var(--body-2);margin-top:5px"></div>
+        </div>
+        <div class="fg">
           <label>Jenis Trip</label>
           <div class="pill-group">
             <span class="pill locked">🔒 Private Trip</span>
@@ -803,7 +876,7 @@ textarea.form-input{resize:vertical;min-height:100px}
     <div>
       <div class="trip-type-tabs">
         <button class="ttype-tab active" id="ttab-all" onclick="setTripTypeTab('all')">🌍 Semua</button>
-        <button class="ttype-tab" id="ttab-rinjani" onclick="setTripTypeTab('rinjani')">🏔️ Pendakian Rinjani</button>
+        <button class="ttype-tab" id="ttab-oneday" onclick="setTripTypeTab('oneday')">🌅 One Day Trip</button>
         <button class="ttype-tab" id="ttab-destination" onclick="setTripTypeTab('destination')">🗺️ Custom Destinations</button>
       </div>
       <div class="custom-trip-katalog-note" id="customKatalogNote">
@@ -852,18 +925,12 @@ textarea.form-input{resize:vertical;min-height:100px}
     <!-- TRIP TYPE SELECTOR -->
     <div id="tripTypeSelectorWrap">
       <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px">Pilih Jenis Trip:</div>
-      <div class="trip-type-selector">
+      <div class="trip-type-selector-2">
         <div class="trip-type-card" id="ttc-oneday" onclick="selectBookingTripType('oneday')">
           <div class="ttc-icon">🌅</div>
           <div class="ttc-label">One Day Trip</div>
           <div class="ttc-sub">Pilih satu destinasi, itinerary sudah disiapkan. Cocok untuk trip 1 hari.</div>
           <div class="ttc-badge">Harga langsung tampil</div>
-        </div>
-        <div class="trip-type-card" id="ttc-rinjani" onclick="selectBookingTripType('rinjani')">
-          <div class="ttc-icon">🏔️</div>
-          <div class="ttc-label">Pendakian Rinjani</div>
-          <div class="ttc-sub">Paket khusus summit Rinjani 3.726 mdpl. Minimum 3 hari 2 malam.</div>
-          <div class="ttc-badge dark">Min. 3H 2M</div>
         </div>
         <div class="trip-type-card" id="ttc-custom" onclick="selectBookingTripType('custom')">
           <div class="ttc-icon">🗺️</div>
@@ -885,20 +952,6 @@ textarea.form-input{resize:vertical;min-height:100px}
 
     <!-- STEP 1: DESTINASI -->
     <div class="step-panel" id="step-1">
-      <!-- RINJANI INFO (shown only for rinjani type) -->
-      <div id="rinjanInfoBox" style="display:none">
-        <div class="rinjani-info-box">
-          <h3>🏔️ Pendakian Rinjani — 3.726 mdpl</h3>
-          <p>Mendaki puncak tertinggi kedua di Indonesia. Paket ini sudah termasuk porter, tenda, perlengkapan masak, dan guide SAR bersertifikat.</p>
-          <div class="rinjani-req">
-            <span class="rinjani-req-item">⏱️ Min. 3 Hari 2 Malam</span>
-            <span class="rinjani-req-item">👤 Guide SAR Bersertifikat</span>
-            <span class="rinjani-req-item">⛺ Perlengkapan Lengkap</span>
-            <span class="rinjani-req-item">🛡️ Asuransi Perjalanan</span>
-          </div>
-        </div>
-        <div style="font-size:13px;color:var(--body-2);margin-bottom:14px">Paket Rinjani sudah otomatis terpilih. Lanjutkan untuk memilih guide.</div>
-      </div>
       <!-- ONE DAY / REGULAR SINGLE SELECT -->
       <div id="onedayDestSection">
         <div class="step-title" id="step1Title">Pilih Destinasi Trip</div>
@@ -967,43 +1020,12 @@ textarea.form-input{resize:vertical;min-height:100px}
         </div>
       </div>
 
-      <!-- RINJANI: fixed 3D2N date -->
-      <div id="regularDateSection" style="display:none">
-        <div class="detail-grid">
-          <div>
-            <div class="form-group">
-              <label>Tanggal Berangkat <span class="req">*</span></label>
-              <input type="date" class="form-input" id="tglBerangkat" onchange="calcRinjaniDate()">
-            </div>
-            <div id="durationDisplay">
-              <div class="duration-badge">📅 <span id="durationText">3 Hari 2 Malam</span></div>
-            </div>
-            <div style="font-size:12px;color:var(--body-2);margin-top:7px">Tanggal pulang otomatis dihitung 2 hari setelah keberangkatan.</div>
-          </div>
-          <div>
-            <div class="form-group">
-              <label>Jumlah Peserta <span class="req">*</span></label>
-              <div class="counter-wrap">
-                <button class="counter-btn" onclick="changeParticipants(-1)">−</button>
-                <div class="counter-val" id="participantVal">1</div>
-                <button class="counter-btn" onclick="changeParticipants(1)">+</button>
-              </div>
-              <div style="font-size:12px;color:var(--body-2);margin-top:7px">Minimal 1 orang</div>
-            </div>
-            <div class="form-group">
-              <label>Meeting Point</label>
-              <input type="text" class="form-input" id="meetingPoint" placeholder="Contoh: Bandara Lombok International">
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- CUSTOM: custom duration + participants -->
       <div id="customDurSection" style="display:none">
         <div class="form-group">
           <label>Berapa hari perkiraan trip kamu? <span class="req">*</span></label>
           <div class="custom-dur-row">
-            <input type="number" class="custom-dur-input" id="customDurInput" min="1" max="7" placeholder="1" oninput="validateCustomDur()">
+            <input type="number" class="custom-dur-input" id="customDurInput" min="1" max="14" placeholder="1" oninput="validateCustomDur()">
             <span style="font-size:15px;font-weight:700;color:var(--dark)">Hari</span>
           </div>
           <div style="font-size:12px;color:var(--body-2)">Durasi perkiraan, maks. 7 hari — admin akan konfirmasi detail jadwal bersamamu.</div>
@@ -1349,14 +1371,12 @@ textarea.form-input{resize:vertical;min-height:100px}
 /* ═══ DATA ═══ */
 const TRIPS = [
   // ── ONE DAY TRIPS (Lombok) ──
-  {id:1,tripType:'oneday',name:'Mandalika',city:'Lombok',cat:'Beach',tags:['Pantai','Surfing'],dur:1,price:350000,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80',status:'Tersedia',desc:'Jelajahi pesisir selatan Lombok dalam satu hari penuh — dari Kuta Lombok, Bukit Merese, hingga Tanjung Aan. Itinerary sudah disiapkan agar kamu menikmati banyak spot terbaik dalam 1 hari.',highlights:[{icon:'🏖️',text:'Kuta Lombok',sub:'Pantai eksotis & surfing spot'},{icon:'📸',text:'Bukit Merese',sub:'Spot foto viral Lombok'},{icon:'🌊',text:'Tanjung Aan',sub:'Pasir bintang yang unik'},{icon:'🍽️',text:'Makan Siang Lokal',sub:'Seafood segar pinggir pantai'}],itinerary:[{day:1,title:'Mandalika & Pesisir Selatan',items:[{time:'07.00',act:'Penjemputan di meeting point (Bandara/Hotel)'},{time:'08.30',act:'Tiba di Kuta Lombok — eksplorasi pantai & surfing spot'},{time:'10.00',act:'Naik ke Bukit Merese — foto panorama & view bukit hijau'},{time:'11.30',act:'Tanjung Aan — bermain di pasir bintang & berenang'},{time:'13.00',act:'Makan siang di warung seafood lokal'},{time:'14.30',act:'Pantai Seger & area Mandalika Circuit'},{time:'16.30',act:'Sunset di Bukit Merese atau Kuta Lombok'},{time:'18.00',act:'Perjalanan kembali ke meeting point'},{time:'19.30',act:'Selesai — tiba di titik awal'}]}]},
-  {id:2,tripType:'oneday',name:'Gili Trawangan',city:'Lombok',cat:'Island',tags:['Pulau','Snorkeling'],dur:1,price:420000,img:'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=500&q=80',status:'Tersedia',desc:'Satu hari penuh menjelajahi Gili Trawangan — pulau paling terkenal di kepulauan Gili. Snorkeling dengan penyu, bersepeda keliling pulau, dan sunset ikonik.',highlights:[{icon:'🐢',text:'Snorkeling dengan penyu',sub:'Spot terbaik di sekitar Gili'},{icon:'🚲',text:'Bersepeda keliling pulau',sub:'Transportasi khas Gili'},{icon:'🌅',text:'Sunset ikonik',sub:'View terbaik di ujung barat'},{icon:'🏖️',text:'Pantai berpasir putih',sub:'Air jernih & bersih'}],itinerary:[{day:1,title:'Gili Trawangan Full Day',items:[{time:'07.00',act:'Penjemputan di hotel/meeting point'},{time:'08.00',act:'Perjalanan ke pelabuhan Bangsal'},{time:'08.45',act:'Fast boat ke Gili Trawangan (~30 menit)'},{time:'09.30',act:'Snorkeling — spot penyu terbaik'},{time:'11.30',act:'Naik ke darat — sewa sepeda & keliling pulau'},{time:'13.00',act:'Makan siang di warung tepi pantai'},{time:'14.30',act:'Free time — pantai & bersantai'},{time:'16.30',act:'Sunset di sisi barat Gili Trawangan'},{time:'17.30',act:'Fast boat kembali ke Bangsal'},{time:'19.00',act:'Tiba kembali di meeting point'}]}]},
+  {id:1,tripType:'oneday',name:'Mandalika',badge:'🔥 Viral',city:'Lombok',cat:'Beach',tags:['Pantai','Surfing'],dur:1,price:350000,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80',status:'Tersedia',desc:'Jelajahi pesisir selatan Lombok dalam satu hari penuh — dari Kuta Lombok, Bukit Merese, hingga Tanjung Aan. Itinerary sudah disiapkan agar kamu menikmati banyak spot terbaik dalam 1 hari.',highlights:[{icon:'🏖️',text:'Kuta Lombok',sub:'Pantai eksotis & surfing spot'},{icon:'📸',text:'Bukit Merese',sub:'Spot foto viral Lombok'},{icon:'🌊',text:'Tanjung Aan',sub:'Pasir bintang yang unik'},{icon:'🍽️',text:'Makan Siang Lokal',sub:'Seafood segar pinggir pantai'}],itinerary:[{day:1,title:'Mandalika & Pesisir Selatan',items:[{time:'07.00',act:'Penjemputan di meeting point (Bandara/Hotel)'},{time:'08.30',act:'Tiba di Kuta Lombok — eksplorasi pantai & surfing spot'},{time:'10.00',act:'Naik ke Bukit Merese — foto panorama & view bukit hijau'},{time:'11.30',act:'Tanjung Aan — bermain di pasir bintang & berenang'},{time:'13.00',act:'Makan siang di warung seafood lokal'},{time:'14.30',act:'Pantai Seger & area Mandalika Circuit'},{time:'16.30',act:'Sunset di Bukit Merese atau Kuta Lombok'},{time:'18.00',act:'Perjalanan kembali ke meeting point'},{time:'19.30',act:'Selesai — tiba di titik awal'}]}]},
+  {id:2,tripType:'oneday',name:'Gili Trawangan',badge:'⭐ Terpopuler',city:'Lombok',cat:'Island',tags:['Pulau','Snorkeling'],dur:1,price:420000,img:'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=500&q=80',status:'Tersedia',desc:'Satu hari penuh menjelajahi Gili Trawangan — pulau paling terkenal di kepulauan Gili. Snorkeling dengan penyu, bersepeda keliling pulau, dan sunset ikonik.',highlights:[{icon:'🐢',text:'Snorkeling dengan penyu',sub:'Spot terbaik di sekitar Gili'},{icon:'🚲',text:'Bersepeda keliling pulau',sub:'Transportasi khas Gili'},{icon:'🌅',text:'Sunset ikonik',sub:'View terbaik di ujung barat'},{icon:'🏖️',text:'Pantai berpasir putih',sub:'Air jernih & bersih'}],itinerary:[{day:1,title:'Gili Trawangan Full Day',items:[{time:'07.00',act:'Penjemputan di hotel/meeting point'},{time:'08.00',act:'Perjalanan ke pelabuhan Bangsal'},{time:'08.45',act:'Fast boat ke Gili Trawangan (~30 menit)'},{time:'09.30',act:'Snorkeling — spot penyu terbaik'},{time:'11.30',act:'Naik ke darat — sewa sepeda & keliling pulau'},{time:'13.00',act:'Makan siang di warung tepi pantai'},{time:'14.30',act:'Free time — pantai & bersantai'},{time:'16.30',act:'Sunset di sisi barat Gili Trawangan'},{time:'17.30',act:'Fast boat kembali ke Bangsal'},{time:'19.00',act:'Tiba kembali di meeting point'}]}]},
   {id:3,tripType:'oneday',name:'Senggigi & Malimbu',city:'Lombok',cat:'Beach',tags:['Pantai','Sunset'],dur:1,price:280000,img:'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=500&q=80',status:'Tersedia',desc:'Jelajahi pesisir barat Lombok dalam satu hari — dari Senggigi yang ramai hingga Malimbu dengan sunset terbaik dan view Gunung Agung Bali di kejauhan.',highlights:[{icon:'🌇',text:'Sunset Malimbu',sub:'View Gunung Agung Bali'},{icon:'🏨',text:'Senggigi Beach',sub:'Pantai ikonik Lombok'},{icon:'🛍️',text:'Pasar Seni Senggigi',sub:'Souvenir & kerajinan lokal'},{icon:'🍽️',text:'Kuliner pinggir pantai',sub:'Seafood & masakan lokal'}],itinerary:[{day:1,title:'Senggigi & Malimbu',items:[{time:'09.00',act:'Penjemputan di meeting point'},{time:'10.00',act:'Senggigi Beach — eksplorasi & foto'},{time:'11.00',act:'Pasar Seni & souvenir shopping'},{time:'12.00',act:'Makan siang di restoran tepi pantai Senggigi'},{time:'13.30',act:'Perjalanan ke Malimbu — mampir di Nipah & Kerandangan'},{time:'15.00',act:'Malimbu Hill — panorama laut & Gunung Agung Bali'},{time:'17.00',act:'Nikmati sunset spektakuler di Malimbu'},{time:'18.30',act:'Perjalanan kembali'},{time:'19.30',act:'Selesai di meeting point'}]}]},
   // ── ONE DAY TRIPS (Bali) ──
-  {id:10,tripType:'oneday',name:'Tanah Lot & Uluwatu',city:'Bali',cat:'Culture',tags:['Budaya','Sunset'],dur:1,price:380000,img:'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=500&q=80',status:'Tersedia',desc:'Kunjungi dua pura paling ikonik di Bali — Tanah Lot yang berdiri di atas batu karang, dan Uluwatu dengan pertunjukan Kecak di tepi tebing saat sunset.',highlights:[{icon:'🛕',text:'Tanah Lot',sub:'Pura di atas batu karang'},{icon:'🌅',text:'Uluwatu Sunset',sub:'Tari Kecak di tepi tebing'},{icon:'🌊',text:'Pantai Padang Padang',sub:'Pantai tersembunyi di Uluwatu'},{icon:'🍽️',text:'Seafood Jimbaran',sub:'Makan malam romantis di pantai'}],itinerary:[{day:1,title:'Tanah Lot & Uluwatu',items:[{time:'08.00',act:'Penjemputan di hotel'},{time:'09.30',act:'Tanah Lot — pura ikonik di atas karang'},{time:'11.30',act:'Perjalanan ke Uluwatu'},{time:'13.00',act:'Makan siang di Jimbaran area'},{time:'14.30',act:'Pantai Padang Padang & Bingin'},{time:'17.00',act:'Uluwatu — Kecak Dance saat sunset'},{time:'19.00',act:'Makan malam seafood Jimbaran'},{time:'21.00',act:'Kembali ke hotel'}]}]},
+  {id:10,tripType:'oneday',name:'Tanah Lot & Uluwatu',badge:'🆕 Baru',city:'Bali',cat:'Culture',tags:['Budaya','Sunset'],dur:1,price:380000,img:'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=500&q=80',status:'Tersedia',desc:'Kunjungi dua pura paling ikonik di Bali — Tanah Lot yang berdiri di atas batu karang, dan Uluwatu dengan pertunjukan Kecak di tepi tebing saat sunset.',highlights:[{icon:'🛕',text:'Tanah Lot',sub:'Pura di atas batu karang'},{icon:'🌅',text:'Uluwatu Sunset',sub:'Tari Kecak di tepi tebing'},{icon:'🌊',text:'Pantai Padang Padang',sub:'Pantai tersembunyi di Uluwatu'},{icon:'🍽️',text:'Seafood Jimbaran',sub:'Makan malam romantis di pantai'}],itinerary:[{day:1,title:'Tanah Lot & Uluwatu',items:[{time:'08.00',act:'Penjemputan di hotel'},{time:'09.30',act:'Tanah Lot — pura ikonik di atas karang'},{time:'11.30',act:'Perjalanan ke Uluwatu'},{time:'13.00',act:'Makan siang di Jimbaran area'},{time:'14.30',act:'Pantai Padang Padang & Bingin'},{time:'17.00',act:'Uluwatu — Kecak Dance saat sunset'},{time:'19.00',act:'Makan malam seafood Jimbaran'},{time:'21.00',act:'Kembali ke hotel'}]}]},
   {id:11,tripType:'oneday',name:'Ubud & Alam Tegallalang',city:'Bali',cat:'Culture',tags:['Budaya','Alam'],dur:1,price:320000,img:'https://images.unsplash.com/photo-1531592937781-344ad608fabf?w=500&q=80',status:'Tersedia',desc:'Jelajahi pusat budaya Bali di Ubud — dari sawah terasering Tegallalang, Monkey Forest, Pasar Ubud, hingga pertunjukan tari Barong yang memukau.',highlights:[{icon:'🌾',text:'Sawah Tegallalang',sub:'Rice terrace ikonik Bali'},{icon:'🐒',text:'Sacred Monkey Forest',sub:'Hutan kera suci Ubud'},{icon:'🛕',text:'Pura Tirta Empul',sub:'Ritual pemandian suci'},{icon:'🎭',text:'Tari Barong',sub:'Pertunjukan seni tradisional'}],itinerary:[{day:1,title:'Ubud & Alam Bali',items:[{time:'08.00',act:'Penjemputan di hotel'},{time:'09.00',act:'Sawah Tegallalang — foto & swing'},{time:'11.00',act:'Pura Tirta Empul'},{time:'12.30',act:'Makan siang di Ubud'},{time:'14.00',act:'Pasar Ubud & toko seni'},{time:'15.30',act:'Sacred Monkey Forest'},{time:'17.00',act:'Tari Barong atau Kecak'},{time:'19.00',act:'Kembali ke hotel'}]}]},
-  // ── PENDAKIAN RINJANI ──
-  {id:4,tripType:'rinjani',name:'Pendakian Rinjani',city:'Lombok',cat:'Mountain',tags:['Gunung','Trekking','3D2N'],dur:3,minDur:3,price:1200000,img:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=500&q=80',status:'Tersedia',desc:'Mendaki puncak tertinggi kedua di Indonesia setinggi 3.726 mdpl. Rasakan keajaiban Danau Segara Anak yang memukau di dalam kaldera Rinjani. Durasi minimum 3 hari 2 malam.',highlights:[{icon:'⛰️',text:'Puncak 3.726 mdpl',sub:'Summit tertinggi di NTB'},{icon:'💧',text:'Danau Segara Anak',sub:'Danau kawah yang menakjubkan'},{icon:'🌅',text:'Sunrise spektakuler',sub:'Golden hour dari puncak'},{icon:'🛡️',text:'Guide SAR bersertifikat',sub:'Keamanan terjamin'}],itinerary:[{day:1,title:'Kedatangan & Trek Awal',items:[{time:'06.00',act:'Kumpul di Sembalun Lawang / Senaru (meeting point)'},{time:'07.00',act:'Briefing & persiapan perlengkapan'},{time:'08.00',act:'Mulai pendakian dari pos awal'},{time:'12.00',act:'Makan siang di Pos 1 atau Pos 2'},{time:'17.00',act:'Tiba di camp area Pos 2 / Pos 3'},{time:'18.00',act:'Setup tenda & makan malam'},{time:'20.00',act:'Istirahat — persiapan summit attack besok'}]},{day:2,title:'Summit Attack & Danau Segara Anak',items:[{time:'02.00',act:'Bangun & persiapan summit attack'},{time:'03.00',act:'Mulai pendakian ke puncak (jalur curam)'},{time:'06.00',act:'Tiba di Puncak Rinjani 3.726 mdpl — SUNRISE!'},{time:'07.30',act:'Dokumentasi & nikmati pemandangan 360°'},{time:'09.00',act:'Turun dari puncak ke Plawangan Sembalun'},{time:'11.00',act:'Turun ke Danau Segara Anak & berendam air panas'},{time:'13.00',act:'Camp di tepi danau — makan siang'},{time:'18.00',act:'Makan malam & istirahat'}]},{day:3,title:'Trek Turun & Kepulangan',items:[{time:'06.00',act:'Sarapan & packing'},{time:'07.00',act:'Trek turun via jalur Senaru'},{time:'10.30',act:'Tiba di Pos Senaru (finish point)'},{time:'11.00',act:'Sertifikat pendakian & foto bersama'},{time:'12.00',act:'Makan siang'},{time:'14.00',act:'Perjalanan kembali ke hotel / Mataram'},{time:'17.00',act:'Tiba di meeting point — pendakian selesai 🎉'}]}]},
   // ── CUSTOM DESTINATIONS ──
   {id:5,tripType:'destination',name:'Gili Islands (Trawangan, Meno & Air)',city:'Lombok',cat:'Island',tags:['Pulau','Snorkeling'],dur:1,price:950000,img:'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=500&q=80',status:'Tersedia',desc:'Jelajahi tiga pulau Gili yang ikonik — Trawangan, Meno, dan Air. Snorkeling dengan penyu, bersantai di pantai berpasir putih, dan nikmati sunset terbaik.',highlights:[{icon:'🐢',text:'Snorkeling dengan penyu',sub:'Spot terbaik di Gili Meno'},{icon:'🏖️',text:'3 Pulau Gili',sub:'Trawangan, Meno & Air'},{icon:'🌊',text:'Pantai berpasir putih',sub:'Air jernih & bersih'},{icon:'🌅',text:'Sunset terbaik',sub:'Dari Gili Trawangan'}],itinerary:[{day:1,title:'Kedatangan & Gili Trawangan',items:[{time:'08.00',act:'Penjemputan di meeting point'},{time:'09.00',act:'Perjalanan ke Pelabuhan Bangsal'},{time:'10.00',act:'Fast boat ke Gili Trawangan'},{time:'11.00',act:'Check in & eksplorasi Gili Trawangan'},{time:'13.00',act:'Makan siang di warung tepi pantai'},{time:'15.00',act:'Snorkeling di spot terbaik'},{time:'17.30',act:'Sunset di sisi barat Gili Trawangan'},{time:'19.00',act:'Makan malam & istirahat'}]},{day:2,title:'Gili Meno & Gili Air',items:[{time:'07.00',act:'Sarapan'},{time:'08.00',act:'Perahu ke Gili Meno — snorkeling dengan penyu'},{time:'11.00',act:'Island hopping ke Gili Air'},{time:'13.00',act:'Makan siang di Gili Air'},{time:'14.00',act:'Eksplorasi & berenang di Gili Air'},{time:'16.00',act:'Kembali ke Gili Trawangan atau direct ke darat'},{time:'19.00',act:'Makan malam'}]},{day:3,title:'Kepulangan',items:[{time:'07.00',act:'Sarapan & check out'},{time:'09.00',act:'Fast boat kembali ke Bangsal'},{time:'10.00',act:'Perjalanan kembali ke hotel/Mataram'},{time:'12.00',act:'Selesai'}]}]},
   {id:6,tripType:'destination',name:'Selong Belanak & Kuta Lombok',city:'Lombok',cat:'Beach',tags:['Pantai','Surfing'],dur:1,price:650000,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80',status:'Tersedia',desc:'Eksplorasi pantai-pantai eksotis di pesisir selatan Lombok — dari Selong Belanak yang tenang hingga Kuta Lombok yang spektakuler dengan ombak surfing.',highlights:[{icon:'🏄',text:'Surfing Kuta Lombok',sub:'Ombak kelas dunia'},{icon:'🏖️',text:'Selong Belanak',sub:'Pantai terpanjang di Lombok'},{icon:'📸',text:'Spot foto viral',sub:'Bukit Merese & Tanjung Aan'},{icon:'🦀',text:'Seafood lokal',sub:'Fresh dari nelayan langsung'}],itinerary:[{day:1,title:'Kedatangan & Eksplorasi',items:[{time:'08.00',act:'Penjemputan di meeting point'},{time:'10.00',act:'Perjalanan menuju destinasi'},{time:'12.00',act:'Makan siang di restoran lokal'},{time:'14.00',act:'Eksplorasi spot utama'},{time:'17.00',act:'Sunset & foto-foto'},{time:'19.00',act:'Makan malam & istirahat'}]},{day:2,title:'Eksplorasi Lanjutan',items:[{time:'07.00',act:'Sarapan'},{time:'08.00',act:'Aktivitas utama (surfing / snorkeling / tour)'},{time:'12.00',act:'Makan siang'},{time:'14.00',act:'Free time / aktivitas opsional'},{time:'16.00',act:'Perjalanan kembali ke meeting point'},{time:'17.00',act:'Selesai'}]}]},
@@ -1434,32 +1454,39 @@ function escapeHtml(value) {
 function renderHomeTrips() {
   const el = document.getElementById('home-trips');
   if (!el) return;
-  // Show 1 oneday, 1 rinjani, 2 custom destinations
   const picks = [
     TRIPS.find(t => t.tripType === 'oneday'),
-    TRIPS.find(t => t.tripType === 'rinjani'),
-    ...TRIPS.filter(t => t.tripType === 'destination').slice(0,2),
+    ...TRIPS.filter(t => t.tripType === 'destination').slice(0,3),
   ].filter(Boolean);
   el.innerHTML = picks.map(t => tripCardHtml(t)).join('');
+
+  // Render trending section
+  const featured = TRIPS.filter(t => t.badge);
+  const trendEl = document.getElementById('trending-trips');
+  const trendSection = document.getElementById('trendingSection');
+  if (trendEl && featured.length > 0) {
+    trendSection.style.display = 'block';
+    trendEl.innerHTML = featured.map(t => tripCardHtml(t)).join('');
+  }
 }
 
 function tripCardHtml(trip) {
   const statusColor = trip.status === 'Tersedia' ? '#16A34A' : '#DC2626';
-  const typeLabel = trip.tripType === 'oneday' ? '🌅 1 Hari'
-    : trip.tripType === 'rinjani' ? '🏔️ Pendakian Rinjani'
-    : '🗺️ Custom';
-  const typeColor = trip.tripType === 'oneday' ? {bg:'#FFF0EB',color:'#E8490F',border:'#FECACA'}
-    : trip.tripType === 'rinjani' ? {bg:'#0F1B2D',color:'#fff',border:'#0F1B2D'}
+  const typeLabel = trip.tripType === 'oneday' ? '🌅 One Day' : '🗺️ Custom';
+  const typeColor = trip.tripType === 'oneday'
+    ? {bg:'#FFF0EB',color:'#E8490F',border:'#FECACA'}
     : {bg:'#F3F4F6',color:'#374151',border:'#D1D5DB'};
-  const durLabel = trip.tripType === 'rinjani' ? '3H/2M min' : '1 Hari';
   const priceHtml = trip.tripType === 'destination'
     ? `<div style="font-size:13px;font-weight:700;color:var(--body)">Harga dikonfirmasi</div>`
     : `<div class="tc-price">${fmtPrice(trip.price)} <small>/ orang</small></div>`;
+  const badgeHtml = trip.badge
+    ? `<span class="tc-badge-viral">${trip.badge}</span>`
+    : `<span class="tc-badge-status" style="background:${statusColor}">${trip.status}</span>`;
   return `<div class="trip-card" onclick="openDestModal(${trip.id})">
-    <div class="tc-img">
+    <div class="tc-img" style="position:relative">
       <img src="${trip.img}" alt="${trip.name}" loading="lazy">
-      <span class="tc-badge-status" style="background:${statusColor}">${trip.status}</span>
-      <span class="tc-badge-dur">${durLabel}</span>
+      ${badgeHtml}
+      <span class="tc-badge-dur">1 Hari</span>
     </div>
     <div class="tc-body">
       <div class="tc-tags">
@@ -1484,14 +1511,14 @@ function setKatalogLocation(loc) {
 
 function setTripTypeTab(type) {
   currentKatalogTripType = type;
-  ['all','rinjani','destination'].forEach(t => document.getElementById('ttab-'+t)?.classList.toggle('active', t===type));
+  ['all','oneday','destination'].forEach(t => document.getElementById('ttab-'+t)?.classList.toggle('active', t===type));
   const note = document.getElementById('customKatalogNote');
   if (note) note.classList.toggle('show', type === 'destination');
   const title = document.getElementById('listingTitle');
   if (title) {
-    title.textContent = type === 'rinjani' ? 'Pendakian Rinjani'
+    title.textContent = type === 'oneday' ? 'One Day Trip'
       : type === 'destination' ? 'Destinasi untuk Custom Trip'
-      : 'Semua Trip Lombok';
+      : 'Semua Destinasi Private Trip';
   }
   filterTrips();
 }
@@ -1500,13 +1527,23 @@ function filterTrips() {
   const search = (document.getElementById('searchFilter')?.value || '').toLowerCase();
   const kategori = document.getElementById('kategoriFilter')?.value || '';
   const sort = document.getElementById('sortFilter')?.value || 'default';
+  const priceMin = parseInt(document.getElementById('priceMin')?.value) || 0;
+  const priceMax = parseInt(document.getElementById('priceMax')?.value) || 0;
+
+  // Update price label
+  const priceLabel = document.getElementById('priceRangeLabel');
+  if (priceLabel && (priceMin || priceMax)) {
+    priceLabel.textContent = `${priceMin ? fmtPrice(priceMin) : 'Rp 0'} — ${priceMax ? fmtPrice(priceMax) : '∞'}`;
+  } else if (priceLabel) { priceLabel.textContent = ''; }
 
   let result = TRIPS.filter(t => {
     const mType = currentKatalogTripType === 'all' || t.tripType === currentKatalogTripType;
     const mLoc = currentKatalogLocation === 'all' || t.city === currentKatalogLocation;
     const mSearch = !search || t.name.toLowerCase().includes(search) || t.tags.join(' ').toLowerCase().includes(search);
     const mKat = !kategori || t.cat === kategori;
-    return mType && mLoc && mSearch && mKat;
+    const mPriceMin = !priceMin || t.price >= priceMin;
+    const mPriceMax = !priceMax || t.price <= priceMax;
+    return mType && mLoc && mSearch && mKat && mPriceMin && mPriceMax;
   });
 
   if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
@@ -1515,73 +1552,51 @@ function filterTrips() {
   const el = document.getElementById('listingGrid');
   const count = document.getElementById('listingCount');
   if (!el) return;
-  count.textContent = `Menampilkan ${result.length} trip`;
-  el.innerHTML = result.length ? result.map(tripCardHtml).join('') : `<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:52px;margin-bottom:14px">🔍</div><p style="color:var(--body-2)">Tidak ada trip ditemukan.</p></div>`;
+  count.textContent = `${result.length} destinasi ditemukan`;
+  el.innerHTML = result.length ? result.map(tripCardHtml).join('') : `<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:52px;margin-bottom:14px">🔍</div><h3 style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:8px">Destinasi Tidak Ditemukan</h3><p style="color:var(--body-2)">Coba ubah filter atau kata pencarian kamu.</p><button onclick="resetKatalogFilters()" style="margin-top:16px;background:var(--primary);color:#fff;border:none;font-family:var(--font);font-size:13.5px;font-weight:700;padding:10px 22px;border-radius:var(--r-sm);cursor:pointer">Reset Filter</button></div>`;
 }
 
 function resetKatalogFilters() {
   document.getElementById('searchFilter').value = '';
   document.getElementById('kategoriFilter').value = '';
   document.getElementById('sortFilter').value = 'default';
+  const pm = document.getElementById('priceMin'); if(pm) pm.value = '';
+  const px = document.getElementById('priceMax'); if(px) px.value = '';
   setKatalogLocation('all');
+  setTripTypeTab('all');
 }
 
-/* ═══ DESTINATION MODAL (Katalog) ═══ */
+/* ═══ DESTINATION MODAL (Katalog) — 4 Tabs ═══ */
+let destModalTab = 'deskripsi';
+
 function openDestModal(id) {
   const trip = TRIPS.find(t => t.id === id);
   if (!trip) return;
-  const hl = trip.highlights.map(h => `
-    <div class="highlight-item">
-      <div class="highlight-icon">${h.icon}</div>
-      <div><div class="highlight-text">${h.text}</div><div class="highlight-sub">${h.sub}</div></div>
-    </div>`).join('');
-
-  // Build itinerary HTML
-  const itinHtml = trip.itinerary ? `
-    <div class="itin-section">
-      <div class="itin-section-title">📅 Itinerary Perjalanan</div>
-      ${trip.itinerary.map(day => `
-        <div class="itin-day">
-          <div class="itin-day-header">
-            <span class="itin-day-num">Hari ${day.day}</span>
-            <span class="itin-day-title">${day.title}</span>
-          </div>
-          <div class="itin-items">
-            ${day.items.map(item => `
-              <div class="itin-item">
-                <span class="itin-time">${item.time}</span>
-                <span class="itin-act">${item.act}</span>
-              </div>`).join('')}
-          </div>
-        </div>`).join('')}
-      <div style="font-size:12px;color:var(--body-2);margin-top:10px;font-style:italic">*Itinerary bersifat informatif dan dapat disesuaikan kondisi lapangan.</div>
-    </div>` : '';
-
-  const durLabel = trip.tripType === 'rinjani' ? '3 Hari 2 Malam (min.)' : '1 Hari';
+  destModalTab = 'deskripsi';
   const isCustom = trip.tripType === 'destination';
 
   document.getElementById('destModalBox').innerHTML = `
-    <div class="dest-modal-img">
-      <img src="${trip.img}" alt="${trip.name}">
+    <div class="dest-modal-img" style="height:220px">
+      <img src="${trip.img}" alt="${trip.name}" style="width:100%;height:100%;object-fit:cover;display:block">
       <div class="dest-modal-img-grad"></div>
       <div class="dest-modal-img-title">
-        <h2>${trip.name}</h2>
-        <p>📍 ${trip.city} · ${durLabel} · 🔒 Private Trip</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;background:rgba(232,73,15,.85);color:#fff">${trip.tripType==='oneday'?'One Day':'Custom'}</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;background:rgba(255,255,255,.2);color:#fff">⏱️ 1 Hari</span>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:3px">${trip.name}</h2>
+        <p style="font-size:13px;opacity:.8">📍 ${trip.city}</p>
       </div>
       <button class="dest-modal-close" onclick="closeDestModal()">✕</button>
     </div>
-    <div class="dest-modal-body">
-      <p style="font-size:14.5px;color:var(--body);line-height:1.8;margin-bottom:20px">${trip.desc}</p>
-      <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">✨ Highlight Perjalanan</div>
-      <div class="dest-modal-highlights">${hl}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;margin-bottom:4px">
-        ${trip.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
-        <span class="tag" style="background:#DCFCE7;color:#16A34A;border-color:#BBF7D0">${trip.status}</span>
-        ${trip.tripType==='oneday'?'<span class="tag" style="background:#FFF0EB;color:#E8490F;border-color:#FECACA">🌅 1 Hari</span>':''}
-        ${trip.tripType==='rinjani'?'<span class="tag" style="background:#1D2A3A;color:#fff;border-color:#1D2A3A">🏔️ Rinjani Min. 3H2M</span>':''}
-        ${isCustom?'<span class="tag" style="background:#F3F4F6;color:#374151;border-color:#D1D5DB">🗺️ Custom Trip</span>':''}
-      </div>
-      ${itinHtml}
+    <div class="dest-modal-tabs">
+      <button class="dmt active" id="dmt-deskripsi" onclick="switchDestTab('deskripsi',${trip.id})">Deskripsi</button>
+      <button class="dmt" id="dmt-itinerary" onclick="switchDestTab('itinerary',${trip.id})">Itinerary</button>
+      <button class="dmt" id="dmt-meeting" onclick="switchDestTab('meeting',${trip.id})">Meeting Points</button>
+      <button class="dmt" id="dmt-ulasan" onclick="switchDestTab('ulasan',${trip.id})">Ulasan</button>
+    </div>
+    <div class="dest-modal-body" id="destModalTabBody">
+      ${buildDestTab('deskripsi', trip)}
     </div>
     <div class="dest-modal-footer">
       ${isCustom ? `
@@ -1599,8 +1614,110 @@ function openDestModal(id) {
       `}
       <button class="btn-book-dest" onclick="bookFromModal(${trip.id})">${isCustom ? 'Tambahkan ke Custom Trip →' : 'Booking Private Trip ini →'}</button>
     </div>`;
+
   document.getElementById('destModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function switchDestTab(tab, tripId) {
+  destModalTab = tab;
+  const trip = TRIPS.find(t => t.id === tripId);
+  ['deskripsi','itinerary','meeting','ulasan'].forEach(t => {
+    document.getElementById('dmt-'+t)?.classList.toggle('active', t === tab);
+  });
+  const body = document.getElementById('destModalTabBody');
+  if (body && trip) body.innerHTML = buildDestTab(tab, trip);
+}
+
+function buildDestTab(tab, trip) {
+  if (tab === 'deskripsi') {
+    const hl = trip.highlights.map(h => `
+      <div class="highlight-item">
+        <div class="highlight-icon">${h.icon}</div>
+        <div><div class="highlight-text">${h.text}</div><div class="highlight-sub">${h.sub}</div></div>
+      </div>`).join('');
+    return `
+      <p style="font-size:13.5px;color:var(--body);line-height:1.8;margin-bottom:20px">${trip.desc}</p>
+      <div class="itin-section-title" style="margin-bottom:12px">✨ Highlight</div>
+      <div class="dest-modal-highlights">${hl}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+        ${trip.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+        <span class="tag" style="background:#DCFCE7;color:#16A34A;border-color:#BBF7D0">${trip.status}</span>
+      </div>
+      <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="itin-section-title" style="margin-bottom:10px">✅ Sudah Termasuk</div>
+          <div class="includes-list">
+            ${['Guide profesional bersertifikat','Transport PP','Snack & makan siang','P3K & asuransi dasar'].map(i=>`<div class="includes-item"><span class="inc-check">✓</span>${i}</div>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="itin-section-title" style="margin-bottom:10px">❌ Tidak Termasuk</div>
+          <div class="includes-list">
+            ${['Tiket masuk objek wisata','Penginapan','Biaya pribadi','Makan malam'].map(i=>`<div class="includes-item"><span class="exc-check">✕</span>${i}</div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (tab === 'itinerary') {
+    if (!trip.itinerary || trip.itinerary.length === 0) {
+      return `<div style="text-align:center;padding:40px 0;color:var(--body-2)"><div style="font-size:36px;margin-bottom:10px">📋</div><p>Itinerary belum tersedia.</p></div>`;
+    }
+    return trip.itinerary.map(day => `
+      <div class="itin-day">
+        <div class="itin-day-header">
+          <span class="itin-day-num">Hari ${day.day}</span>
+          <span class="itin-day-title">${day.title}</span>
+        </div>
+        <div class="itin-items">
+          ${day.items.map(item => `
+            <div class="itin-item">
+              <span class="itin-time">${item.time}</span>
+              <span class="itin-act">${item.act}</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('') + `<div style="font-size:12px;color:var(--body-2);margin-top:10px;font-style:italic">*Itinerary bersifat informatif dan dapat disesuaikan kondisi lapangan.</div>`;
+  }
+
+  if (tab === 'meeting') {
+    const points = [
+      {name:'Bandara Lombok International (BIL)', address:'Terminal Kedatangan, Praya'},
+      {name:'Hotel Area Senggigi', address:'Jl. Raya Senggigi, Lombok Barat'},
+      {name:'Pelabuhan Bangsal', address:'Pemenang, Lombok Utara'},
+    ];
+    return `
+      <p style="font-size:13px;color:var(--body-2);margin-bottom:16px">Pilih titik kumpul yang paling nyaman untukmu. Meeting point final dikonfirmasi saat booking.</p>
+      ${points.map(mp=>`
+        <div class="meeting-point-item">
+          <div class="mp-icon">📍</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--dark)">${mp.name}</div>
+            <div style="font-size:12.5px;color:var(--body-2);margin-top:3px">${mp.address}</div>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  if (tab === 'ulasan') {
+    const reviews = [
+      {name:'Andi Pratama', rating:5, date:'April 2026', comment:'Trip yang luar biasa! Guide sangat profesional dan ramah. Semua berjalan lancar sesuai itinerary. Pasti balik lagi!'},
+      {name:'Sari Dewi', rating:5, date:'Maret 2026', comment:'Pengalaman private trip terbaik yang pernah kami rasakan. Pemandangan spektakuler dan pelayanan memuaskan.'},
+      {name:'Budi Santoso', rating:4, date:'Februari 2026', comment:'Sangat puas! Koordinasi dengan tim AGA mudah, semua permintaan dipenuhi. Recommended banget untuk group trip.'},
+    ];
+    return `
+      ${reviews.map(r=>`
+        <div class="review-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--dark)">${r.name}</div>
+              <div style="font-size:11.5px;color:var(--body-2);margin-top:2px">Trip: ${r.date}</div>
+            </div>
+            <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+          </div>
+          <p class="review-comment">"${r.comment}"</p>
+        </div>`).join('')}`;
+  }
+  return '';
 }
 
 function closeDestModal(e) {
@@ -1633,8 +1750,7 @@ function bookFromModal(tripId) {
 function initBooking() {
   // If coming from modal with pre-selected destination, determine type automatically
   if (bookingState.destination && bookingState.tripType === null) {
-    bookingState.tripType = bookingState.destination.tripType === 'oneday' ? 'oneday'
-      : bookingState.destination.tripType === 'rinjani' ? 'rinjani' : 'custom';
+    bookingState.tripType = bookingState.destination.tripType === 'oneday' ? 'oneday' : 'custom';
   }
   if (bookingState.tripType) {
     // Re-enter step flow
@@ -1652,7 +1768,7 @@ function initBooking() {
     document.getElementById('tripTypeSelectorWrap').style.display = 'block';
     document.getElementById('bookingStepBar').style.display = 'none';
     for (let i=1;i<=5;i++) { const p=document.getElementById('step-'+i); if(p) p.classList.remove('active'); }
-    ['oneday','rinjani','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.remove('selected'));
+    ['oneday','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.remove('selected'));
     currentStep = 1;
   }
   // Set today as min date
@@ -1674,7 +1790,7 @@ function selectBookingTripType(type) {
   bookingState.participants = 1;
   bookingState.participantNames = [''];
 
-  ['oneday','rinjani','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.toggle('selected', t===type));
+  ['oneday','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.toggle('selected', t===type));
 
   setTimeout(() => {
     document.getElementById('tripTypeSelectorWrap').style.display = 'none';
@@ -1691,21 +1807,10 @@ function selectBookingTripType(type) {
 }
 
 function applyTripTypeUI(type) {
-  // Step 1 sections
-  document.getElementById('rinjanInfoBox').style.display = type === 'rinjani' ? 'block' : 'none';
-  document.getElementById('onedayDestSection').style.display = type === 'custom' ? 'none' : (type === 'rinjani' ? 'none' : 'block');
+  document.getElementById('onedayDestSection').style.display = type === 'custom' ? 'none' : 'block';
   document.getElementById('customDestSection').style.display = type === 'custom' ? 'block' : 'none';
-
-  // Step 3 sections
   document.getElementById('onedayDateSection').style.display = type === 'oneday' ? 'block' : 'none';
-  document.getElementById('regularDateSection').style.display = type === 'rinjani' ? 'block' : 'none';
   document.getElementById('customDurSection').style.display = type === 'custom' ? 'block' : 'none';
-
-  // For Rinjani, pre-select it
-  if (type === 'rinjani') {
-    bookingState.destination = TRIPS.find(t => t.tripType === 'rinjani');
-  }
-  // For one-day, title
   if (type === 'oneday') {
     const el = document.getElementById('step1Title'); if(el) el.textContent = 'Pilih Paket One Day Trip';
     const sub = document.getElementById('step1Sub'); if(sub) sub.textContent = 'Pilih paket one day trip yang ingin kamu ikuti';
@@ -1772,7 +1877,7 @@ function backToTypeSelector() {
   for (let i=1;i<=5;i++) { const p=document.getElementById('step-'+i); if(p) p.classList.remove('active'); }
   document.getElementById('bookingStepBar').style.display = 'none';
   document.getElementById('tripTypeSelectorWrap').style.display = 'block';
-  ['oneday','rinjani','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.remove('selected'));
+  ['oneday','custom'].forEach(t => document.getElementById('ttc-'+t)?.classList.remove('selected'));
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1782,12 +1887,29 @@ function goToStep(n) {
   showStep(n);
 }
 
+const STEP_NAMES = {1:'Pemilihan Destinasi',2:'Pemilihan Tour Guide',3:'Detail Perjalanan',4:'Data Pemesan'};
+
 function nextStep(from) {
-  currentStep = from + 1;
-  showStep(currentStep);
-  window.scrollTo({top:0,behavior:'smooth'});
-  // Build order summary on step 5
-  if (currentStep === 5) buildOrderSummary();
+  showStepSuccess(STEP_NAMES[from] || `Langkah ${from}`, () => {
+    currentStep = from + 1;
+    showStep(currentStep);
+    window.scrollTo({top:0,behavior:'smooth'});
+    if (currentStep === 5) buildOrderSummary();
+  });
+}
+
+let stepOkTimer;
+function showStepSuccess(stepName, callback) {
+  const overlay = document.getElementById('stepOkOverlay');
+  const desc = document.getElementById('stepOkDesc');
+  if (!overlay) { callback(); return; }
+  desc.textContent = stepName + ' berhasil diisi. Melanjutkan ke langkah berikutnya...';
+  overlay.classList.add('open');
+  clearTimeout(stepOkTimer);
+  stepOkTimer = setTimeout(() => {
+    overlay.classList.remove('open');
+    callback();
+  }, 1500);
 }
 
 function prevStep(from) {
@@ -1800,7 +1922,6 @@ function prevStep(from) {
 function renderDestGrid() {
   const type = bookingState.tripType;
   if (type === 'custom') { renderCustomDestGrid(); return; }
-  if (type === 'rinjani') { validateStep1(); return; }
 
   const search = (document.getElementById('destSearch')?.value || '').toLowerCase();
   const filtered = TRIPS.filter(t => t.tripType === 'oneday' && (!search || t.name.toLowerCase().includes(search)));
@@ -1826,7 +1947,7 @@ function renderDestGrid() {
 
 function renderCustomDestGrid() {
   const search = (document.getElementById('customDestSearch')?.value || '').toLowerCase();
-  const filtered = TRIPS.filter(t => t.tripType !== 'rinjani' && (!search || t.name.toLowerCase().includes(search)));
+  const filtered = TRIPS.filter(t => !search || t.name.toLowerCase().includes(search));
   const el = document.getElementById('customDestGrid');
   if (!el) return;
   el.innerHTML = filtered.map(t => {
@@ -1936,7 +2057,7 @@ function calcRinjaniDate() {
 
 function validateCustomDur() {
   const input = document.getElementById('customDurInput');
-  if (input && parseInt(input.value) > 7) input.value = 7;
+  if (input && parseInt(input.value) > 14) input.value = 14;
   const dur = parseInt(input?.value) || 0;
   const tgl = document.getElementById('tglCustom')?.value;
   bookingState.customDuration = dur;
@@ -1973,12 +2094,10 @@ function validateStep3() {
   const type = bookingState.tripType;
   if (type === 'oneday') {
     btn.disabled = !bookingState.startDate;
-  } else if (type === 'rinjani') {
-    btn.disabled = !(bookingState.startDate && bookingState.endDate && bookingState.duration >= 3);
   } else if (type === 'custom') {
     btn.disabled = !(bookingState.customDuration > 0 && bookingState.startDate);
   } else {
-    btn.disabled = !(bookingState.startDate && bookingState.endDate && bookingState.duration > 0);
+    btn.disabled = !bookingState.startDate;
   }
 }
 
@@ -2054,25 +2173,35 @@ function buildOrderSummary() {
   const el = document.getElementById('orderSummary');
   if (!el) return;
 
-  const typeLabelMap = {oneday:'🌅 One Day Trip', rinjani:'🏔️ Pendakian Rinjani', custom:'🗺️ Custom Trip'};
+  const typeLabelMap = {oneday:'🌅 One Day Trip', custom:'🗺️ Custom Trip'};
+
+  const osRow = (label, val, step) => `
+    <div class="os-row">
+      <span class="os-row-label" style="min-width:130px">${label}</span>
+      <span class="os-row-val" style="flex:1;text-align:right">${val}</span>
+      <button class="btn-os-edit" onclick="goToStep(${step})">Edit</button>
+    </div>`;
 
   el.innerHTML = `
     <div class="order-summary">
-      <div class="os-header"><h3>📋 Ringkasan Pemesanan</h3></div>
+      <div class="os-header">
+        <h3>📋 Ringkasan Pemesanan</h3>
+        <span style="margin-left:auto"><span class="private-badge">🔒 100% Private</span></span>
+      </div>
       <div class="os-body">
-        <div class="os-row"><span class="os-row-label">Jenis Trip</span><span class="os-row-val"><span class="private-badge">${typeLabelMap[d.tripType]||'Private Trip'}</span></span></div>
-        <div class="os-row"><span class="os-row-label">Destinasi</span><span class="os-row-val" style="text-align:right;max-width:260px">${destLabel}</span></div>
-        <div class="os-row"><span class="os-row-label">Tour Guide</span><span class="os-row-val">${d.guide?.name || '-'}</span></div>
-        <div class="os-row"><span class="os-row-label">Tanggal Keberangkatan</span><span class="os-row-val">${fmtDate(d.startDate)}</span></div>
-        ${!isCustom && d.endDate && d.endDate !== d.startDate ? `<div class="os-row"><span class="os-row-label">Tanggal Kembali</span><span class="os-row-val">${fmtDate(d.endDate)}</span></div>` : ''}
-        <div class="os-row"><span class="os-row-label">Durasi</span><span class="os-row-val">${durLabel}</span></div>
-        <div class="os-row"><span class="os-row-label">Jumlah Peserta</span><span class="os-row-val">${d.participants} orang</span></div>
-        <div class="os-row"><span class="os-row-label">Nama Peserta</span><span class="os-row-val" style="text-align:right;max-width:260px">${participantNamesHtml || '-'}</span></div>
-        <div class="os-row"><span class="os-row-label">Meeting Point</span><span class="os-row-val">${meetingPt}</span></div>
-        <div class="os-row"><span class="os-row-label">Nama Pemesan</span><span class="os-row-val">${d.name}</span></div>
-        <div class="os-row"><span class="os-row-label">Nomor Ponsel</span><span class="os-row-val">${d.phone}</span></div>
-        <div class="os-row"><span class="os-row-label">Email</span><span class="os-row-val">${d.email}</span></div>
-        ${d.notes ? `<div class="os-row"><span class="os-row-label">Catatan</span><span class="os-row-val" style="max-width:260px;text-align:right">${d.notes}</span></div>` : ''}
+        ${osRow('Jenis Trip', typeLabelMap[d.tripType]||'Private Trip', 0)}
+        ${osRow('Destinasi', destLabel, 1)}
+        ${osRow('Tour Guide', d.guide?.name || '-', 2)}
+        ${osRow('Tanggal Berangkat', fmtDate(d.startDate), 3)}
+        ${!isCustom && d.endDate && d.endDate !== d.startDate ? osRow('Tanggal Kembali', fmtDate(d.endDate), 3) : ''}
+        ${osRow('Durasi', durLabel, 3)}
+        ${osRow('Jumlah Peserta', d.participants + ' orang', 3)}
+        ${osRow('Nama Peserta', participantNamesHtml || '-', 4)}
+        ${osRow('Meeting Point', meetingPt, 3)}
+        ${osRow('Nama Pemesan', d.name, 4)}
+        ${osRow('Nomor Ponsel', d.phone, 4)}
+        ${osRow('Email', d.email, 4)}
+        ${d.notes ? osRow('Catatan', d.notes, 4) : ''}
         ${!isCustom ? `
         <div style="padding:16px 0 0;margin-top:4px;border-top:1px dashed var(--stroke)">
           <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--body)">Harga trip (${fmtPrice(d.destination?.price||0)} × ${d.participants} orang)</span><span style="font-size:13px;font-weight:600;color:var(--dark)">${fmtPrice(tripTotal)}</span></div>
