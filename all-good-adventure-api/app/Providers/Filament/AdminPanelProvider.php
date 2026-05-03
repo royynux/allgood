@@ -68,7 +68,7 @@ class AdminPanelProvider extends PanelProvider
                 fn (): HtmlString => new HtmlString(<<<'HTML'
                     <div class="aga-sidebar-footer">
                         <strong>AGA Admin</strong>
-                        Guide included pricing, Rinjani fixed 3D2N, and custom trip confirmation queue.
+                        Guide included pricing, one day trip, and custom trip confirmation queue.
                     </div>
                 HTML),
             )

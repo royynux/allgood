@@ -37,7 +37,8 @@ class DestinationsTable
                 TextColumn::make('duration_nights')
                     ->numeric()
                     ->sortable(),
-                ImageColumn::make('image'),
+                ImageColumn::make('image')
+                    ->disk('public'),
                 TextColumn::make('status')
                     ->badge()
                     ->searchable(),

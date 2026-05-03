@@ -19,7 +19,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'trip_type' => ['required', Rule::in(['one-day', 'rinjani', 'custom'])],
+            'trip_type' => ['required', Rule::in(['one-day', 'custom'])],
             'destination_id' => ['nullable', 'integer', 'exists:destinations,id'],
             'destination_ids' => ['nullable', 'array'],
             'destination_ids.*' => ['integer', 'exists:destinations,id'],
@@ -121,15 +121,6 @@ class BookingController extends Controller
             }
 
             return [null, $destinationIds, null, $durationDays, null];
-        }
-
-        if ($validated['trip_type'] === 'rinjani') {
-            $destination = Destination::whereHas(
-                'tripType',
-                fn ($query) => $query->where('slug', 'rinjani'),
-            )->firstOrFail();
-
-            return [$destination, [], $startDate->copy()->addDays(2), 3, $destination->price * $validated['participants_count']];
         }
 
         $destination = Destination::whereKey($validated['destination_id'] ?? null)

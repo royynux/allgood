@@ -11,7 +11,6 @@ class TripTypeSeeder extends Seeder
     {
         $tripTypes = [
             ['name' => 'One Day Trip', 'slug' => 'one-day', 'description' => 'Paket private trip satu hari penuh.'],
-            ['name' => 'Pendakian Rinjani', 'slug' => 'rinjani', 'description' => 'Paket pendakian Rinjani fixed 3 hari 2 malam.'],
             ['name' => 'Custom Trip', 'slug' => 'custom', 'description' => 'Trip fleksibel dengan beberapa destinasi dan harga dikonfirmasi admin.'],
         ];
 

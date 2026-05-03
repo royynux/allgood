@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class DestinationResource extends JsonResource
 {
@@ -19,9 +20,15 @@ class DestinationResource extends JsonResource
             'duration_nights' => $this->duration_nights,
             'description' => $this->description,
             'tags' => $this->tags ?? [],
+            'badge' => $this->badge,
+            'includes' => $this->includes ?? [],
+            'excludes' => $this->excludes ?? [],
+            'meeting_points' => $this->meeting_points ?? [],
             'highlights' => $this->highlights ?? [],
             'itinerary' => $this->itinerary ?? [],
-            'image' => $this->image,
+            'image' => $this->image
+                ? (str_starts_with($this->image, 'http') ? $this->image : url(Storage::url($this->image)))
+                : null,
             'status' => $this->status,
             'is_active' => $this->is_active,
             'trip_type' => [

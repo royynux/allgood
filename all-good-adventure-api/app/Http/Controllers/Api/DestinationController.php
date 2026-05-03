@@ -23,6 +23,9 @@ class DestinationController extends Controller
                 fn ($categoryQuery) => $categoryQuery->where('slug', $category),
             ))
             ->when($request->query('city'), fn ($query, $city) => $query->where('city', $city))
+            ->when($request->query('price_min'), fn ($query, $min) => $query->where('price', '>=', (int) $min))
+            ->when($request->query('price_max'), fn ($query, $max) => $query->where('price', '<=', (int) $max))
+            ->when($request->boolean('featured'), fn ($query) => $query->whereNotNull('badge'))
             ->when($request->query('search'), fn ($query, $search) => $query->where(
                 fn ($searchQuery) => $searchQuery
                     ->where('name', 'ilike', "%{$search}%")

@@ -19,6 +19,10 @@ class Destination extends Model
         'duration_nights',
         'description',
         'tags',
+        'badge',
+        'includes',
+        'excludes',
+        'meeting_points',
         'highlights',
         'itinerary',
         'image',
@@ -33,6 +37,9 @@ class Destination extends Model
             'duration_days' => 'integer',
             'duration_nights' => 'integer',
             'tags' => 'array',
+            'includes' => 'array',
+            'excludes' => 'array',
+            'meeting_points' => 'array',
             'highlights' => 'array',
             'itinerary' => 'array',
             'is_active' => 'boolean',
@@ -57,5 +64,10 @@ class Destination extends Model
     public function bookingDestinations(): HasMany
     {
         return $this->hasMany(BookingDestination::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }

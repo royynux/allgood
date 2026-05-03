@@ -11,7 +11,7 @@ class TripTypeBreakdownChart extends ChartWidget
 
     protected ?string $heading = 'Trip Type Breakdown';
 
-    protected ?string $description = 'One Day vs Rinjani vs Custom';
+    protected ?string $description = 'One Day vs Custom';
 
     protected int|string|array $columnSpan = [
         'md' => 1,
