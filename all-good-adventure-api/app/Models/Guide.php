@@ -31,6 +31,7 @@ class Guide extends Model
             'review_count' => 'integer',
             'trips_done' => 'integer',
             'years_experience' => 'integer',
+            'languages' => 'array',
             'destinations' => 'array',
             'is_active' => 'boolean',
         ];

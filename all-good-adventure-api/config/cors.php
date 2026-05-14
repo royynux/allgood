@@ -8,7 +8,7 @@ return [
     'allowed_origins' => [],
 
     'allowed_origins_patterns' => [
-        '#^http://(localhost|127\.0\.0\.1)(:\d+)?$#',
+        '#^http://(localhost|127\.0\.0\.1|192\.168\.56\.1)(:\d+)?$#',
     ],
 
     'allowed_headers' => ['*'],
