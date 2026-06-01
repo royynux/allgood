@@ -1,88 +1,92 @@
 import Link from 'next/link'
 
+const navLinks = [
+  { href: '/katalog', label: 'Katalog Destinasi' },
+  { href: '/booking', label: 'Booking Layanan' },
+  { href: '/guide', label: 'Tour Guide' },
+  { href: '/tentang', label: 'Tentang Kami' },
+]
+
 export default function Footer() {
   return (
-    <footer style={{ background: 'var(--dark)', color: 'rgba(255,255,255,0.65)', padding: '64px 5% 32px' }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: 44, marginBottom: 44,
-      }}>
-        <div>
-          <h3 style={{ color: '#fff', fontSize: 19, fontWeight: 800, marginBottom: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{
-              width: 28, height: 28, background: 'var(--primary)',
-              borderRadius: 6, display: 'inline-flex', alignItems: 'center',
-              justifyContent: 'center', fontSize: 14,
-            }}>🏔️</span>
-            All Good Adventure
-          </h3>
-          <p style={{ fontSize: 13.5, lineHeight: 1.75, marginBottom: 22 }}>
-            Spesialis private trip di Lombok. Kami hadir untuk membuat setiap perjalananmu eksklusif dan tak terlupakan.
-          </p>
-          <a
-            href="https://wa.me/6281234567890"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: '#25D366', color: '#fff', border: 'none',
-              fontSize: 13.5, fontWeight: 700, padding: '11px 20px',
-              borderRadius: 'var(--r-sm)', textDecoration: 'none',
-              cursor: 'pointer', transition: 'all 0.2s',
-            }}
-          >📱 Hubungi via WhatsApp</a>
-        </div>
+    <footer style={{ background: 'var(--dark)', color: 'rgba(255,255,255,0.65)' }}>
+      {/* Main footer body */}
+      <div style={{ padding: '56px 5% 48px', maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          gap: '48px 80px',
+          alignItems: 'start',
+        }} className="footer-grid">
 
-        <div>
-          <h4 style={{ color: '#fff', fontSize: 13.5, fontWeight: 700, marginBottom: 14 }}>Layanan</h4>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {[
-              { href: '/katalog', label: 'Katalog Destinasi' },
-              { href: '/booking', label: 'Booking Layanan' },
-              { href: '/guide', label: 'Tour Guide' },
-              { href: '/tentang', label: 'Tentang Kami' },
-            ].map(link => (
-              <li key={link.href}>
-                <Link href={link.href} style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: 13.5, transition: 'color 0.2s' }}>
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Brand block */}
+          <div style={{ maxWidth: 420 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <span style={{
+                width: 36, height: 36, background: 'var(--primary)',
+                borderRadius: 8, display: 'inline-flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: 18, flexShrink: 0,
+              }}>🏔️</span>
+              <span style={{ color: '#fff', fontSize: 20, fontWeight: 800 }}>All Good Adventure</span>
+            </div>
+            <p style={{ fontSize: 14, lineHeight: 1.8, marginBottom: 28, color: 'rgba(255,255,255,0.55)' }}>
+              Spesialis private trip di Lombok. Kami hadir untuk membuat setiap perjalananmu eksklusif, personal, dan tak terlupakan.
+            </p>
+            <a
+              href="https://wa.me/6281234567890"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 9,
+                background: '#25D366', color: '#fff',
+                fontSize: 13.5, fontWeight: 700, padding: '11px 22px',
+                borderRadius: 'var(--r-sm)', textDecoration: 'none',
+                transition: 'opacity 0.2s',
+              }}
+            >
+              📱 Hubungi via WhatsApp
+            </a>
+          </div>
 
-        <div>
-          <h4 style={{ color: '#fff', fontSize: 13.5, fontWeight: 700, marginBottom: 14 }}>Perusahaan</h4>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {['Profil Perusahaan', 'Blog & Artikel', 'Karir', 'Kemitraan'].map(item => (
-              <li key={item}>
-                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13.5, cursor: 'pointer', transition: 'color 0.2s' }}>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 style={{ color: '#fff', fontSize: 13.5, fontWeight: 700, marginBottom: 14 }}>Bantuan</h4>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {['FAQ', 'Hubungi Kami', 'Syarat & Ketentuan', 'Kebijakan Privasi'].map(item => (
-              <li key={item}>
-                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13.5, cursor: 'pointer', transition: 'color 0.2s' }}>{item}</span>
-              </li>
-            ))}
-          </ul>
+          {/* Nav links */}
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18, opacity: 0.5 }}>
+              Navigasi
+            </h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {navLinks.map(link => (
+                <li key={link.href}>
+                  <Link href={link.href} style={{
+                    color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
+                    fontSize: 14, fontWeight: 500, transition: 'color 0.2s',
+                  }}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div style={{
-        borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 22,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        fontSize: 12.5, flexWrap: 'wrap', gap: 10,
-      }}>
-        <span>© 2026 All Good Adventure. Hak cipta dilindungi.</span>
-        <span>Dibuat dengan ❤️ di Lombok</span>
+      {/* Bottom bar */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '18px 5%' }}>
+        <div style={{
+          maxWidth: 1200, margin: '0 auto',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          fontSize: 12.5, flexWrap: 'wrap', gap: 8,
+          color: 'rgba(255,255,255,0.35)',
+        }}>
+          <span>© 2026 All Good Adventure. Hak cipta dilindungi.</span>
+          <span>Dibuat dengan ❤️ di Lombok</span>
+        </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .footer-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+        }
+      `}</style>
     </footer>
   )
 }

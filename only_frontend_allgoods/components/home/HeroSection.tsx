@@ -36,7 +36,7 @@ export default function HeroSection() {
           fontSize: 16.5, color: 'rgba(255,255,255,0.72)', lineHeight: 1.75,
           marginBottom: 34, maxWidth: 460,
         }}>
-          Temukan pengalaman private trip terbaik di Lombok — dari pendakian Rinjani, island hopping Gili, hingga private getaway eksklusif untuk kamu dan orang-orang terkasih.
+          Temukan pengalaman private trip terbaik di Lombok & Bali— dari pendakian Rinjani, kuta beach, island hopping Gili, hingga private getaway eksklusif untuk kamu dan orang-orang terkasih.
         </p>
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

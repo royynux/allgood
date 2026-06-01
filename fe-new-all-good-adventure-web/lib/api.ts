@@ -1,15 +1,18 @@
-import type { Destination, Guide, BookingPayload, BookingResponse, ApiResponse, Review } from './types'
+import type { Destination, Guide, BookingPayload, BookingResponse, ApiResponse, Review, SnapTokenResponse, UserBooking } from './types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function request<T>(path: string, options?: RequestInit & { token?: string }): Promise<T> {
   const isPost = options?.method === 'POST'
+  const { token, headers: extraHeaders, ...restOptions } = options ?? {}
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Accept': 'application/json',
       ...(isPost ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(extraHeaders as Record<string, string> ?? {}),
     },
-    ...options,
+    ...restOptions,
   })
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: 'Request failed' }))
@@ -66,9 +69,30 @@ export async function getGuide(id: number): Promise<{ data: Guide }> {
   return request<{ data: Guide }>(`/api/guides/${id}`)
 }
 
-export async function createBooking(payload: BookingPayload): Promise<BookingResponse> {
+export async function createBooking(payload: BookingPayload, token: string): Promise<BookingResponse> {
   return request<BookingResponse>('/api/bookings', {
     method: 'POST',
     body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export async function createSnapToken(bookingCode: string, token: string): Promise<SnapTokenResponse> {
+  return request<SnapTokenResponse>('/api/payments/snap-token', {
+    method: 'POST',
+    body: JSON.stringify({ booking_code: bookingCode }),
+    token,
+  })
+}
+
+export async function getUserBookings(token: string): Promise<{ data: UserBooking[] }> {
+  return request<{ data: UserBooking[] }>('/api/bookings', { token })
+}
+
+export async function confirmPayment(bookingCode: string, token: string): Promise<{ booking_status: string }> {
+  return request<{ booking_status: string }>('/api/payments/confirm', {
+    method: 'POST',
+    body: JSON.stringify({ booking_code: bookingCode }),
+    token,
   })
 }

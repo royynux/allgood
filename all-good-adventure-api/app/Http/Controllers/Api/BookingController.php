@@ -16,6 +16,34 @@ use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
+    public function index(Request $request)
+    {
+        $bookings = $request->user()
+            ->bookings()
+            ->with(['tripType', 'destination', 'guide'])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'data' => $bookings->map(fn ($b) => [
+                'id'               => $b->id,
+                'booking_code'     => $b->booking_code,
+                'status'           => $b->status,
+                'trip_type'        => $b->tripType?->only(['id', 'name', 'slug']),
+                'destination'      => $b->destination ? ['name' => $b->destination->name] : null,
+                'guide'            => $b->guide ? ['name' => $b->guide->name] : null,
+                'start_date'       => $b->start_date?->format('Y-m-d'),
+                'end_date'         => $b->end_date?->format('Y-m-d'),
+                'duration_days'    => $b->duration_days,
+                'participants_count' => $b->participants_count,
+                'customer_name'    => $b->customer_name,
+                'estimated_total'  => $b->estimated_total,
+                'confirmed_total'  => $b->confirmed_total,
+                'created_at'       => $b->created_at->format('Y-m-d H:i:s'),
+            ]),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -50,6 +78,8 @@ class BookingController extends Controller
             $startDate,
         );
 
+        $userId = $request->user()->id;
+
         $booking = DB::transaction(function () use (
             $validated,
             $tripType,
@@ -59,8 +89,10 @@ class BookingController extends Controller
             $endDate,
             $durationDays,
             $estimatedTotal,
+            $userId,
         ) {
             $booking = Booking::create([
+                'user_id' => $userId,
                 'trip_type_id' => $tripType->id,
                 'destination_id' => $destination?->id,
                 'guide_id' => $validated['guide_id'],

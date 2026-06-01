@@ -2,12 +2,27 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import Script from 'next/script'
 import { useRouter } from 'next/navigation'
-import { getDestinations, getGuides, createBooking } from '@/lib/api'
+import { getDestinations, getGuides, createBooking, createSnapToken, confirmPayment } from '@/lib/api'
 import type { Destination, Guide, BookingState } from '@/lib/types'
 import { formatPrice, today, addDays, formatDate, avatarFallback } from '@/lib/utils'
+import { isLoggedIn, getUser, getToken } from '@/lib/auth'
 
 const STEPS = ['Destinasi', 'Tour Guide', 'Detail Perjalanan', 'Data Pemesan', 'Ringkasan']
+
+interface SnapCallbacks {
+  onSuccess: (result: unknown) => void
+  onPending: (result: unknown) => void
+  onError: (result: unknown) => void
+  onClose: () => void
+}
+
+function getSnap(): { pay: (token: string, cb: SnapCallbacks) => void } | null {
+  if (typeof window === 'undefined') return null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (window as any).snap ?? null
+}
 
 function StepBar({ step, onGo }: { step: number; onGo: (s: number) => void }) {
   return (
@@ -115,8 +130,16 @@ export default function BookingClient() {
   const [toast, setToast] = useState('')
   const [submitError, setSubmitError] = useState('')
   const [stepSuccess, setStepSuccess] = useState<string | null>(null)
+  const [paymentStatus, setPaymentStatus] = useState<null | 'success' | 'pending' | 'failed'>(null)
+  const [createdBookingCode, setCreatedBookingCode] = useState('')
 
   useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace('/auth/login?redirect=/booking')
+      return
+    }
+    const u = getUser()
+    if (u) update({ name: u.name, email: u.email })
     getDestinations().then(r => setDestinations(r.data ?? [])).catch(() => {})
   }, [])
 
@@ -184,34 +207,73 @@ export default function BookingClient() {
     update({ participants: n, participantNames: names })
   }
 
+  function buildPayload(): Parameters<typeof createBooking>[0] {
+    const participantNames = state.participantNames.map((name, i) =>
+      name.trim() ? name.trim() : (i === 0 ? state.name : `Peserta ${i + 1}`)
+    )
+    const payload: Parameters<typeof createBooking>[0] = {
+      trip_type: state.tripType!,
+      guide_id: state.guide!.id,
+      start_date: state.startDate,
+      duration_days: tripDuration,
+      participants_count: state.participants,
+      participant_names: participantNames,
+      meeting_point: state.meetingPoint || undefined,
+      customer_name: state.name,
+      customer_phone: state.phone,
+      customer_email: state.email,
+      notes: state.notes || undefined,
+    }
+    if (state.tripType === 'one-day' && state.destination) payload.destination_id = state.destination.id
+    if (state.tripType === 'custom') payload.destination_ids = state.customDestinations.map(d => d.id)
+    return payload
+  }
+
+  function openSnapPopup(token: string, bookingCode: string) {
+    const snap = getSnap()
+    if (!snap) {
+      setSubmitError('Halaman pembayaran belum siap. Tunggu beberapa detik lalu coba lagi.')
+      return
+    }
+    snap.pay(token, {
+      onSuccess: () => {
+        const authToken = getToken() ?? ''
+        confirmPayment(bookingCode, authToken).catch(() => {})
+        setPaymentStatus('success')
+      },
+      onPending: () => setPaymentStatus('pending'),
+      onError: () => setPaymentStatus('failed'),
+      onClose: () => setSubmitError('Pembayaran belum selesai. Klik "Bayar Sekarang" untuk melanjutkan.'),
+    })
+  }
+
   async function handleSubmit() {
     setSubmitting(true)
     setSubmitError('')
     try {
-      const payload: Parameters<typeof createBooking>[0] = {
-        trip_type: state.tripType!,
-        guide_id: state.guide!.id,
-        start_date: state.startDate,
-        duration_days: tripDuration,
-        participants_count: state.participants,
-        participant_names: state.participantNames,
-        meeting_point: state.meetingPoint || undefined,
-        customer_name: state.name,
-        customer_phone: state.phone,
-        customer_email: state.email,
-        notes: state.notes || undefined,
+      const token = getToken() ?? ''
+      if (state.tripType === 'custom') {
+        const res = await createBooking(buildPayload(), token)
+        setToast(`Booking berhasil! Kode: ${res.data?.booking_code ?? ''}`)
+        setState(initialState)
+        setStep(0)
+        setTimeout(() => router.push('/profile'), 2500)
+        return
       }
-      if (state.tripType === 'one-day' && state.destination) payload.destination_id = state.destination.id
-      if (state.tripType === 'custom') payload.destination_ids = state.customDestinations.map(d => d.id)
 
-      const res = await createBooking(payload)
-      setToast(`Booking berhasil! Kode: ${res.data?.booking_code ?? 'AGA-XXXX'}`)
-      setState(initialState)
-      setStep(0)
-      setTimeout(() => router.push('/'), 2500)
+      // One-day trip: create booking (only once) then open Snap
+      let code = createdBookingCode
+      if (!code) {
+        const res = await createBooking(buildPayload(), token)
+        code = res.data?.booking_code ?? ''
+        setCreatedBookingCode(code)
+      }
+
+      const { snap_token } = await createSnapToken(code, token)
+      setSubmitting(false)
+      openSnapPopup(snap_token, code)
     } catch (err: unknown) {
-      setSubmitError(err instanceof Error ? err.message : 'Gagal mengirim booking. Coba lagi.')
-    } finally {
+      setSubmitError(err instanceof Error ? err.message : 'Gagal memproses. Coba lagi.')
       setSubmitting(false)
     }
   }
@@ -247,8 +309,18 @@ export default function BookingClient() {
     } as React.CSSProperties,
   }
 
+  const snapUrl = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
+    ? 'https://app.midtrans.com/snap/snap.js'
+    : 'https://app.sandbox.midtrans.com/snap/snap.js'
+
   return (
     <div style={{ padding: '36px 5%', maxWidth: 900, margin: '0 auto' }}>
+      <Script
+        src={snapUrl}
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="afterInteractive"
+      />
+
       {toast && <Toast msg={toast} onHide={() => setToast('')} />}
       {stepSuccess && (
         <StepSuccessModal
@@ -569,86 +641,149 @@ export default function BookingClient() {
             </div>
           )}
 
-          {/* Step 5: Summary */}
+          {/* Step 5: Summary + Payment */}
           {step === 5 && (
             <div className="animate-fade-in-up">
-              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--dark)', marginBottom: 4 }}>Ringkasan & Total Biaya</div>
-              <div style={{ fontSize: 13.5, color: 'var(--body-2)', marginBottom: 22 }}>Periksa detail tripmu sebelum mengirim permintaan</div>
 
-              <div style={{ background: 'var(--bg)', border: '1px solid var(--stroke)', borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 20 }}>
-                <div style={{ background: 'var(--dark)', padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 18 }}>📋</span>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Detail Pemesanan</h3>
-                  <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 50 }}>
-                    🔒 100% Private
-                  </span>
-                </div>
-                <div style={{ padding: '20px 22px' }}>
-                  {[
-                    { label: 'Jenis Trip', value: state.tripType === 'one-day' ? 'One Day Trip' : 'Custom Trip', editStep: 0 },
-                    { label: 'Destinasi', value: state.tripType === 'one-day' ? (state.destination?.name ?? '-') : (state.customDestinations.map(d => d.name).join(', ') || '-'), editStep: 1 },
-                    { label: 'Tour Guide', value: state.guide?.name ?? '-', editStep: 2 },
-                    { label: 'Tanggal Berangkat', value: state.startDate ? formatDate(state.startDate) : '-', editStep: 3 },
-                    { label: 'Tanggal Pulang', value: endDate ? formatDate(endDate) : '-', editStep: 3 },
-                    { label: 'Durasi', value: `${tripDuration} Hari ${tripDuration > 1 ? `${tripDuration - 1} Malam` : ''}`, editStep: 3 },
-                    { label: 'Jumlah Peserta', value: `${state.participants} orang`, editStep: 3 },
-                    { label: 'Meeting Point', value: state.meetingPoint || '-', editStep: 3 },
-                    { label: 'Nama Pemesan', value: state.name, editStep: 4 },
-                    { label: 'Nomor Ponsel', value: state.phone, editStep: 4 },
-                    { label: 'Email', value: state.email, editStep: 4 },
-                  ].map(row => (
-                    <div key={row.label} className="booking-summary-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0', borderBottom: '1px solid var(--stroke)', gap: 8, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 12.5, color: 'var(--body)', minWidth: 110, flexShrink: 0 }}>{row.label}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--dark)', flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{row.value}</span>
-                      <button style={S.btnEdit} onClick={() => goToStep(row.editStep)}>Edit</button>
-                    </div>
-                  ))}
-                  {state.notes && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '11px 0', borderBottom: '1px solid var(--stroke)', gap: 12 }}>
-                      <span style={{ fontSize: 13, color: 'var(--body)', minWidth: 130 }}>Catatan</span>
-                      <span style={{ fontSize: 13.5, color: 'var(--dark)', flex: 1, textAlign: 'right' }}>{state.notes}</span>
-                      <button style={S.btnEdit} onClick={() => goToStep(4)}>Edit</button>
-                    </div>
-                  )}
-                </div>
-
-                {state.tripType !== 'custom' && state.destination?.price ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 22px', background: 'var(--primary-light)', borderTop: '2px solid var(--primary)' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)' }}>Estimasi Total</span>
-                    <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}>
-                      {formatPrice(state.destination.price * state.participants)}
-                    </span>
+              {/* Payment success screen */}
+              {paymentStatus === 'success' && (
+                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 36 }}>✓</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--dark)', marginBottom: 8 }}>Pembayaran Berhasil!</div>
+                  <div style={{ fontSize: 14, color: 'var(--body)', marginBottom: 20, lineHeight: 1.7 }}>
+                    Booking kamu sudah dikonfirmasi.<br />
+                    <strong style={{ color: 'var(--dark)' }}>Kode booking: {createdBookingCode}</strong><br />
+                    Tim kami akan menghubungi kamu segera.
                   </div>
-                ) : (
-                  <div style={{ padding: '12px 22px', borderTop: '1px solid var(--stroke)', background: 'var(--white)' }}>
-                    <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                      <div style={{ fontSize: 24, marginBottom: 6 }}>💬</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 4 }}>Harga Dikonfirmasi Admin</div>
-                      <div style={{ fontSize: 12, color: 'var(--body-2)' }}>Tim kami akan menghubungimu dalam 1×24 jam dengan penawaran terbaik.</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {submitError && (
-                <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 'var(--r-sm)', padding: '12px 16px', fontSize: 13, color: 'var(--danger)', marginBottom: 16 }}>
-                  ❌ {submitError}
+                  <button onClick={() => router.push('/')} style={{ ...S.btnNext, margin: '0 auto', fontSize: 15, padding: '14px 36px' }}>
+                    Kembali ke Beranda
+                  </button>
                 </div>
               )}
 
-              <div style={S.stepNav}>
-                <button style={S.btnBack} onClick={() => setStep(4)}>← Kembali</button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  style={{
-                    ...S.btnNext, fontSize: 15, padding: '14px 36px',
-                    opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {submitting ? '⏳ Mengirim...' : 'Kirim Permintaan ✈️'}
-                </button>
-              </div>
+              {/* Payment pending screen */}
+              {paymentStatus === 'pending' && (
+                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 36 }}>⏳</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--dark)', marginBottom: 8 }}>Pembayaran Diproses</div>
+                  <div style={{ fontSize: 14, color: 'var(--body)', marginBottom: 20, lineHeight: 1.7 }}>
+                    Pembayaran kamu sedang diverifikasi.<br />
+                    <strong style={{ color: 'var(--dark)' }}>Kode booking: {createdBookingCode}</strong><br />
+                    Setelah dikonfirmasi, booking akan aktif otomatis. Cek email kamu.
+                  </div>
+                  <button onClick={() => router.push('/')} style={{ ...S.btnNext, margin: '0 auto', fontSize: 15, padding: '14px 36px' }}>
+                    Kembali ke Beranda
+                  </button>
+                </div>
+              )}
+
+              {/* Payment failed screen */}
+              {paymentStatus === 'failed' && (
+                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--danger, #EF4444)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 36 }}>✕</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--dark)', marginBottom: 8 }}>Pembayaran Gagal</div>
+                  <div style={{ fontSize: 14, color: 'var(--body)', marginBottom: 20, lineHeight: 1.7 }}>
+                    Pembayaran tidak berhasil. Kode booking kamu <strong style={{ color: 'var(--dark)' }}>{createdBookingCode}</strong> masih tersimpan.<br />
+                    Silakan coba bayar lagi.
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button onClick={() => { setPaymentStatus(null); setSubmitError('') }} style={{ ...S.btnNext, fontSize: 15, padding: '14px 36px' }}>
+                      Coba Bayar Lagi
+                    </button>
+                    <button onClick={() => router.push('/')} style={{ ...S.btnBack, padding: '14px 24px' }}>
+                      Kembali ke Beranda
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Normal summary (shown when no payment result yet) */}
+              {!paymentStatus && (
+                <>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--dark)', marginBottom: 4 }}>Ringkasan & Total Biaya</div>
+                  <div style={{ fontSize: 13.5, color: 'var(--body-2)', marginBottom: 22 }}>Periksa detail tripmu sebelum melanjutkan</div>
+
+                  <div style={{ background: 'var(--bg)', border: '1px solid var(--stroke)', borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 20 }}>
+                    <div style={{ background: 'var(--dark)', padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 18 }}>📋</span>
+                      <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Detail Pemesanan</h3>
+                      <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 50 }}>
+                        🔒 100% Private
+                      </span>
+                    </div>
+                    <div style={{ padding: '20px 22px' }}>
+                      {[
+                        { label: 'Jenis Trip', value: state.tripType === 'one-day' ? 'One Day Trip' : 'Custom Trip', editStep: 0 },
+                        { label: 'Destinasi', value: state.tripType === 'one-day' ? (state.destination?.name ?? '-') : (state.customDestinations.map(d => d.name).join(', ') || '-'), editStep: 1 },
+                        { label: 'Tour Guide', value: state.guide?.name ?? '-', editStep: 2 },
+                        { label: 'Tanggal Berangkat', value: state.startDate ? formatDate(state.startDate) : '-', editStep: 3 },
+                        { label: 'Tanggal Pulang', value: endDate ? formatDate(endDate) : '-', editStep: 3 },
+                        { label: 'Durasi', value: `${tripDuration} Hari ${tripDuration > 1 ? `${tripDuration - 1} Malam` : ''}`, editStep: 3 },
+                        { label: 'Jumlah Peserta', value: `${state.participants} orang`, editStep: 3 },
+                        { label: 'Meeting Point', value: state.meetingPoint || '-', editStep: 3 },
+                        { label: 'Nama Pemesan', value: state.name, editStep: 4 },
+                        { label: 'Nomor Ponsel', value: state.phone, editStep: 4 },
+                        { label: 'Email', value: state.email, editStep: 4 },
+                      ].map(row => (
+                        <div key={row.label} className="booking-summary-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0', borderBottom: '1px solid var(--stroke)', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 12.5, color: 'var(--body)', minWidth: 110, flexShrink: 0 }}>{row.label}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--dark)', flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{row.value}</span>
+                          <button style={S.btnEdit} onClick={() => goToStep(row.editStep)}>Edit</button>
+                        </div>
+                      ))}
+                      {state.notes && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '11px 0', borderBottom: '1px solid var(--stroke)', gap: 12 }}>
+                          <span style={{ fontSize: 13, color: 'var(--body)', minWidth: 130 }}>Catatan</span>
+                          <span style={{ fontSize: 13.5, color: 'var(--dark)', flex: 1, textAlign: 'right' }}>{state.notes}</span>
+                          <button style={S.btnEdit} onClick={() => goToStep(4)}>Edit</button>
+                        </div>
+                      )}
+                    </div>
+
+                    {state.tripType !== 'custom' && state.destination?.price ? (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 22px', background: 'var(--primary-light)', borderTop: '2px solid var(--primary)' }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)' }}>Total Pembayaran</span>
+                        <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}>
+                          {formatPrice(state.destination.price * state.participants)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '12px 22px', borderTop: '1px solid var(--stroke)', background: 'var(--white)' }}>
+                        <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                          <div style={{ fontSize: 24, marginBottom: 6 }}>💬</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 4 }}>Harga Dikonfirmasi Admin</div>
+                          <div style={{ fontSize: 12, color: 'var(--body-2)' }}>Tim kami akan menghubungimu dalam 1×24 jam dengan penawaran terbaik.</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {submitError && (
+                    <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 'var(--r-sm)', padding: '12px 16px', fontSize: 13, color: 'var(--danger, #EF4444)', marginBottom: 16 }}>
+                      ❌ {submitError}
+                    </div>
+                  )}
+
+                  <div style={S.stepNav}>
+                    <button style={S.btnBack} onClick={() => setStep(4)}>← Kembali</button>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={submitting}
+                      style={{
+                        ...S.btnNext, fontSize: 15, padding: '14px 36px',
+                        opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {submitting
+                        ? '⏳ Memproses...'
+                        : state.tripType === 'one-day'
+                          ? (createdBookingCode ? 'Lanjutkan Pembayaran 💳' : 'Bayar Sekarang 💳')
+                          : 'Kirim Permintaan ✈️'
+                      }
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </>

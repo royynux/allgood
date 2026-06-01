@@ -102,7 +102,7 @@ export default function PopularTrips() {
           Destinasi Pilihan
         </div>
         <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
-          Private Trip Terpopuler di Lombok
+          Private Trip Terpopuler di Lombok & Bali
         </h2>
         <p style={{ fontSize: 16, color: 'var(--body)', marginTop: 12, maxWidth: 480, margin: '12px auto 0', lineHeight: 1.75, textAlign: 'center' }}>
           Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!

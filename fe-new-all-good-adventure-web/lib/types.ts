@@ -145,6 +145,28 @@ export interface ApiResponse<T> {
   }
 }
 
+export interface SnapTokenResponse {
+  snap_token: string
+  order_id: string
+}
+
+export interface UserBooking {
+  id: number
+  booking_code: string
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  trip_type: { id: number; name: string; slug: string } | null
+  destination: { name: string } | null
+  guide: { name: string } | null
+  start_date: string | null
+  end_date: string | null
+  duration_days: number
+  participants_count: number
+  customer_name: string
+  estimated_total: number | null
+  confirmed_total: number | null
+  created_at: string
+}
+
 export interface BookingState {
   tripType: 'one-day' | 'custom' | null
   destination: Destination | null

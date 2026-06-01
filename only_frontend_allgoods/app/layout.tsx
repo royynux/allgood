@@ -11,7 +11,7 @@ const jakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: 'All Good Adventure — Private Trip Specialist Lombok',
-  description: 'Temukan pengalaman private trip terbaik di Lombok — pendakian Rinjani, island hopping Gili, dan private getaway eksklusif.',
+  description: 'Temukan pengalaman private trip terbaik di Lombok & Bali— pendakian Rinjani, kuta beach,island hopping Gili, dan private getaway eksklusif.',
   keywords: ['private trip lombok', 'rinjani', 'gili islands', 'tour guide lombok', 'adventure'],
   openGraph: {
     title: 'All Good Adventure',
