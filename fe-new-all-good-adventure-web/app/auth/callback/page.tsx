@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { setAuth } from '@/lib/auth'
 
-export default function AuthCallbackPage() {
+function CallbackHandler() {
   const router = useRouter()
   const params = useSearchParams()
 
@@ -31,6 +31,10 @@ export default function AuthCallbackPage() {
     router.replace('/')
   }, [params, router])
 
+  return null
+}
+
+export default function AuthCallbackPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', flexDirection: 'column',
@@ -43,6 +47,9 @@ export default function AuthCallbackPage() {
       }} />
       <p style={{ fontSize: 15, color: 'var(--body)', fontWeight: 600 }}>Memproses login...</p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <Suspense>
+        <CallbackHandler />
+      </Suspense>
     </div>
   )
 }
