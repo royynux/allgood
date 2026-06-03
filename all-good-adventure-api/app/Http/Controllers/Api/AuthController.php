@@ -20,7 +20,7 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
-            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+            $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
             $msg = urlencode($e->getMessage());
             return redirect("{$frontendUrl}/auth/login?error=google_failed&detail={$msg}");
         }
@@ -47,7 +47,7 @@ class AuthController extends Controller
         $user->tokens()->where('name', 'google-auth')->delete();
         $token = $user->createToken('google-auth')->plainTextToken;
 
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
         $params = http_build_query([
             'token'  => $token,
             'id'     => $user->id,
