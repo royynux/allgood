@@ -1,4 +1,4 @@
-import type { Destination, Guide, BookingPayload, BookingResponse, ApiResponse, Review, SnapTokenResponse, UserBooking } from './types'
+import type { Destination, Guide, BookingPayload, BookingResponse, ApiResponse, Review, SnapTokenResponse, UserBooking, TeamMember, GalleryPhoto, Testimonial, SiteSettings } from './types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -95,4 +95,20 @@ export async function confirmPayment(bookingCode: string, token: string): Promis
     body: JSON.stringify({ booking_code: bookingCode }),
     token,
   })
+}
+
+export async function getSiteSettings(): Promise<{ data: SiteSettings }> {
+  return request<{ data: SiteSettings }>('/api/settings')
+}
+
+export async function getTeamMembers(): Promise<{ data: TeamMember[] }> {
+  return request<{ data: TeamMember[] }>('/api/team-members')
+}
+
+export async function getGalleryPhotos(): Promise<{ data: GalleryPhoto[] }> {
+  return request<{ data: GalleryPhoto[] }>('/api/gallery')
+}
+
+export async function getTestimonials(): Promise<{ data: Testimonial[] }> {
+  return request<{ data: Testimonial[] }>('/api/testimonials')
 }

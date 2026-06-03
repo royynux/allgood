@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Testimonial extends Model
+{
+    protected $fillable = [
+        'reviewer_name', 'reviewer_role', 'reviewer_avatar',
+        'rating', 'comment', 'sort_order', 'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'rating' => 'integer',
+    ];
+}

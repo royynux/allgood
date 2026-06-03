@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\GuideController;
 use App\Http\Controllers\Api\PaymentController;
@@ -14,6 +15,11 @@ Route::get('/destinations/{destination:slug}/reviews', [ReviewController::class,
 
 Route::get('/guides', [GuideController::class, 'index']);
 Route::get('/guides/{guide}', [GuideController::class, 'show']);
+
+Route::get('/settings', [ContentController::class, 'settings']);
+Route::get('/team-members', [ContentController::class, 'team']);
+Route::get('/gallery', [ContentController::class, 'gallery']);
+Route::get('/testimonials', [ContentController::class, 'testimonials']);
 
 Route::post('/payments/notification', [PaymentController::class, 'notification']);
 

@@ -167,6 +167,60 @@ export interface UserBooking {
   created_at: string
 }
 
+export interface TeamMember {
+  id: number
+  name: string
+  role: string
+  bio: string | null
+  avatar: string | null
+  cover_image: string | null
+}
+
+export interface GalleryPhoto {
+  id: number
+  image: string
+  caption: string | null
+}
+
+export interface Testimonial {
+  id: number
+  reviewer_name: string
+  reviewer_role: string | null
+  reviewer_avatar: string | null
+  rating: number
+  comment: string
+}
+
+export interface HeroSettings {
+  background_image?: string | null
+  badge_text?: string
+  title_line1?: string
+  title_line2_colored?: string
+  title_line3?: string
+  description?: string
+}
+
+export interface AboutHeroSettings {
+  background_image?: string | null
+  badge_text?: string
+  headline?: string
+  description?: string
+}
+
+export interface AboutStorySettings {
+  image?: string | null
+  title?: string
+  description1?: string
+  description2?: string
+}
+
+export interface SiteSettings {
+  hero?: HeroSettings
+  about_hero?: AboutHeroSettings
+  about_story?: AboutStorySettings
+  [key: string]: unknown
+}
+
 export interface BookingState {
   tripType: 'one-day' | 'custom' | null
   destination: Destination | null
