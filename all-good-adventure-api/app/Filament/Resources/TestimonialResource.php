@@ -22,6 +22,8 @@ use Filament\Tables\Table;
 
 class TestimonialResource extends Resource
 {
+    public const MAX_TESTIMONIALS = 4;
+
     protected static ?string $model = Testimonial::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
