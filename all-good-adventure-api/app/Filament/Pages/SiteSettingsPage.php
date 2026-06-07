@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Destination;
 use App\Models\SiteSetting;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -40,6 +42,7 @@ class SiteSettingsPage extends Page implements HasForms
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
         $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
         $featuredSection = json_decode(SiteSetting::get('featured_destinations_section', '{}'), true) ?? [];
+        $featuredDestinationIds = Destination::where('is_featured_home', true)->pluck('id')->toArray();
 
         $this->form->fill([
             'hero_background_image'    => $hero['background_image'] ?? null,
@@ -85,6 +88,7 @@ class SiteSettingsPage extends Page implements HasForms
             'featured_section_label'       => $featuredSection['label'] ?? 'Destinasi Pilihan',
             'featured_section_title'       => $featuredSection['title'] ?? 'Private Trip Terpopuler di Lombok',
             'featured_section_description' => $featuredSection['description'] ?? 'Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!',
+            'featured_destination_ids'     => $featuredDestinationIds,
         ]);
     }
 
@@ -235,7 +239,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ])->columns(2),
 
                 Section::make('🏝️ Destinasi Pilihan (Halaman Utama)')
-                    ->description('Judul dan deskripsi pada section "Destinasi Pilihan" di halaman utama. Untuk memilih destinasi mana yang tampil di section ini, buka menu Destinasi → edit destinasi → aktifkan toggle "Tampilkan di Destinasi Pilihan (Beranda)" (maksimal 4 destinasi).')
+                    ->description('Atur judul, deskripsi, dan destinasi mana saja yang ditampilkan pada section "Destinasi Pilihan" di halaman utama — semuanya dari sini, tidak perlu buka halaman edit destinasi satu per satu.')
                     ->schema([
                         TextInput::make('featured_section_label')
                             ->label('Label Kecil (di atas judul)')
@@ -248,6 +252,16 @@ class SiteSettingsPage extends Page implements HasForms
                         Textarea::make('featured_section_description')
                             ->label('Deskripsi')
                             ->rows(2)
+                            ->columnSpanFull(),
+
+                        Select::make('featured_destination_ids')
+                            ->label('Pilih Destinasi yang Ditampilkan')
+                            ->helperText('Pilih maksimal 4 destinasi yang ingin ditampilkan di section ini pada halaman utama. Jika tidak ada yang dipilih, sistem akan menampilkan 4 destinasi pertama secara otomatis.')
+                            ->options(fn () => Destination::where('is_active', true)->orderBy('name')->pluck('name', 'id'))
+                            ->multiple()
+                            ->maxItems(4)
+                            ->searchable()
+                            ->preload()
                             ->columnSpanFull(),
                     ])->columns(2),
             ])
@@ -315,6 +329,12 @@ class SiteSettingsPage extends Page implements HasForms
             'title'       => $data['featured_section_title'],
             'description' => $data['featured_section_description'],
         ]));
+
+        $selectedDestinationIds = $data['featured_destination_ids'] ?? [];
+        Destination::query()->update(['is_featured_home' => false]);
+        if (! empty($selectedDestinationIds)) {
+            Destination::whereIn('id', $selectedDestinationIds)->update(['is_featured_home' => true]);
+        }
 
         Notification::make()
             ->title('Pengaturan berhasil disimpan!')
