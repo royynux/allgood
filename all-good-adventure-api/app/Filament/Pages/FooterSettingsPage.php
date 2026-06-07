@@ -17,7 +17,7 @@ class FooterSettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-bottom';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected string $view = 'filament.pages.site-settings-page';
 
