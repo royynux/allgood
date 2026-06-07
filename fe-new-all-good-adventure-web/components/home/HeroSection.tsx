@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getSiteSettings } from '@/lib/api'
-import type { HeroSettings } from '@/lib/types'
+import type { HeroSettings, SiteStats } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -16,6 +16,13 @@ const DEFAULTS: HeroSettings = {
   description: 'Temukan pengalaman private trip terbaik di Lombok — dari pendakian Rinjani, island hopping Gili, hingga private getaway eksklusif untuk kamu dan orang-orang terkasih.',
 }
 
+const DEFAULT_STATS: SiteStats = {
+  stat1_num: '50+', stat1_label: 'Destinasi Lombok & Bali',
+  stat2_num: '10K+', stat2_label: 'Traveler Puas',
+  stat3_num: '100%', stat3_label: 'Private Trip',
+  stat4_num: '48', stat4_label: 'Tour Guide Aktif',
+}
+
 const FALLBACK_BG = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&q=80'
 
 function resolveImageUrl(path: string | null | undefined): string {
@@ -26,11 +33,13 @@ function resolveImageUrl(path: string | null | undefined): string {
 
 export default function HeroSection() {
   const [hero, setHero] = useState<HeroSettings>(DEFAULTS)
+  const [stats, setStats] = useState<SiteStats>(DEFAULT_STATS)
 
   useEffect(() => {
     getSiteSettings()
       .then(res => {
         if (res.data?.hero) setHero({ ...DEFAULTS, ...res.data.hero })
+        if (res.data?.hero_stats) setStats({ ...DEFAULT_STATS, ...res.data.hero_stats })
       })
       .catch(() => {})
   }, [])
@@ -98,10 +107,10 @@ export default function HeroSection() {
 
         <div style={{ display: 'flex', gap: 36, marginTop: 48, flexWrap: 'wrap' }}>
           {[
-            { num: '50+', label: 'Destinasi Lombok & Bali' },
-            { num: '10K+', label: 'Traveler Puas' },
-            { num: '100%', label: 'Private Trip' },
-            { num: '48', label: 'Tour Guide Aktif' },
+            { num: stats.stat1_num, label: stats.stat1_label },
+            { num: stats.stat2_num, label: stats.stat2_label },
+            { num: stats.stat3_num, label: stats.stat3_label },
+            { num: stats.stat4_num, label: stats.stat4_label },
           ].map(stat => (
             <div key={stat.label}>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#fff' }}>{stat.num}</div>

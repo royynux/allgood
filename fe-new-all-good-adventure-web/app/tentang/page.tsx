@@ -8,7 +8,7 @@ import Drawer from '@/components/layout/Drawer'
 import Footer from '@/components/layout/Footer'
 import BottomNav from '@/components/layout/BottomNav'
 import { getSiteSettings, getTeamMembers } from '@/lib/api'
-import type { TeamMember, AboutHeroSettings, AboutStorySettings } from '@/lib/types'
+import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -39,6 +39,13 @@ const DEFAULT_ABOUT_HERO: AboutHeroSettings = {
   description: 'Berawal dari kecintaan terhadap alam Lombok, kami hadir sebagai spesialis private trip terpercaya untuk setiap perjalananmu.',
 }
 
+const DEFAULT_STATS: SiteStats = {
+  stat1_num: '7+', stat1_label: 'Tahun Berpengalaman',
+  stat2_num: '10K+', stat2_label: 'Traveler Puas',
+  stat3_num: '50+', stat3_label: 'Destinasi',
+  stat4_num: '48', stat4_label: 'Guide Aktif',
+}
+
 const DEFAULT_STORY: AboutStorySettings = {
   image: null,
   title: 'Dari Hobi Menjadi Misi',
@@ -51,12 +58,14 @@ export default function TentangPage() {
   const [team, setTeam] = useState<TeamMember[]>(FALLBACK_TEAM)
   const [aboutHero, setAboutHero] = useState<AboutHeroSettings>(DEFAULT_ABOUT_HERO)
   const [story, setStory] = useState<AboutStorySettings>(DEFAULT_STORY)
+  const [stats, setStats] = useState<SiteStats>(DEFAULT_STATS)
 
   useEffect(() => {
     getSiteSettings()
       .then(res => {
         if (res.data?.about_hero) setAboutHero({ ...DEFAULT_ABOUT_HERO, ...res.data.about_hero })
         if (res.data?.about_story) setStory({ ...DEFAULT_STORY, ...res.data.about_story })
+        if (res.data?.about_stats) setStats({ ...DEFAULT_STATS, ...res.data.about_stats })
       })
       .catch(() => {})
 
@@ -95,7 +104,12 @@ export default function TentangPage() {
               {aboutHero.description}
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
-              {[{ num: '7+', label: 'Tahun Berpengalaman' }, { num: '10K+', label: 'Traveler Puas' }, { num: '50+', label: 'Destinasi' }, { num: '48', label: 'Guide Aktif' }].map(s => (
+              {[
+                { num: stats.stat1_num, label: stats.stat1_label },
+                { num: stats.stat2_num, label: stats.stat2_label },
+                { num: stats.stat3_num, label: stats.stat3_label },
+                { num: stats.stat4_num, label: stats.stat4_label },
+              ].map(s => (
                 <div key={s.label}>
                   <div style={{ fontSize: 36, fontWeight: 800, color: '#fff' }}>{s.num}</div>
                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>{s.label}</div>

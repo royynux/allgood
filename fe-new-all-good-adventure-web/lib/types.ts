@@ -221,11 +221,24 @@ export interface WhyusImages {
   image_4?: string | null
 }
 
+export interface SiteStats {
+  stat1_num?: string
+  stat1_label?: string
+  stat2_num?: string
+  stat2_label?: string
+  stat3_num?: string
+  stat3_label?: string
+  stat4_num?: string
+  stat4_label?: string
+}
+
 export interface SiteSettings {
   hero?: HeroSettings
   about_hero?: AboutHeroSettings
   about_story?: AboutStorySettings
   whyus_images?: WhyusImages
+  hero_stats?: SiteStats
+  about_stats?: SiteStats
   [key: string]: unknown
 }
 

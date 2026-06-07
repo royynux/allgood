@@ -37,6 +37,8 @@ class SiteSettingsPage extends Page implements HasForms
         $aboutHero = json_decode(SiteSetting::get('about_hero', '{}'), true) ?? [];
         $aboutStory = json_decode(SiteSetting::get('about_story', '{}'), true) ?? [];
         $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
+        $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
+        $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
 
         $this->form->fill([
             'hero_background_image'    => $hero['background_image'] ?? null,
@@ -60,6 +62,24 @@ class SiteSettingsPage extends Page implements HasForms
             'whyus_image_2' => $whyusImages['image_2'] ?? null,
             'whyus_image_3' => $whyusImages['image_3'] ?? null,
             'whyus_image_4' => $whyusImages['image_4'] ?? null,
+
+            'hero_stat1_num'   => $heroStats['stat1_num'] ?? '50+',
+            'hero_stat1_label' => $heroStats['stat1_label'] ?? 'Destinasi Lombok & Bali',
+            'hero_stat2_num'   => $heroStats['stat2_num'] ?? '10K+',
+            'hero_stat2_label' => $heroStats['stat2_label'] ?? 'Traveler Puas',
+            'hero_stat3_num'   => $heroStats['stat3_num'] ?? '100%',
+            'hero_stat3_label' => $heroStats['stat3_label'] ?? 'Private Trip',
+            'hero_stat4_num'   => $heroStats['stat4_num'] ?? '48',
+            'hero_stat4_label' => $heroStats['stat4_label'] ?? 'Tour Guide Aktif',
+
+            'about_stat1_num'   => $aboutStats['stat1_num'] ?? '7+',
+            'about_stat1_label' => $aboutStats['stat1_label'] ?? 'Tahun Berpengalaman',
+            'about_stat2_num'   => $aboutStats['stat2_num'] ?? '10K+',
+            'about_stat2_label' => $aboutStats['stat2_label'] ?? 'Traveler Puas',
+            'about_stat3_num'   => $aboutStats['stat3_num'] ?? '50+',
+            'about_stat3_label' => $aboutStats['stat3_label'] ?? 'Destinasi',
+            'about_stat4_num'   => $aboutStats['stat4_num'] ?? '48',
+            'about_stat4_label' => $aboutStats['stat4_label'] ?? 'Guide Aktif',
         ]);
     }
 
@@ -176,6 +196,38 @@ class SiteSettingsPage extends Page implements HasForms
                             ->directory('site')
                             ->imagePreviewHeight('120'),
                     ])->columns(2),
+
+                Section::make('📊 Statistik — Halaman Utama (Hero)')
+                    ->description('4 angka statistik yang tampil di bagian bawah Hero pada halaman utama (mis. "50+ Destinasi Lombok & Bali").')
+                    ->schema([
+                        TextInput::make('hero_stat1_num')->label('Statistik 1 — Angka')->placeholder('50+'),
+                        TextInput::make('hero_stat1_label')->label('Statistik 1 — Label')->placeholder('Destinasi Lombok & Bali'),
+
+                        TextInput::make('hero_stat2_num')->label('Statistik 2 — Angka')->placeholder('10K+'),
+                        TextInput::make('hero_stat2_label')->label('Statistik 2 — Label')->placeholder('Traveler Puas'),
+
+                        TextInput::make('hero_stat3_num')->label('Statistik 3 — Angka')->placeholder('100%'),
+                        TextInput::make('hero_stat3_label')->label('Statistik 3 — Label')->placeholder('Private Trip'),
+
+                        TextInput::make('hero_stat4_num')->label('Statistik 4 — Angka')->placeholder('48'),
+                        TextInput::make('hero_stat4_label')->label('Statistik 4 — Label')->placeholder('Tour Guide Aktif'),
+                    ])->columns(2),
+
+                Section::make('📊 Statistik — Halaman Tentang')
+                    ->description('4 angka statistik yang tampil di bagian Hero halaman Tentang Kami (mis. "7+ Tahun Berpengalaman").')
+                    ->schema([
+                        TextInput::make('about_stat1_num')->label('Statistik 1 — Angka')->placeholder('7+'),
+                        TextInput::make('about_stat1_label')->label('Statistik 1 — Label')->placeholder('Tahun Berpengalaman'),
+
+                        TextInput::make('about_stat2_num')->label('Statistik 2 — Angka')->placeholder('10K+'),
+                        TextInput::make('about_stat2_label')->label('Statistik 2 — Label')->placeholder('Traveler Puas'),
+
+                        TextInput::make('about_stat3_num')->label('Statistik 3 — Angka')->placeholder('50+'),
+                        TextInput::make('about_stat3_label')->label('Statistik 3 — Label')->placeholder('Destinasi'),
+
+                        TextInput::make('about_stat4_num')->label('Statistik 4 — Angka')->placeholder('48'),
+                        TextInput::make('about_stat4_label')->label('Statistik 4 — Label')->placeholder('Guide Aktif'),
+                    ])->columns(2),
             ])
             ->statePath('data');
     }
@@ -212,6 +264,28 @@ class SiteSettingsPage extends Page implements HasForms
             'image_2' => $data['whyus_image_2'],
             'image_3' => $data['whyus_image_3'],
             'image_4' => $data['whyus_image_4'],
+        ]));
+
+        SiteSetting::set('hero_stats', json_encode([
+            'stat1_num'   => $data['hero_stat1_num'],
+            'stat1_label' => $data['hero_stat1_label'],
+            'stat2_num'   => $data['hero_stat2_num'],
+            'stat2_label' => $data['hero_stat2_label'],
+            'stat3_num'   => $data['hero_stat3_num'],
+            'stat3_label' => $data['hero_stat3_label'],
+            'stat4_num'   => $data['hero_stat4_num'],
+            'stat4_label' => $data['hero_stat4_label'],
+        ]));
+
+        SiteSetting::set('about_stats', json_encode([
+            'stat1_num'   => $data['about_stat1_num'],
+            'stat1_label' => $data['about_stat1_label'],
+            'stat2_num'   => $data['about_stat2_num'],
+            'stat2_label' => $data['about_stat2_label'],
+            'stat3_num'   => $data['about_stat3_num'],
+            'stat3_label' => $data['about_stat3_label'],
+            'stat4_num'   => $data['about_stat4_num'],
+            'stat4_label' => $data['about_stat4_label'],
         ]));
 
         Notification::make()
