@@ -238,6 +238,14 @@ export interface FeaturedSectionSettings {
   description?: string
 }
 
+export interface FooterSettings {
+  logo_image?: string | null
+  description?: string
+  whatsapp_number?: string
+  address?: string
+  map_url?: string
+}
+
 export interface SiteSettings {
   hero?: HeroSettings
   about_hero?: AboutHeroSettings
@@ -246,6 +254,7 @@ export interface SiteSettings {
   hero_stats?: SiteStats
   about_stats?: SiteStats
   featured_destinations_section?: FeaturedSectionSettings
+  footer?: FooterSettings
   [key: string]: unknown
 }
 
