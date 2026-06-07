@@ -238,6 +238,11 @@ export interface FeaturedSectionSettings {
   description?: string
 }
 
+export interface TeamSectionSettings {
+  label?: string
+  title?: string
+}
+
 export interface FooterSettings {
   logo_image?: string | null
   description?: string
@@ -254,6 +259,7 @@ export interface SiteSettings {
   hero_stats?: SiteStats
   about_stats?: SiteStats
   featured_destinations_section?: FeaturedSectionSettings
+  team_section?: TeamSectionSettings
   footer?: FooterSettings
   [key: string]: unknown
 }

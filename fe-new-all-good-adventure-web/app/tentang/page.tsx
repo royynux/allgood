@@ -8,7 +8,7 @@ import Drawer from '@/components/layout/Drawer'
 import Footer from '@/components/layout/Footer'
 import BottomNav from '@/components/layout/BottomNav'
 import { getSiteSettings, getTeamMembers } from '@/lib/api'
-import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats } from '@/lib/types'
+import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats, TeamSectionSettings } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -46,6 +46,11 @@ const DEFAULT_STATS: SiteStats = {
   stat4_num: '48', stat4_label: 'Guide Aktif',
 }
 
+const DEFAULT_TEAM_SECTION: TeamSectionSettings = {
+  label: 'Tim Kami',
+  title: 'Orang-orang di Balik AGA',
+}
+
 const DEFAULT_STORY: AboutStorySettings = {
   image: null,
   title: 'Dari Hobi Menjadi Misi',
@@ -59,6 +64,7 @@ export default function TentangPage() {
   const [aboutHero, setAboutHero] = useState<AboutHeroSettings>(DEFAULT_ABOUT_HERO)
   const [story, setStory] = useState<AboutStorySettings>(DEFAULT_STORY)
   const [stats, setStats] = useState<SiteStats>(DEFAULT_STATS)
+  const [teamSection, setTeamSection] = useState<TeamSectionSettings>(DEFAULT_TEAM_SECTION)
 
   useEffect(() => {
     getSiteSettings()
@@ -66,6 +72,7 @@ export default function TentangPage() {
         if (res.data?.about_hero) setAboutHero({ ...DEFAULT_ABOUT_HERO, ...res.data.about_hero })
         if (res.data?.about_story) setStory({ ...DEFAULT_STORY, ...res.data.about_story })
         if (res.data?.about_stats) setStats({ ...DEFAULT_STATS, ...res.data.about_stats })
+        if (res.data?.team_section) setTeamSection({ ...DEFAULT_TEAM_SECTION, ...res.data.team_section })
       })
       .catch(() => {})
 
@@ -166,8 +173,8 @@ export default function TentangPage() {
         {/* Team */}
         <div style={{ padding: '80px 5%' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>Tim Kami</div>
-            <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: 'var(--dark)' }}>Orang-orang di Balik AGA</h2>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>{teamSection.label}</div>
+            <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: 'var(--dark)' }}>{teamSection.title}</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 24 }}>
             {team.map(member => (

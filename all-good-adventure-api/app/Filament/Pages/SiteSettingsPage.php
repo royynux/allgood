@@ -42,6 +42,7 @@ class SiteSettingsPage extends Page implements HasForms
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
         $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
         $featuredSection = json_decode(SiteSetting::get('featured_destinations_section', '{}'), true) ?? [];
+        $teamSection = json_decode(SiteSetting::get('team_section', '{}'), true) ?? [];
         $featuredDestinationIds = Destination::where('is_featured_home', true)->pluck('id')->toArray();
 
         $this->form->fill([
@@ -88,6 +89,9 @@ class SiteSettingsPage extends Page implements HasForms
             'featured_section_label'       => $featuredSection['label'] ?? 'Destinasi Pilihan',
             'featured_section_title'       => $featuredSection['title'] ?? 'Private Trip Terpopuler di Lombok',
             'featured_section_description' => $featuredSection['description'] ?? 'Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!',
+
+            'team_section_label' => $teamSection['label'] ?? 'Tim Kami',
+            'team_section_title' => $teamSection['title'] ?? 'Orang-orang di Balik AGA',
             'featured_destination_ids'     => $featuredDestinationIds,
         ]);
     }
@@ -264,6 +268,18 @@ class SiteSettingsPage extends Page implements HasForms
                             ->preload()
                             ->columnSpanFull(),
                     ])->columns(2),
+
+                Section::make('👥 Tim Kami (Halaman Tentang)')
+                    ->description('Atur label dan judul section yang menampilkan daftar anggota tim pada halaman "Tentang Kami".')
+                    ->schema([
+                        TextInput::make('team_section_label')
+                            ->label('Label Kecil (di atas judul)')
+                            ->placeholder('Tim Kami'),
+
+                        TextInput::make('team_section_title')
+                            ->label('Judul Section')
+                            ->placeholder('Orang-orang di Balik AGA'),
+                    ])->columns(2),
             ])
             ->statePath('data');
     }
@@ -328,6 +344,11 @@ class SiteSettingsPage extends Page implements HasForms
             'label'       => $data['featured_section_label'],
             'title'       => $data['featured_section_title'],
             'description' => $data['featured_section_description'],
+        ]));
+
+        SiteSetting::set('team_section', json_encode([
+            'label' => $data['team_section_label'],
+            'title' => $data['team_section_title'],
         ]));
 
         $selectedDestinationIds = $data['featured_destination_ids'] ?? [];
