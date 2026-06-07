@@ -232,6 +232,12 @@ export interface SiteStats {
   stat4_label?: string
 }
 
+export interface FeaturedSectionSettings {
+  label?: string
+  title?: string
+  description?: string
+}
+
 export interface SiteSettings {
   hero?: HeroSettings
   about_hero?: AboutHeroSettings
@@ -239,6 +245,7 @@ export interface SiteSettings {
   whyus_images?: WhyusImages
   hero_stats?: SiteStats
   about_stats?: SiteStats
+  featured_destinations_section?: FeaturedSectionSettings
   [key: string]: unknown
 }
 

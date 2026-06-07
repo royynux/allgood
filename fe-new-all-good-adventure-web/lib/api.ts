@@ -29,6 +29,7 @@ export interface DestinationFilters {
   price_min?: number
   price_max?: number
   featured?: boolean
+  featured_home?: boolean
 }
 
 export interface GuideFilters {
@@ -45,6 +46,7 @@ export async function getDestinations(filters: DestinationFilters = {}): Promise
   if (filters.price_min != null) params.set('price_min', String(filters.price_min))
   if (filters.price_max != null) params.set('price_max', String(filters.price_max))
   if (filters.featured) params.set('featured', '1')
+  if (filters.featured_home) params.set('featured_home', '1')
   const qs = params.toString()
   return request<ApiResponse<Destination[]>>(`/api/destinations${qs ? `?${qs}` : ''}`)
 }

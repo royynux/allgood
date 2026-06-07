@@ -3,9 +3,15 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getDestinations } from '@/lib/api'
-import type { Destination } from '@/lib/types'
+import { getDestinations, getSiteSettings } from '@/lib/api'
+import type { Destination, FeaturedSectionSettings } from '@/lib/types'
 import { formatPrice } from '@/lib/utils'
+
+const DEFAULT_SECTION: FeaturedSectionSettings = {
+  label: 'Destinasi Pilihan',
+  title: 'Private Trip Terpopuler di Lombok',
+  description: 'Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!',
+}
 
 function TripCard({ dest, onDetail }: { dest: Destination; onDetail: (d: Destination) => void }) {
   const image = dest.image ?? `https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80`
@@ -87,25 +93,42 @@ function TripCard({ dest, onDetail }: { dest: Destination; onDetail: (d: Destina
 export default function PopularTrips() {
   const [destinations, setDestinations] = useState<Destination[]>([])
   const [loading, setLoading] = useState(true)
+  const [section, setSection] = useState<FeaturedSectionSettings>(DEFAULT_SECTION)
 
   useEffect(() => {
-    getDestinations()
-      .then(res => setDestinations((res.data ?? []).slice(0, 4)))
+    getDestinations({ featured_home: true })
+      .then(res => {
+        const featured = res.data ?? []
+        if (featured.length > 0) {
+          setDestinations(featured.slice(0, 4))
+        } else {
+          // Fallback when admin hasn't picked any "Destinasi Pilihan" yet
+          return getDestinations().then(fallback => setDestinations((fallback.data ?? []).slice(0, 4)))
+        }
+      })
       .catch((err) => { console.error('[PopularTrips] fetch error:', err); setDestinations([]) })
       .finally(() => setLoading(false))
+
+    getSiteSettings()
+      .then(res => {
+        if (res.data?.featured_destinations_section) {
+          setSection({ ...DEFAULT_SECTION, ...res.data.featured_destinations_section })
+        }
+      })
+      .catch(() => {})
   }, [])
 
   return (
     <section style={{ padding: '80px 5%', background: 'var(--bg)' }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>
-          Destinasi Pilihan
+          {section.label}
         </div>
         <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
-          Private Trip Terpopuler di Lombok
+          {section.title}
         </h2>
         <p style={{ fontSize: 16, color: 'var(--body)', marginTop: 12, maxWidth: 480, margin: '12px auto 0', lineHeight: 1.75, textAlign: 'center' }}>
-          Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!
+          {section.description}
         </p>
       </div>
 
