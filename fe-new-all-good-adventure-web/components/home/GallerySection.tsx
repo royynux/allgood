@@ -20,7 +20,7 @@ const FALLBACK_PHOTOS: GalleryPhoto[] = [
 
 const PHOTO_COUNT = 10
 
-const TILE_HEIGHTS = [320, 220, 260, 360, 200, 280, 240, 340, 220, 300]
+const TILE_HEIGHTS = [220, 160, 180, 240, 150, 190, 170, 230, 160, 200]
 
 export default function GallerySection() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>(FALLBACK_PHOTOS)
@@ -47,7 +47,7 @@ export default function GallerySection() {
         </h2>
       </div>
 
-      <div className="columns-2 sm:columns-3 lg:columns-4" style={{ columnGap: 11 }}>
+      <div className="columns-2 sm:columns-3 lg:columns-5" style={{ columnGap: 11 }}>
         {display.map((photo, i) => (
           <div key={photo.id ?? i} style={{
             breakInside: 'avoid', marginBottom: 11,
