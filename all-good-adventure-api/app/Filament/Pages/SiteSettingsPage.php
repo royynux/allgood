@@ -36,6 +36,7 @@ class SiteSettingsPage extends Page implements HasForms
         $hero = json_decode(SiteSetting::get('hero', '{}'), true) ?? [];
         $aboutHero = json_decode(SiteSetting::get('about_hero', '{}'), true) ?? [];
         $aboutStory = json_decode(SiteSetting::get('about_story', '{}'), true) ?? [];
+        $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
 
         $this->form->fill([
             'hero_background_image'    => $hero['background_image'] ?? null,
@@ -54,6 +55,11 @@ class SiteSettingsPage extends Page implements HasForms
             'about_story_title'        => $aboutStory['title'] ?? 'Dari Hobi Menjadi Misi',
             'about_story_description1' => $aboutStory['description1'] ?? 'All Good Adventure lahir pada tahun 2018 dari sebuah grup pendakian kecil di Lombok. Kami percaya bahwa setiap orang berhak merasakan keajaiban alam Lombok — tanpa kerumitan dan rasa khawatir.',
             'about_story_description2' => $aboutStory['description2'] ?? 'Selama 7 tahun, kami telah menemani lebih dari 10.000 traveler dari seluruh Indonesia dan dunia menjelajahi keindahan Lombok.',
+
+            'whyus_image_1' => $whyusImages['image_1'] ?? null,
+            'whyus_image_2' => $whyusImages['image_2'] ?? null,
+            'whyus_image_3' => $whyusImages['image_3'] ?? null,
+            'whyus_image_4' => $whyusImages['image_4'] ?? null,
         ]);
     }
 
@@ -138,6 +144,38 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Paragraf 2')
                             ->rows(3),
                     ])->columns(2),
+
+                Section::make('🖼️ Kenapa Memilih Kami — 4 Gambar')
+                    ->description('4 gambar di sebelah kanan bagian "Kenapa Memilih All Good Adventure?" pada halaman utama.')
+                    ->schema([
+                        FileUpload::make('whyus_image_1')
+                            ->label('Gambar 1 (kiri atas)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('site')
+                            ->imagePreviewHeight('120'),
+
+                        FileUpload::make('whyus_image_2')
+                            ->label('Gambar 2 (kanan atas — lebih tinggi)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('site')
+                            ->imagePreviewHeight('120'),
+
+                        FileUpload::make('whyus_image_3')
+                            ->label('Gambar 3 (kiri bawah)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('site')
+                            ->imagePreviewHeight('120'),
+
+                        FileUpload::make('whyus_image_4')
+                            ->label('Gambar 4 (kanan bawah)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('site')
+                            ->imagePreviewHeight('120'),
+                    ])->columns(2),
             ])
             ->statePath('data');
     }
@@ -167,6 +205,13 @@ class SiteSettingsPage extends Page implements HasForms
             'title'        => $data['about_story_title'],
             'description1' => $data['about_story_description1'],
             'description2' => $data['about_story_description2'],
+        ]));
+
+        SiteSetting::set('whyus_images', json_encode([
+            'image_1' => $data['whyus_image_1'],
+            'image_2' => $data['whyus_image_2'],
+            'image_3' => $data['whyus_image_3'],
+            'image_4' => $data['whyus_image_4'],
         ]));
 
         Notification::make()

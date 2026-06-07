@@ -28,9 +28,9 @@ class DestinationController extends Controller
             ->when($request->boolean('featured'), fn ($query) => $query->whereNotNull('badge'))
             ->when($request->query('search'), fn ($query, $search) => $query->where(
                 fn ($searchQuery) => $searchQuery
-                    ->where('name', 'ilike', "%{$search}%")
-                    ->orWhere('city', 'ilike', "%{$search}%")
-                    ->orWhere('description', 'ilike', "%{$search}%"),
+                    ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(city) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(description) LIKE ?', ['%' . strtolower($search) . '%']),
             ))
             ->orderBy('city')
             ->orderBy('name')
