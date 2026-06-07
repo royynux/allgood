@@ -26,6 +26,7 @@ class DestinationController extends Controller
             ->when($request->query('price_min'), fn ($query, $min) => $query->where('price', '>=', (int) $min))
             ->when($request->query('price_max'), fn ($query, $max) => $query->where('price', '<=', (int) $max))
             ->when($request->boolean('featured'), fn ($query) => $query->whereNotNull('badge'))
+            ->when($request->boolean('featured_home'), fn ($query) => $query->where('is_featured_home', true))
             ->when($request->query('search'), fn ($query, $search) => $query->where(
                 fn ($searchQuery) => $searchQuery
                     ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])

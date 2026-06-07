@@ -44,6 +44,10 @@ class DestinationsTable
                     ->searchable(),
                 IconColumn::make('is_active')
                     ->boolean(),
+                IconColumn::make('is_featured_home')
+                    ->label('Destinasi Pilihan')
+                    ->boolean()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

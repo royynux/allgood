@@ -62,6 +62,10 @@ class DestinationForm
                     ->placeholder('— Tidak ada badge —')
                     ->helperText('Destinasi dengan badge akan muncul di section "Trip Lagi Viral" di homepage.')
                     ->columnSpanFull(),
+                Toggle::make('is_featured_home')
+                    ->label('Tampilkan di "Destinasi Pilihan" (Beranda)')
+                    ->helperText('Aktifkan untuk menampilkan destinasi ini pada section "Destinasi Pilihan — Private Trip Terpopuler di Lombok" di halaman utama. Maksimal 4 destinasi yang ditandai akan tampil.')
+                    ->columnSpanFull(),
                 Repeater::make('includes')
                     ->label('Sudah Termasuk (Includes)')
                     ->schema([

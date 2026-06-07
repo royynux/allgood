@@ -39,6 +39,7 @@ class SiteSettingsPage extends Page implements HasForms
         $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
         $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
+        $featuredSection = json_decode(SiteSetting::get('featured_destinations_section', '{}'), true) ?? [];
 
         $this->form->fill([
             'hero_background_image'    => $hero['background_image'] ?? null,
@@ -80,6 +81,10 @@ class SiteSettingsPage extends Page implements HasForms
             'about_stat3_label' => $aboutStats['stat3_label'] ?? 'Destinasi',
             'about_stat4_num'   => $aboutStats['stat4_num'] ?? '48',
             'about_stat4_label' => $aboutStats['stat4_label'] ?? 'Guide Aktif',
+
+            'featured_section_label'       => $featuredSection['label'] ?? 'Destinasi Pilihan',
+            'featured_section_title'       => $featuredSection['title'] ?? 'Private Trip Terpopuler di Lombok',
+            'featured_section_description' => $featuredSection['description'] ?? 'Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!',
         ]);
     }
 
@@ -228,6 +233,23 @@ class SiteSettingsPage extends Page implements HasForms
                         TextInput::make('about_stat4_num')->label('Statistik 4 — Angka')->placeholder('48'),
                         TextInput::make('about_stat4_label')->label('Statistik 4 — Label')->placeholder('Guide Aktif'),
                     ])->columns(2),
+
+                Section::make('🏝️ Destinasi Pilihan (Halaman Utama)')
+                    ->description('Judul dan deskripsi pada section "Destinasi Pilihan" di halaman utama. Untuk memilih destinasi mana yang tampil di section ini, buka menu Destinasi → edit destinasi → aktifkan toggle "Tampilkan di Destinasi Pilihan (Beranda)" (maksimal 4 destinasi).')
+                    ->schema([
+                        TextInput::make('featured_section_label')
+                            ->label('Label Kecil (di atas judul)')
+                            ->placeholder('Destinasi Pilihan'),
+
+                        TextInput::make('featured_section_title')
+                            ->label('Judul Section')
+                            ->placeholder('Private Trip Terpopuler di Lombok'),
+
+                        Textarea::make('featured_section_description')
+                            ->label('Deskripsi')
+                            ->rows(2)
+                            ->columnSpanFull(),
+                    ])->columns(2),
             ])
             ->statePath('data');
     }
@@ -286,6 +308,12 @@ class SiteSettingsPage extends Page implements HasForms
             'stat3_label' => $data['about_stat3_label'],
             'stat4_num'   => $data['about_stat4_num'],
             'stat4_label' => $data['about_stat4_label'],
+        ]));
+
+        SiteSetting::set('featured_destinations_section', json_encode([
+            'label'       => $data['featured_section_label'],
+            'title'       => $data['featured_section_title'],
+            'description' => $data['featured_section_description'],
         ]));
 
         Notification::make()

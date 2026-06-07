@@ -20,6 +20,7 @@ class Destination extends Model
         'description',
         'tags',
         'badge',
+        'is_featured_home',
         'includes',
         'excludes',
         'meeting_points',
@@ -43,6 +44,7 @@ class Destination extends Model
             'highlights' => 'array',
             'itinerary' => 'array',
             'is_active' => 'boolean',
+            'is_featured_home' => 'boolean',
         ];
     }
 
