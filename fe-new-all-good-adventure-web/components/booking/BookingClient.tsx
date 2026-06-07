@@ -487,8 +487,14 @@ export default function BookingClient() {
                         <Image src={avatar} alt={guide.name} width={52} height={52} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 3 }}>{guide.name}</div>
-                      <div style={{ fontSize: 11.5, color: 'var(--body-2)', marginBottom: 6 }}>📍 {guide.location}</div>
-                      <div style={{ fontSize: 12, color: 'var(--body-2)' }}>⭐ {guide.rating} · {guide.review_count} ulasan</div>
+                      <div style={{ fontSize: 11.5, color: 'var(--body-2)', marginBottom: 6 }}>
+                        📍 {guide.location}
+                        {guide.age != null && <> · 🎂 {guide.age} tahun</>}
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--body-2)', marginBottom: 6 }}>⭐ {guide.rating} · {guide.review_count} ulasan</div>
+                      {guide.years_experience != null && (
+                        <div style={{ fontSize: 11.5, color: 'var(--body-2)' }}>🏅 {guide.years_experience} tahun pengalaman</div>
+                      )}
                     </div>
                   )
                 })}
