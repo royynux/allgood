@@ -157,11 +157,8 @@ export default function BookingClient() {
 
   const update = (patch: Partial<BookingState>) => setState(s => ({ ...s, ...patch }))
 
-  const filteredDests = destinations.filter(d => {
-    if (state.tripType === 'one-day') return d.trip_type?.slug === 'one-day'
-    if (state.tripType === 'custom') return d.trip_type?.slug === 'custom'
-    return true
-  }).filter(d => !destSearch || d.name.toLowerCase().includes(destSearch.toLowerCase()))
+  const filteredDests = destinations
+    .filter(d => !destSearch || d.name.toLowerCase().includes(destSearch.toLowerCase()))
 
   const tripDuration = state.tripType === 'one-day' ? 1 : state.customDuration
   const endDate = state.startDate ? addDays(state.startDate, tripDuration - 1) : ''
@@ -419,7 +416,7 @@ export default function BookingClient() {
                       <div style={{ padding: '10px 12px' }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--dark)' }}>{dest.name}</div>
                         <div style={{ fontSize: 11.5, color: 'var(--body-2)', marginTop: 1 }}>{dest.city}</div>
-                        {dest.price && <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginTop: 4 }}>{formatPrice(dest.price)}</div>}
+                        {state.tripType === 'one-day' && dest.price && <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginTop: 4 }}>{formatPrice(dest.price)}</div>}
                       </div>
                     </div>
                   )

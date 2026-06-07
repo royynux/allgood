@@ -1,3 +1,9 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { getSiteSettings } from '@/lib/api'
+import type { HowToBookSectionSettings } from '@/lib/types'
+
 const steps = [
   { num: 1, title: 'Pilih Destinasi', desc: 'Browse destinasi Lombok favorit dari katalog kami.' },
   { num: 2, title: 'Pilih Tour Guide', desc: 'Pilih tour guide bersertifikat sesuai spesialisasi dan kebutuhan trip.' },
@@ -7,15 +13,30 @@ const steps = [
   { num: 6, title: 'Siap Berangkat! 🎉', desc: 'Tim kami menghubungimu dalam 1×24 jam untuk konfirmasi.' },
 ]
 
+const DEFAULT_SECTION: HowToBookSectionSettings = {
+  label: 'Cara Pesan',
+  title: 'Cara Booking Private Trip Mudah & Cepat',
+}
+
 export default function HowToBook() {
+  const [section, setSection] = useState<HowToBookSectionSettings>(DEFAULT_SECTION)
+
+  useEffect(() => {
+    getSiteSettings()
+      .then(res => {
+        if (res.data?.how_to_book_section) setSection({ ...DEFAULT_SECTION, ...res.data.how_to_book_section })
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <section style={{ padding: '80px 5%', background: 'var(--white)' }}>
       <div style={{ textAlign: 'center', marginBottom: 52 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10, display: 'block', textAlign: 'center' }}>
-          Cara Pesan
+          {section.label}
         </div>
         <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
-          Cara Booking Private Trip<br />Mudah & Cepat
+          {section.title}
         </h2>
       </div>
 

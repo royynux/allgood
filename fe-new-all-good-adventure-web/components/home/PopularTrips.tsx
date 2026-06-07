@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getDestinations, getSiteSettings } from '@/lib/api'
 import type { Destination, FeaturedSectionSettings } from '@/lib/types'
 import { formatPrice } from '@/lib/utils'
+import DestinationModal from '@/components/katalog/DestinationModal'
 
 const DEFAULT_SECTION: FeaturedSectionSettings = {
   label: 'Destinasi Pilihan',
@@ -94,6 +95,7 @@ export default function PopularTrips() {
   const [destinations, setDestinations] = useState<Destination[]>([])
   const [loading, setLoading] = useState(true)
   const [section, setSection] = useState<FeaturedSectionSettings>(DEFAULT_SECTION)
+  const [selectedDest, setSelectedDest] = useState<Destination | null>(null)
 
   useEffect(() => {
     getDestinations({ featured_home: true })
@@ -149,7 +151,7 @@ export default function PopularTrips() {
           display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(272px, 1fr))', gap: 22,
         }}>
           {destinations.map(dest => (
-            <TripCard key={dest.id} dest={dest} onDetail={() => {}} />
+            <TripCard key={dest.id} dest={dest} onDetail={setSelectedDest} />
           ))}
         </div>
       )}
@@ -164,6 +166,10 @@ export default function PopularTrips() {
           Lihat Semua Destinasi →
         </Link>
       </div>
+
+      {selectedDest && (
+        <DestinationModal dest={selectedDest} onClose={() => setSelectedDest(null)} />
+      )}
     </section>
   )
 }

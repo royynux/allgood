@@ -58,7 +58,10 @@ export default function GuideModal({ guide, onClose }: Props) {
             </div>
             <div style={{ paddingBottom: 4 }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--dark)' }}>{guide.name}</div>
-              <div style={{ fontSize: 13.5, color: 'var(--body-2)' }}>📍 {guide.location}</div>
+              <div style={{ fontSize: 13.5, color: 'var(--body-2)' }}>
+                📍 {guide.location}
+                {guide.age != null && <> · 🎂 {guide.age} tahun</>}
+              </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
                 <span style={{ color: '#F59E0B', fontSize: 13 }}>{'★'.repeat(Math.round(Number(guide.rating)))}</span>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{Number(guide.rating).toFixed(1)}</span>

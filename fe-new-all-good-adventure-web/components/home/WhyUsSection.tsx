@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { getSiteSettings } from '@/lib/api'
+import type { WhyUsSectionSettings } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -17,6 +18,12 @@ function resolveImageUrl(path: string | null | undefined, fallback: string): str
   if (!path) return fallback
   if (path.startsWith('http')) return path
   return `${BASE_URL}/storage/${path}`
+}
+
+const DEFAULT_SECTION: WhyUsSectionSettings = {
+  label: 'Kenapa Kami',
+  title: 'Kenapa Memilih All Good Adventure?',
+  description: 'Kami spesialis private trip di Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.',
 }
 
 const whyItems = [
@@ -44,6 +51,7 @@ const whyItems = [
 
 export default function WhyUsSection() {
   const [images, setImages] = useState(FALLBACK_IMAGES)
+  const [section, setSection] = useState<WhyUsSectionSettings>(DEFAULT_SECTION)
 
   useEffect(() => {
     getSiteSettings()
@@ -57,6 +65,7 @@ export default function WhyUsSection() {
             resolveImageUrl(wi.image_4, FALLBACK_IMAGES[3]),
           ])
         }
+        if (res.data?.whyus_section) setSection({ ...DEFAULT_SECTION, ...res.data.whyus_section })
       })
       .catch(() => {})
   }, [])
@@ -70,13 +79,13 @@ export default function WhyUsSection() {
       }}>
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>
-            Kenapa Kami
+            {section.label}
           </div>
           <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
-            Kenapa Memilih<br />All Good Adventure?
+            {section.title}
           </h2>
           <p style={{ fontSize: 16, color: 'var(--body)', lineHeight: 1.75, marginTop: 14 }}>
-            Kami spesialis private trip di Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.
+            {section.description}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 32 }}>

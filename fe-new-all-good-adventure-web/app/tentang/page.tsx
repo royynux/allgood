@@ -8,7 +8,7 @@ import Drawer from '@/components/layout/Drawer'
 import Footer from '@/components/layout/Footer'
 import BottomNav from '@/components/layout/BottomNav'
 import { getSiteSettings, getTeamMembers } from '@/lib/api'
-import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats, TeamSectionSettings } from '@/lib/types'
+import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats, TeamSectionSettings, ValuesSectionSettings, AboutCtaSettings } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -19,7 +19,7 @@ function resolveImageUrl(path: string | null | undefined, fallback: string): str
 }
 
 const values = [
-  { icon: '🌿', title: 'Cinta Lingkungan', desc: 'Setiap trip dirancang untuk menghormati kelestarian alam dan budaya Lombok.' },
+  { icon: '🌿', title: 'Cinta Lingkungan', desc: 'Setiap trip dirancang untuk menghormati kelestarian alam dan budaya Lombok & Bali.' },
   { icon: '🛡️', title: 'Keselamatan Utama', desc: 'Standar keselamatan ketat, asuransi perjalanan, dan guide bersertifikat.' },
   { icon: '🔒', title: '100% Private', desc: 'Tripmu eksklusif hanya untuk kamu dan rombongan. Tidak ada stranger yang ikut.' },
   { icon: '⭐', title: 'Pengalaman Terbaik', desc: 'Setiap detail dirancang untuk kenangan yang tak terlupakan seumur hidup.' },
@@ -51,6 +51,16 @@ const DEFAULT_TEAM_SECTION: TeamSectionSettings = {
   title: 'Orang-orang di Balik AGA',
 }
 
+const DEFAULT_VALUES_SECTION: ValuesSectionSettings = {
+  label: 'Nilai Kami',
+  title: 'Yang Kami Pegang Teguh',
+}
+
+const DEFAULT_CTA: AboutCtaSettings = {
+  title: 'Siap Memulai Petualanganmu?',
+  description: 'Bergabunglah dengan 10.000+ traveler yang sudah mempercayai All Good Adventure.',
+}
+
 const DEFAULT_STORY: AboutStorySettings = {
   image: null,
   title: 'Dari Hobi Menjadi Misi',
@@ -65,6 +75,8 @@ export default function TentangPage() {
   const [story, setStory] = useState<AboutStorySettings>(DEFAULT_STORY)
   const [stats, setStats] = useState<SiteStats>(DEFAULT_STATS)
   const [teamSection, setTeamSection] = useState<TeamSectionSettings>(DEFAULT_TEAM_SECTION)
+  const [valuesSection, setValuesSection] = useState<ValuesSectionSettings>(DEFAULT_VALUES_SECTION)
+  const [cta, setCta] = useState<AboutCtaSettings>(DEFAULT_CTA)
 
   useEffect(() => {
     getSiteSettings()
@@ -73,6 +85,8 @@ export default function TentangPage() {
         if (res.data?.about_story) setStory({ ...DEFAULT_STORY, ...res.data.about_story })
         if (res.data?.about_stats) setStats({ ...DEFAULT_STATS, ...res.data.about_stats })
         if (res.data?.team_section) setTeamSection({ ...DEFAULT_TEAM_SECTION, ...res.data.team_section })
+        if (res.data?.values_section) setValuesSection({ ...DEFAULT_VALUES_SECTION, ...res.data.values_section })
+        if (res.data?.about_cta) setCta({ ...DEFAULT_CTA, ...res.data.about_cta })
       })
       .catch(() => {})
 
@@ -156,8 +170,8 @@ export default function TentangPage() {
         {/* Values */}
         <div style={{ background: 'var(--bg)', padding: '80px 5%' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>Nilai Kami</div>
-            <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: 'var(--dark)' }}>Yang Kami Pegang Teguh</h2>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>{valuesSection.label}</div>
+            <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: 'var(--dark)' }}>{valuesSection.title}</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 22 }}>
             {values.map(v => (
@@ -209,8 +223,8 @@ export default function TentangPage() {
 
         {/* CTA */}
         <div style={{ background: 'var(--primary)', padding: '64px 5%', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: '#fff', marginBottom: 14 }}>Siap Memulai Petualanganmu?</h2>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)', marginBottom: 30 }}>Bergabunglah dengan 10.000+ traveler yang sudah mempercayai All Good Adventure.</p>
+          <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: '#fff', marginBottom: 14 }}>{cta.title}</h2>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)', marginBottom: 30 }}>{cta.description}</p>
           <Link href="/katalog" style={{
             background: '#fff', color: 'var(--primary)', border: 'none',
             fontSize: 15, fontWeight: 700, padding: '14px 32px', borderRadius: 'var(--r-sm)',

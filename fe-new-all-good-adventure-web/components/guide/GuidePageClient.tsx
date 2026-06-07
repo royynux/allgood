@@ -46,7 +46,10 @@ function GuideCard({ guide, onView }: { guide: Guide; onView: (g: Guide) => void
               <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--dark)' }}>{guide.name}</span>
               <span style={{ width: 18, height: 18, background: 'var(--success)', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff' }}>✓</span>
             </div>
-            <div style={{ fontSize: 12.5, color: 'var(--body-2)' }}>📍 {guide.location}</div>
+            <div style={{ fontSize: 12.5, color: 'var(--body-2)' }}>
+              📍 {guide.location}
+              {guide.age != null && <> · 🎂 {guide.age} tahun</>}
+            </div>
           </div>
         </div>
 

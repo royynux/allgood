@@ -88,6 +88,7 @@ export interface Guide {
   review_count: number
   trips_done: number
   years_experience: number
+  age?: number | null
   languages: string[]
   destinations: string[]
   is_active: boolean
@@ -238,6 +239,27 @@ export interface FeaturedSectionSettings {
   description?: string
 }
 
+export interface WhyUsSectionSettings {
+  label?: string
+  title?: string
+  description?: string
+}
+
+export interface HowToBookSectionSettings {
+  label?: string
+  title?: string
+}
+
+export interface ValuesSectionSettings {
+  label?: string
+  title?: string
+}
+
+export interface AboutCtaSettings {
+  title?: string
+  description?: string
+}
+
 export interface TeamSectionSettings {
   label?: string
   title?: string
@@ -259,6 +281,10 @@ export interface SiteSettings {
   hero_stats?: SiteStats
   about_stats?: SiteStats
   featured_destinations_section?: FeaturedSectionSettings
+  whyus_section?: WhyUsSectionSettings
+  how_to_book_section?: HowToBookSectionSettings
+  values_section?: ValuesSectionSettings
+  about_cta?: AboutCtaSettings
   team_section?: TeamSectionSettings
   footer?: FooterSettings
   [key: string]: unknown
