@@ -27,7 +27,7 @@ class FooterSettingsPage extends Page implements HasForms
 
     protected static \UnitEnum|string|null $navigationGroup = 'Konten Website';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public ?array $data = [];
 

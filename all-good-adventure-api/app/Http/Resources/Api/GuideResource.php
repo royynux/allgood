@@ -22,6 +22,7 @@ class GuideResource extends JsonResource
             'review_count' => (int) $this->review_count,
             'trips_done' => (int) $this->trips_done,
             'years_experience' => (int) $this->years_experience,
+            'age' => $this->age !== null ? (int) $this->age : null,
             'languages' => $this->languages ?? [],
             'destinations' => $this->destinations ?? [],
             'is_active' => $this->is_active,

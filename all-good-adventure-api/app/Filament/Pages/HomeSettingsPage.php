@@ -15,17 +15,17 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-class SiteSettingsPage extends Page implements HasForms
+class HomeSettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
 
     protected string $view = 'filament.pages.site-settings-page';
 
-    protected static ?string $navigationLabel = 'Pengaturan Website';
+    protected static ?string $navigationLabel = 'Pengaturan Beranda';
 
-    protected static ?string $title = 'Pengaturan Website';
+    protected static ?string $title = 'Pengaturan Halaman Utama (Beranda)';
 
     protected static \UnitEnum|string|null $navigationGroup = 'Konten Website';
 
@@ -36,13 +36,11 @@ class SiteSettingsPage extends Page implements HasForms
     public function mount(): void
     {
         $hero = json_decode(SiteSetting::get('hero', '{}'), true) ?? [];
-        $aboutHero = json_decode(SiteSetting::get('about_hero', '{}'), true) ?? [];
-        $aboutStory = json_decode(SiteSetting::get('about_story', '{}'), true) ?? [];
+        $whyusSection = json_decode(SiteSetting::get('whyus_section', '{}'), true) ?? [];
         $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
+        $howToBookSection = json_decode(SiteSetting::get('how_to_book_section', '{}'), true) ?? [];
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
-        $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
         $featuredSection = json_decode(SiteSetting::get('featured_destinations_section', '{}'), true) ?? [];
-        $teamSection = json_decode(SiteSetting::get('team_section', '{}'), true) ?? [];
         $featuredDestinationIds = Destination::where('is_featured_home', true)->pluck('id')->toArray();
 
         $this->form->fill([
@@ -53,20 +51,17 @@ class SiteSettingsPage extends Page implements HasForms
             'hero_title_line3'         => $hero['title_line3'] ?? 'Bareng Kami!',
             'hero_description'         => $hero['description'] ?? 'Temukan pengalaman private trip terbaik di Lombok — dari pendakian Rinjani, island hopping Gili, hingga private getaway eksklusif untuk kamu dan orang-orang terkasih.',
 
-            'about_hero_background_image' => $aboutHero['background_image'] ?? null,
-            'about_hero_badge_text'       => $aboutHero['badge_text'] ?? '🏔️ Sejak 2018 — Lombok',
-            'about_hero_headline'         => $aboutHero['headline'] ?? 'Kami adalah All Good Adventure',
-            'about_hero_description'      => $aboutHero['description'] ?? 'Berawal dari kecintaan terhadap alam Lombok, kami hadir sebagai spesialis private trip terpercaya untuk setiap perjalananmu.',
-
-            'about_story_image'        => $aboutStory['image'] ?? null,
-            'about_story_title'        => $aboutStory['title'] ?? 'Dari Hobi Menjadi Misi',
-            'about_story_description1' => $aboutStory['description1'] ?? 'All Good Adventure lahir pada tahun 2018 dari sebuah grup pendakian kecil di Lombok. Kami percaya bahwa setiap orang berhak merasakan keajaiban alam Lombok — tanpa kerumitan dan rasa khawatir.',
-            'about_story_description2' => $aboutStory['description2'] ?? 'Selama 7 tahun, kami telah menemani lebih dari 10.000 traveler dari seluruh Indonesia dan dunia menjelajahi keindahan Lombok.',
+            'whyus_section_label'       => $whyusSection['label'] ?? 'Kenapa Kami',
+            'whyus_section_title'       => $whyusSection['title'] ?? 'Kenapa Memilih All Good Adventure?',
+            'whyus_section_description' => $whyusSection['description'] ?? 'Kami spesialis private trip di Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.',
 
             'whyus_image_1' => $whyusImages['image_1'] ?? null,
             'whyus_image_2' => $whyusImages['image_2'] ?? null,
             'whyus_image_3' => $whyusImages['image_3'] ?? null,
             'whyus_image_4' => $whyusImages['image_4'] ?? null,
+
+            'how_to_book_label' => $howToBookSection['label'] ?? 'Cara Pesan',
+            'how_to_book_title' => $howToBookSection['title'] ?? 'Cara Booking Private Trip Mudah & Cepat',
 
             'hero_stat1_num'   => $heroStats['stat1_num'] ?? '50+',
             'hero_stat1_label' => $heroStats['stat1_label'] ?? 'Destinasi Lombok & Bali',
@@ -77,21 +72,9 @@ class SiteSettingsPage extends Page implements HasForms
             'hero_stat4_num'   => $heroStats['stat4_num'] ?? '48',
             'hero_stat4_label' => $heroStats['stat4_label'] ?? 'Tour Guide Aktif',
 
-            'about_stat1_num'   => $aboutStats['stat1_num'] ?? '7+',
-            'about_stat1_label' => $aboutStats['stat1_label'] ?? 'Tahun Berpengalaman',
-            'about_stat2_num'   => $aboutStats['stat2_num'] ?? '10K+',
-            'about_stat2_label' => $aboutStats['stat2_label'] ?? 'Traveler Puas',
-            'about_stat3_num'   => $aboutStats['stat3_num'] ?? '50+',
-            'about_stat3_label' => $aboutStats['stat3_label'] ?? 'Destinasi',
-            'about_stat4_num'   => $aboutStats['stat4_num'] ?? '48',
-            'about_stat4_label' => $aboutStats['stat4_label'] ?? 'Guide Aktif',
-
             'featured_section_label'       => $featuredSection['label'] ?? 'Destinasi Pilihan',
             'featured_section_title'       => $featuredSection['title'] ?? 'Private Trip Terpopuler di Lombok',
             'featured_section_description' => $featuredSection['description'] ?? 'Semua perjalanan dirancang khusus untuk kamu — 100% private, no strangers!',
-
-            'team_section_label' => $teamSection['label'] ?? 'Tim Kami',
-            'team_section_title' => $teamSection['title'] ?? 'Orang-orang di Balik AGA',
             'featured_destination_ids'     => $featuredDestinationIds,
         ]);
     }
@@ -100,7 +83,7 @@ class SiteSettingsPage extends Page implements HasForms
     {
         return $schema
             ->components([
-                Section::make('🏠 Hero Section (Halaman Utama)')
+                Section::make('🏠 Hero Section')
                     ->description('Bagian pertama yang dilihat pengunjung di halaman utama.')
                     ->schema([
                         FileUpload::make('hero_background_image')
@@ -132,50 +115,21 @@ class SiteSettingsPage extends Page implements HasForms
                             ->rows(3),
                     ])->columns(2),
 
-                Section::make('ℹ️ Halaman Tentang — Hero Banner')
-                    ->description('Bagian header di halaman Tentang Kami.')
+                Section::make('💡 Kenapa Kami — Teks')
+                    ->description('Label, judul, dan deskripsi pada section "Kenapa Memilih All Good Adventure?".')
                     ->schema([
-                        FileUpload::make('about_hero_background_image')
-                            ->label('Background Image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('site')
-                            ->imagePreviewHeight('150'),
+                        TextInput::make('whyus_section_label')
+                            ->label('Label Kecil (di atas judul)')
+                            ->placeholder('Kenapa Kami'),
 
-                        TextInput::make('about_hero_badge_text')
-                            ->label('Teks Badge')
-                            ->placeholder('🏔️ Sejak 2018 — Lombok'),
+                        TextInput::make('whyus_section_title')
+                            ->label('Judul Section')
+                            ->placeholder('Kenapa Memilih All Good Adventure?'),
 
-                        TextInput::make('about_hero_headline')
-                            ->label('Headline')
-                            ->placeholder('Kami adalah All Good Adventure'),
-
-                        Textarea::make('about_hero_description')
+                        Textarea::make('whyus_section_description')
                             ->label('Deskripsi')
-                            ->rows(3),
-                    ])->columns(2),
-
-                Section::make('📖 Halaman Tentang — Cerita Kami')
-                    ->description('Section "Dari Hobi Menjadi Misi" di halaman Tentang.')
-                    ->schema([
-                        FileUpload::make('about_story_image')
-                            ->label('Gambar Cerita')
-                            ->image()
-                            ->disk('public')
-                            ->directory('site')
-                            ->imagePreviewHeight('150'),
-
-                        TextInput::make('about_story_title')
-                            ->label('Judul')
-                            ->placeholder('Dari Hobi Menjadi Misi'),
-
-                        Textarea::make('about_story_description1')
-                            ->label('Paragraf 1')
-                            ->rows(3),
-
-                        Textarea::make('about_story_description2')
-                            ->label('Paragraf 2')
-                            ->rows(3),
+                            ->rows(2)
+                            ->columnSpanFull(),
                     ])->columns(2),
 
                 Section::make('🖼️ Kenapa Memilih Kami — 4 Gambar')
@@ -210,6 +164,18 @@ class SiteSettingsPage extends Page implements HasForms
                             ->imagePreviewHeight('120'),
                     ])->columns(2),
 
+                Section::make('📝 Cara Booking — Judul Section')
+                    ->description('Label dan judul pada section "Cara Booking Private Trip Mudah & Cepat" di halaman utama. Daftar 6 langkahnya masih tetap (tidak berubah).')
+                    ->schema([
+                        TextInput::make('how_to_book_label')
+                            ->label('Label Kecil (di atas judul)')
+                            ->placeholder('Cara Pesan'),
+
+                        TextInput::make('how_to_book_title')
+                            ->label('Judul Section')
+                            ->placeholder('Cara Booking Private Trip Mudah & Cepat'),
+                    ])->columns(2),
+
                 Section::make('📊 Statistik — Halaman Utama (Hero)')
                     ->description('4 angka statistik yang tampil di bagian bawah Hero pada halaman utama (mis. "50+ Destinasi Lombok & Bali").')
                     ->schema([
@@ -226,23 +192,7 @@ class SiteSettingsPage extends Page implements HasForms
                         TextInput::make('hero_stat4_label')->label('Statistik 4 — Label')->placeholder('Tour Guide Aktif'),
                     ])->columns(2),
 
-                Section::make('📊 Statistik — Halaman Tentang')
-                    ->description('4 angka statistik yang tampil di bagian Hero halaman Tentang Kami (mis. "7+ Tahun Berpengalaman").')
-                    ->schema([
-                        TextInput::make('about_stat1_num')->label('Statistik 1 — Angka')->placeholder('7+'),
-                        TextInput::make('about_stat1_label')->label('Statistik 1 — Label')->placeholder('Tahun Berpengalaman'),
-
-                        TextInput::make('about_stat2_num')->label('Statistik 2 — Angka')->placeholder('10K+'),
-                        TextInput::make('about_stat2_label')->label('Statistik 2 — Label')->placeholder('Traveler Puas'),
-
-                        TextInput::make('about_stat3_num')->label('Statistik 3 — Angka')->placeholder('50+'),
-                        TextInput::make('about_stat3_label')->label('Statistik 3 — Label')->placeholder('Destinasi'),
-
-                        TextInput::make('about_stat4_num')->label('Statistik 4 — Angka')->placeholder('48'),
-                        TextInput::make('about_stat4_label')->label('Statistik 4 — Label')->placeholder('Guide Aktif'),
-                    ])->columns(2),
-
-                Section::make('🏝️ Destinasi Pilihan (Halaman Utama)')
+                Section::make('🏝️ Destinasi Pilihan')
                     ->description('Atur judul, deskripsi, dan destinasi mana saja yang ditampilkan pada section "Destinasi Pilihan" di halaman utama — semuanya dari sini, tidak perlu buka halaman edit destinasi satu per satu.')
                     ->schema([
                         TextInput::make('featured_section_label')
@@ -268,18 +218,6 @@ class SiteSettingsPage extends Page implements HasForms
                             ->preload()
                             ->columnSpanFull(),
                     ])->columns(2),
-
-                Section::make('👥 Tim Kami (Halaman Tentang)')
-                    ->description('Atur label dan judul section yang menampilkan daftar anggota tim pada halaman "Tentang Kami".')
-                    ->schema([
-                        TextInput::make('team_section_label')
-                            ->label('Label Kecil (di atas judul)')
-                            ->placeholder('Tim Kami'),
-
-                        TextInput::make('team_section_title')
-                            ->label('Judul Section')
-                            ->placeholder('Orang-orang di Balik AGA'),
-                    ])->columns(2),
             ])
             ->statePath('data');
     }
@@ -297,18 +235,10 @@ class SiteSettingsPage extends Page implements HasForms
             'description'         => $data['hero_description'],
         ]));
 
-        SiteSetting::set('about_hero', json_encode([
-            'background_image' => $data['about_hero_background_image'],
-            'badge_text'       => $data['about_hero_badge_text'],
-            'headline'         => $data['about_hero_headline'],
-            'description'      => $data['about_hero_description'],
-        ]));
-
-        SiteSetting::set('about_story', json_encode([
-            'image'        => $data['about_story_image'],
-            'title'        => $data['about_story_title'],
-            'description1' => $data['about_story_description1'],
-            'description2' => $data['about_story_description2'],
+        SiteSetting::set('whyus_section', json_encode([
+            'label'       => $data['whyus_section_label'],
+            'title'       => $data['whyus_section_title'],
+            'description' => $data['whyus_section_description'],
         ]));
 
         SiteSetting::set('whyus_images', json_encode([
@@ -316,6 +246,11 @@ class SiteSettingsPage extends Page implements HasForms
             'image_2' => $data['whyus_image_2'],
             'image_3' => $data['whyus_image_3'],
             'image_4' => $data['whyus_image_4'],
+        ]));
+
+        SiteSetting::set('how_to_book_section', json_encode([
+            'label' => $data['how_to_book_label'],
+            'title' => $data['how_to_book_title'],
         ]));
 
         SiteSetting::set('hero_stats', json_encode([
@@ -329,26 +264,10 @@ class SiteSettingsPage extends Page implements HasForms
             'stat4_label' => $data['hero_stat4_label'],
         ]));
 
-        SiteSetting::set('about_stats', json_encode([
-            'stat1_num'   => $data['about_stat1_num'],
-            'stat1_label' => $data['about_stat1_label'],
-            'stat2_num'   => $data['about_stat2_num'],
-            'stat2_label' => $data['about_stat2_label'],
-            'stat3_num'   => $data['about_stat3_num'],
-            'stat3_label' => $data['about_stat3_label'],
-            'stat4_num'   => $data['about_stat4_num'],
-            'stat4_label' => $data['about_stat4_label'],
-        ]));
-
         SiteSetting::set('featured_destinations_section', json_encode([
             'label'       => $data['featured_section_label'],
             'title'       => $data['featured_section_title'],
             'description' => $data['featured_section_description'],
-        ]));
-
-        SiteSetting::set('team_section', json_encode([
-            'label' => $data['team_section_label'],
-            'title' => $data['team_section_title'],
         ]));
 
         $selectedDestinationIds = $data['featured_destination_ids'] ?? [];
@@ -358,7 +277,7 @@ class SiteSettingsPage extends Page implements HasForms
         }
 
         Notification::make()
-            ->title('Pengaturan berhasil disimpan!')
+            ->title('Pengaturan beranda berhasil disimpan!')
             ->success()
             ->send();
     }

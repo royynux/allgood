@@ -46,9 +46,16 @@ class GuideForm
                     ->numeric()
                     ->default(0),
                 TextInput::make('years_experience')
+                    ->label('Tahun Pengalaman')
                     ->required()
                     ->numeric()
                     ->default(0),
+                TextInput::make('age')
+                    ->label('Umur')
+                    ->numeric()
+                    ->minValue(17)
+                    ->maxValue(100)
+                    ->suffix('tahun'),
                 TextInput::make('languages'),
                 TagsInput::make('destinations')
                     ->columnSpanFull(),
