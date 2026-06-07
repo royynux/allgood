@@ -214,10 +214,18 @@ export interface AboutStorySettings {
   description2?: string
 }
 
+export interface WhyusImages {
+  image_1?: string | null
+  image_2?: string | null
+  image_3?: string | null
+  image_4?: string | null
+}
+
 export interface SiteSettings {
   hero?: HeroSettings
   about_hero?: AboutHeroSettings
   about_story?: AboutStorySettings
+  whyus_images?: WhyusImages
   [key: string]: unknown
 }
 

@@ -7,7 +7,7 @@ import Navbar from '@/components/layout/Navbar'
 import Drawer from '@/components/layout/Drawer'
 import BottomNav from '@/components/layout/BottomNav'
 import { getUser, getToken, clearAuth, isLoggedIn } from '@/lib/auth'
-import { getUserBookings } from '@/lib/api'
+import { getUserBookings, confirmPayment } from '@/lib/api'
 import type { AuthUser } from '@/lib/auth'
 import type { UserBooking } from '@/lib/types'
 
@@ -70,15 +70,48 @@ function HistoryTab() {
   const [bookings, setBookings] = useState<UserBooking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [checking, setChecking] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const token = getToken()
     if (!token) { setLoading(false); setError('Not authenticated'); return }
     getUserBookings(token)
-      .then(r => setBookings(r.data ?? []))
+      .then(r => {
+        const data = r.data ?? []
+        setBookings(data)
+        // Auto-check every pending booking silently on load
+        const pending = data.filter(b => b.status === 'pending')
+        pending.forEach(b => {
+          confirmPayment(b.booking_code, token)
+            .then(res => {
+              if (res.booking_status !== 'pending') {
+                setBookings(prev => prev.map(x =>
+                  x.booking_code === b.booking_code ? { ...x, status: res.booking_status as UserBooking['status'] } : x
+                ))
+              }
+            })
+            .catch(() => {})
+        })
+      })
       .catch(() => setError('Gagal memuat riwayat. Coba refresh halaman.'))
       .finally(() => setLoading(false))
   }, [])
+
+  async function handleCheckStatus(bookingCode: string) {
+    const token = getToken()
+    if (!token) return
+    setChecking(prev => ({ ...prev, [bookingCode]: true }))
+    try {
+      const res = await confirmPayment(bookingCode, token)
+      setBookings(prev => prev.map(b =>
+        b.booking_code === bookingCode ? { ...b, status: res.booking_status as UserBooking['status'] } : b
+      ))
+    } catch {
+      // fail silently
+    } finally {
+      setChecking(prev => ({ ...prev, [bookingCode]: false }))
+    }
+  }
 
   if (loading) return (
     <div style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -129,13 +162,31 @@ function HistoryTab() {
                 <div><span style={{ color: 'var(--body-2)' }}>Durasi: </span><strong>{b.duration_days} hari</strong></div>
                 <div><span style={{ color: 'var(--body-2)' }}>Peserta: </span><strong>{b.participants_count} orang</strong></div>
               </div>
-              <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--stroke)', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
-                {b.confirmed_total ? (
-                  <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary)' }}>{formatRp(b.confirmed_total)}</span>
-                ) : b.estimated_total ? (
-                  <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary)' }}>{formatRp(b.estimated_total)}</span>
-                ) : (
-                  <span style={{ fontSize: 12.5, color: 'var(--body-2)' }}>Harga dikonfirmasi admin</span>
+              <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--stroke)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div>
+                  {b.confirmed_total ? (
+                    <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary)' }}>{formatRp(b.confirmed_total)}</span>
+                  ) : b.estimated_total ? (
+                    <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary)' }}>{formatRp(b.estimated_total)}</span>
+                  ) : (
+                    <span style={{ fontSize: 12.5, color: 'var(--body-2)' }}>Harga dikonfirmasi admin</span>
+                  )}
+                </div>
+                {b.status === 'pending' && (
+                  <button
+                    onClick={() => handleCheckStatus(b.booking_code)}
+                    disabled={checking[b.booking_code]}
+                    style={{
+                      background: 'none', border: '1.5px solid var(--primary)',
+                      color: 'var(--primary)', fontSize: 12, fontWeight: 700,
+                      padding: '6px 14px', borderRadius: 'var(--r-sm)',
+                      cursor: checking[b.booking_code] ? 'not-allowed' : 'pointer',
+                      opacity: checking[b.booking_code] ? 0.6 : 1,
+                      fontFamily: 'inherit', transition: 'all 0.2s',
+                    }}
+                  >
+                    {checking[b.booking_code] ? '⏳ Mengecek...' : '🔄 Cek Status Pembayaran'}
+                  </button>
                 )}
               </div>
             </div>
