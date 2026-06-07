@@ -37,6 +37,7 @@ class HomeSettingsPage extends Page implements HasForms
     {
         $hero = json_decode(SiteSetting::get('hero', '{}'), true) ?? [];
         $whyusSection = json_decode(SiteSetting::get('whyus_section', '{}'), true) ?? [];
+        $whyusItems = json_decode(SiteSetting::get('whyus_items', '[]'), true) ?? [];
         $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
         $howToBookSection = json_decode(SiteSetting::get('how_to_book_section', '{}'), true) ?? [];
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
@@ -53,7 +54,16 @@ class HomeSettingsPage extends Page implements HasForms
 
             'whyus_section_label'       => $whyusSection['label'] ?? 'Kenapa Kami',
             'whyus_section_title'       => $whyusSection['title'] ?? 'Kenapa Memilih All Good Adventure?',
-            'whyus_section_description' => $whyusSection['description'] ?? 'Kami spesialis private trip di Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.',
+            'whyus_section_description' => $whyusSection['description'] ?? 'Kami spesialis private trip di Bali dan Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.',
+
+            'whyus_item1_title' => $whyusItems[0]['title'] ?? 'Destinasi Terbaik Lombok',
+            'whyus_item1_desc'  => $whyusItems[0]['desc'] ?? 'Dari puncak Rinjani, Gili Islands, Selong Belanak hingga spot tersembunyi yang hanya kami tahu.',
+            'whyus_item2_title' => $whyusItems[1]['title'] ?? 'Tour Guide Bersertifikat',
+            'whyus_item2_desc'  => $whyusItems[1]['desc'] ?? 'Semua guide kami telah tersertifikasi BNSP, berpengalaman, dan siap membuat tripmu luar biasa.',
+            'whyus_item3_title' => $whyusItems[2]['title'] ?? '100% Private Trip',
+            'whyus_item3_desc'  => $whyusItems[2]['desc'] ?? 'Tripmu hanya untuk kamu dan rombonganmu. Tidak ada orang asing yang ikut serta.',
+            'whyus_item4_title' => $whyusItems[3]['title'] ?? 'Keamanan Terjamin',
+            'whyus_item4_desc'  => $whyusItems[3]['desc'] ?? 'Semua trip dilengkapi asuransi perjalanan dan pemandu berlisensi resmi.',
 
             'whyus_image_1' => $whyusImages['image_1'] ?? null,
             'whyus_image_2' => $whyusImages['image_2'] ?? null,
@@ -130,6 +140,38 @@ class HomeSettingsPage extends Page implements HasForms
                             ->label('Deskripsi')
                             ->rows(2)
                             ->columnSpanFull(),
+                    ])->columns(2),
+
+                Section::make('✅ Kenapa Kami — 4 Poin Alasan')
+                    ->description('Judul dan deskripsi dari 4 kartu alasan di section "Kenapa Memilih All Good Adventure?". Ikon (🗺️ 👤 🔒 🛡️) tetap dan tidak bisa diubah.')
+                    ->schema([
+                        TextInput::make('whyus_item1_title')
+                            ->label('🗺️ Poin 1 — Judul')
+                            ->placeholder('Destinasi Terbaik Lombok'),
+                        Textarea::make('whyus_item1_desc')
+                            ->label('🗺️ Poin 1 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('whyus_item2_title')
+                            ->label('👤 Poin 2 — Judul')
+                            ->placeholder('Tour Guide Bersertifikat'),
+                        Textarea::make('whyus_item2_desc')
+                            ->label('👤 Poin 2 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('whyus_item3_title')
+                            ->label('🔒 Poin 3 — Judul')
+                            ->placeholder('100% Private Trip'),
+                        Textarea::make('whyus_item3_desc')
+                            ->label('🔒 Poin 3 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('whyus_item4_title')
+                            ->label('🛡️ Poin 4 — Judul')
+                            ->placeholder('Keamanan Terjamin'),
+                        Textarea::make('whyus_item4_desc')
+                            ->label('🛡️ Poin 4 — Deskripsi')
+                            ->rows(2),
                     ])->columns(2),
 
                 Section::make('🖼️ Kenapa Memilih Kami — 4 Gambar')
@@ -239,6 +281,13 @@ class HomeSettingsPage extends Page implements HasForms
             'label'       => $data['whyus_section_label'],
             'title'       => $data['whyus_section_title'],
             'description' => $data['whyus_section_description'],
+        ]));
+
+        SiteSetting::set('whyus_items', json_encode([
+            ['title' => $data['whyus_item1_title'], 'desc' => $data['whyus_item1_desc']],
+            ['title' => $data['whyus_item2_title'], 'desc' => $data['whyus_item2_desc']],
+            ['title' => $data['whyus_item3_title'], 'desc' => $data['whyus_item3_desc']],
+            ['title' => $data['whyus_item4_title'], 'desc' => $data['whyus_item4_desc']],
         ]));
 
         SiteSetting::set('whyus_images', json_encode([

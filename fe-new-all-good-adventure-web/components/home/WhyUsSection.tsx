@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { getSiteSettings } from '@/lib/api'
-import type { WhyUsSectionSettings } from '@/lib/types'
+import type { WhyUsSectionSettings, WhyUsItemSettings } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -26,24 +26,22 @@ const DEFAULT_SECTION: WhyUsSectionSettings = {
   description: 'Kami spesialis private trip di Lombok — memastikan setiap perjalananmu eksklusif, aman, dan sesuai keinginanmu.',
 }
 
-const whyItems = [
+const ITEM_ICONS = ['🗺️', '👤', '🔒', '🛡️']
+
+const DEFAULT_ITEMS: WhyUsItemSettings[] = [
   {
-    icon: '🗺️',
     title: 'Destinasi Terbaik Lombok',
     desc: 'Dari puncak Rinjani, Gili Islands, Selong Belanak hingga spot tersembunyi yang hanya kami tahu.',
   },
   {
-    icon: '👤',
     title: 'Tour Guide Bersertifikat',
     desc: 'Semua guide kami telah tersertifikasi BNSP, berpengalaman, dan siap membuat tripmu luar biasa.',
   },
   {
-    icon: '🔒',
     title: '100% Private Trip',
     desc: 'Tripmu hanya untuk kamu dan rombonganmu. Tidak ada orang asing yang ikut serta.',
   },
   {
-    icon: '🛡️',
     title: 'Keamanan Terjamin',
     desc: 'Semua trip dilengkapi asuransi perjalanan dan pemandu berlisensi resmi.',
   },
@@ -52,6 +50,7 @@ const whyItems = [
 export default function WhyUsSection() {
   const [images, setImages] = useState(FALLBACK_IMAGES)
   const [section, setSection] = useState<WhyUsSectionSettings>(DEFAULT_SECTION)
+  const [items, setItems] = useState<WhyUsItemSettings[]>(DEFAULT_ITEMS)
 
   useEffect(() => {
     getSiteSettings()
@@ -66,6 +65,9 @@ export default function WhyUsSection() {
           ])
         }
         if (res.data?.whyus_section) setSection({ ...DEFAULT_SECTION, ...res.data.whyus_section })
+        if (res.data?.whyus_items) {
+          setItems(DEFAULT_ITEMS.map((def, i) => ({ ...def, ...res.data.whyus_items?.[i] })))
+        }
       })
       .catch(() => {})
   }, [])
@@ -89,8 +91,8 @@ export default function WhyUsSection() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 32 }}>
-            {whyItems.map(item => (
-              <div key={item.title} style={{
+            {items.map((item, i) => (
+              <div key={i} style={{
                 display: 'flex', gap: 14, alignItems: 'flex-start',
                 padding: 18, borderRadius: 'var(--r-md)', transition: 'all 0.25s',
               }}>
@@ -98,7 +100,7 @@ export default function WhyUsSection() {
                   width: 46, height: 46, background: 'var(--primary-light)',
                   borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', fontSize: 21, flexShrink: 0,
-                }}>{item.icon}</div>
+                }}>{ITEM_ICONS[i]}</div>
                 <div>
                   <h4 style={{ fontSize: 15.5, fontWeight: 700, color: 'var(--dark)', marginBottom: 5 }}>{item.title}</h4>
                   <p style={{ fontSize: 13.5, color: 'var(--body)', lineHeight: 1.65 }}>{item.desc}</p>

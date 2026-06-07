@@ -245,6 +245,11 @@ export interface WhyUsSectionSettings {
   description?: string
 }
 
+export interface WhyUsItemSettings {
+  title?: string
+  desc?: string
+}
+
 export interface HowToBookSectionSettings {
   label?: string
   title?: string
@@ -282,6 +287,7 @@ export interface SiteSettings {
   about_stats?: SiteStats
   featured_destinations_section?: FeaturedSectionSettings
   whyus_section?: WhyUsSectionSettings
+  whyus_items?: WhyUsItemSettings[]
   how_to_book_section?: HowToBookSectionSettings
   values_section?: ValuesSectionSettings
   about_cta?: AboutCtaSettings
