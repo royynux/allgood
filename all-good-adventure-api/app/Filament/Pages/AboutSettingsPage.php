@@ -37,6 +37,7 @@ class AboutSettingsPage extends Page implements HasForms
         $aboutStory = json_decode(SiteSetting::get('about_story', '{}'), true) ?? [];
         $aboutStats = json_decode(SiteSetting::get('about_stats', '{}'), true) ?? [];
         $valuesSection = json_decode(SiteSetting::get('values_section', '{}'), true) ?? [];
+        $valuesItems = json_decode(SiteSetting::get('values_items', '[]'), true) ?? [];
         $teamSection = json_decode(SiteSetting::get('team_section', '{}'), true) ?? [];
         $aboutCta = json_decode(SiteSetting::get('about_cta', '{}'), true) ?? [];
 
@@ -62,6 +63,15 @@ class AboutSettingsPage extends Page implements HasForms
 
             'values_section_label' => $valuesSection['label'] ?? 'Nilai Kami',
             'values_section_title' => $valuesSection['title'] ?? 'Yang Kami Pegang Teguh',
+
+            'values_item1_title' => $valuesItems[0]['title'] ?? 'Cinta Lingkungan',
+            'values_item1_desc'  => $valuesItems[0]['desc'] ?? 'Setiap trip dirancang untuk menghormati kelestarian alam dan budaya Lombok & Bali.',
+            'values_item2_title' => $valuesItems[1]['title'] ?? 'Keselamatan Utama',
+            'values_item2_desc'  => $valuesItems[1]['desc'] ?? 'Standar keselamatan ketat, asuransi perjalanan, dan guide bersertifikat.',
+            'values_item3_title' => $valuesItems[2]['title'] ?? '100% Private',
+            'values_item3_desc'  => $valuesItems[2]['desc'] ?? 'Tripmu eksklusif hanya untuk kamu dan rombongan. Tidak ada stranger yang ikut.',
+            'values_item4_title' => $valuesItems[3]['title'] ?? 'Pengalaman Terbaik',
+            'values_item4_desc'  => $valuesItems[3]['desc'] ?? 'Setiap detail dirancang untuk kenangan yang tak terlupakan seumur hidup.',
 
             'team_section_label' => $teamSection['label'] ?? 'Tim Kami',
             'team_section_title' => $teamSection['title'] ?? 'Orang-orang di Balik AGA',
@@ -138,7 +148,7 @@ class AboutSettingsPage extends Page implements HasForms
                     ])->columns(2),
 
                 Section::make('💎 Nilai Kami — Judul Section')
-                    ->description('Label dan judul pada section "Yang Kami Pegang Teguh". Daftar 4 nilai (Cinta Lingkungan, Keselamatan, dll) masih tetap.')
+                    ->description('Label dan judul pada section "Yang Kami Pegang Teguh".')
                     ->schema([
                         TextInput::make('values_section_label')
                             ->label('Label Kecil (di atas judul)')
@@ -147,6 +157,38 @@ class AboutSettingsPage extends Page implements HasForms
                         TextInput::make('values_section_title')
                             ->label('Judul Section')
                             ->placeholder('Yang Kami Pegang Teguh'),
+                    ])->columns(2),
+
+                Section::make('💎 Nilai Kami — 4 Poin Nilai')
+                    ->description('Judul dan deskripsi dari 4 kartu nilai pada section "Yang Kami Pegang Teguh". Ikon (🌿 🛡️ 🔒 ⭐) tetap dan tidak bisa diubah.')
+                    ->schema([
+                        TextInput::make('values_item1_title')
+                            ->label('🌿 Poin 1 — Judul')
+                            ->placeholder('Cinta Lingkungan'),
+                        Textarea::make('values_item1_desc')
+                            ->label('🌿 Poin 1 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('values_item2_title')
+                            ->label('🛡️ Poin 2 — Judul')
+                            ->placeholder('Keselamatan Utama'),
+                        Textarea::make('values_item2_desc')
+                            ->label('🛡️ Poin 2 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('values_item3_title')
+                            ->label('🔒 Poin 3 — Judul')
+                            ->placeholder('100% Private'),
+                        Textarea::make('values_item3_desc')
+                            ->label('🔒 Poin 3 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('values_item4_title')
+                            ->label('⭐ Poin 4 — Judul')
+                            ->placeholder('Pengalaman Terbaik'),
+                        Textarea::make('values_item4_desc')
+                            ->label('⭐ Poin 4 — Deskripsi')
+                            ->rows(2),
                     ])->columns(2),
 
                 Section::make('👥 Tim Kami — Judul Section')
@@ -209,6 +251,13 @@ class AboutSettingsPage extends Page implements HasForms
         SiteSetting::set('values_section', json_encode([
             'label' => $data['values_section_label'],
             'title' => $data['values_section_title'],
+        ]));
+
+        SiteSetting::set('values_items', json_encode([
+            ['title' => $data['values_item1_title'], 'desc' => $data['values_item1_desc']],
+            ['title' => $data['values_item2_title'], 'desc' => $data['values_item2_desc']],
+            ['title' => $data['values_item3_title'], 'desc' => $data['values_item3_desc']],
+            ['title' => $data['values_item4_title'], 'desc' => $data['values_item4_desc']],
         ]));
 
         SiteSetting::set('team_section', json_encode([

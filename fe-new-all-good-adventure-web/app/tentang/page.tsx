@@ -8,7 +8,7 @@ import Drawer from '@/components/layout/Drawer'
 import Footer from '@/components/layout/Footer'
 import BottomNav from '@/components/layout/BottomNav'
 import { getSiteSettings, getTeamMembers } from '@/lib/api'
-import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats, TeamSectionSettings, ValuesSectionSettings, AboutCtaSettings } from '@/lib/types'
+import type { TeamMember, AboutHeroSettings, AboutStorySettings, SiteStats, TeamSectionSettings, ValuesSectionSettings, ValuesItemSettings, AboutCtaSettings } from '@/lib/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -18,11 +18,13 @@ function resolveImageUrl(path: string | null | undefined, fallback: string): str
   return `${BASE_URL}/storage/${path}`
 }
 
-const values = [
-  { icon: '🌿', title: 'Cinta Lingkungan', desc: 'Setiap trip dirancang untuk menghormati kelestarian alam dan budaya Lombok & Bali.' },
-  { icon: '🛡️', title: 'Keselamatan Utama', desc: 'Standar keselamatan ketat, asuransi perjalanan, dan guide bersertifikat.' },
-  { icon: '🔒', title: '100% Private', desc: 'Tripmu eksklusif hanya untuk kamu dan rombongan. Tidak ada stranger yang ikut.' },
-  { icon: '⭐', title: 'Pengalaman Terbaik', desc: 'Setiap detail dirancang untuk kenangan yang tak terlupakan seumur hidup.' },
+const VALUES_ICONS = ['🌿', '🛡️', '🔒', '⭐']
+
+const DEFAULT_VALUES_ITEMS: ValuesItemSettings[] = [
+  { title: 'Cinta Lingkungan', desc: 'Setiap trip dirancang untuk menghormati kelestarian alam dan budaya Lombok & Bali.' },
+  { title: 'Keselamatan Utama', desc: 'Standar keselamatan ketat, asuransi perjalanan, dan guide bersertifikat.' },
+  { title: '100% Private', desc: 'Tripmu eksklusif hanya untuk kamu dan rombongan. Tidak ada stranger yang ikut.' },
+  { title: 'Pengalaman Terbaik', desc: 'Setiap detail dirancang untuk kenangan yang tak terlupakan seumur hidup.' },
 ]
 
 const FALLBACK_TEAM: TeamMember[] = [
@@ -76,6 +78,7 @@ export default function TentangPage() {
   const [stats, setStats] = useState<SiteStats>(DEFAULT_STATS)
   const [teamSection, setTeamSection] = useState<TeamSectionSettings>(DEFAULT_TEAM_SECTION)
   const [valuesSection, setValuesSection] = useState<ValuesSectionSettings>(DEFAULT_VALUES_SECTION)
+  const [valuesItems, setValuesItems] = useState<ValuesItemSettings[]>(DEFAULT_VALUES_ITEMS)
   const [cta, setCta] = useState<AboutCtaSettings>(DEFAULT_CTA)
 
   useEffect(() => {
@@ -86,6 +89,9 @@ export default function TentangPage() {
         if (res.data?.about_stats) setStats({ ...DEFAULT_STATS, ...res.data.about_stats })
         if (res.data?.team_section) setTeamSection({ ...DEFAULT_TEAM_SECTION, ...res.data.team_section })
         if (res.data?.values_section) setValuesSection({ ...DEFAULT_VALUES_SECTION, ...res.data.values_section })
+        if (res.data?.values_items) {
+          setValuesItems(DEFAULT_VALUES_ITEMS.map((def, i) => ({ ...def, ...res.data.values_items?.[i] })))
+        }
         if (res.data?.about_cta) setCta({ ...DEFAULT_CTA, ...res.data.about_cta })
       })
       .catch(() => {})
@@ -174,9 +180,9 @@ export default function TentangPage() {
             <h2 style={{ fontSize: 'clamp(24px,3.5vw,38px)', fontWeight: 800, color: 'var(--dark)' }}>{valuesSection.title}</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 22 }}>
-            {values.map(v => (
-              <div key={v.title} style={{ background: 'var(--white)', border: '1px solid var(--stroke)', borderRadius: 'var(--r-lg)', padding: '28px 24px', textAlign: 'center', transition: 'all 0.25s' }}>
-                <div style={{ fontSize: 36, marginBottom: 14 }}>{v.icon}</div>
+            {valuesItems.map((v, i) => (
+              <div key={i} style={{ background: 'var(--white)', border: '1px solid var(--stroke)', borderRadius: 'var(--r-lg)', padding: '28px 24px', textAlign: 'center', transition: 'all 0.25s' }}>
+                <div style={{ fontSize: 36, marginBottom: 14 }}>{VALUES_ICONS[i]}</div>
                 <h4 style={{ fontSize: 16, fontWeight: 700, color: 'var(--dark)', marginBottom: 8 }}>{v.title}</h4>
                 <p style={{ fontSize: 13.5, color: 'var(--body)', lineHeight: 1.65 }}>{v.desc}</p>
               </div>

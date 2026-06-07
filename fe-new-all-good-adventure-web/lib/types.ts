@@ -260,6 +260,11 @@ export interface ValuesSectionSettings {
   title?: string
 }
 
+export interface ValuesItemSettings {
+  title?: string
+  desc?: string
+}
+
 export interface AboutCtaSettings {
   title?: string
   description?: string
@@ -290,6 +295,7 @@ export interface SiteSettings {
   whyus_items?: WhyUsItemSettings[]
   how_to_book_section?: HowToBookSectionSettings
   values_section?: ValuesSectionSettings
+  values_items?: ValuesItemSettings[]
   about_cta?: AboutCtaSettings
   team_section?: TeamSectionSettings
   footer?: FooterSettings
