@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName('All Good Adventure')
             ->brandLogoHeight('2rem')
+            ->favicon(asset('logoTrip.png'))
             ->font('Plus Jakarta Sans', url: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap')
             ->icons([
                 PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM => Heroicon::OutlinedHome,
