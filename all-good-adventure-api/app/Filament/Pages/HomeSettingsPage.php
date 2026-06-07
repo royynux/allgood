@@ -40,6 +40,7 @@ class HomeSettingsPage extends Page implements HasForms
         $whyusItems = json_decode(SiteSetting::get('whyus_items', '[]'), true) ?? [];
         $whyusImages = json_decode(SiteSetting::get('whyus_images', '{}'), true) ?? [];
         $howToBookSection = json_decode(SiteSetting::get('how_to_book_section', '{}'), true) ?? [];
+        $howToBookSteps = json_decode(SiteSetting::get('how_to_book_steps', '[]'), true) ?? [];
         $heroStats = json_decode(SiteSetting::get('hero_stats', '{}'), true) ?? [];
         $featuredSection = json_decode(SiteSetting::get('featured_destinations_section', '{}'), true) ?? [];
         $featuredDestinationIds = Destination::where('is_featured_home', true)->pluck('id')->toArray();
@@ -72,6 +73,19 @@ class HomeSettingsPage extends Page implements HasForms
 
             'how_to_book_label' => $howToBookSection['label'] ?? 'Cara Pesan',
             'how_to_book_title' => $howToBookSection['title'] ?? 'Cara Booking Private Trip Mudah & Cepat',
+
+            'how_to_book_step1_title' => $howToBookSteps[0]['title'] ?? 'Pilih Destinasi',
+            'how_to_book_step1_desc'  => $howToBookSteps[0]['desc'] ?? 'Browse destinasi Lombok favorit dari katalog kami.',
+            'how_to_book_step2_title' => $howToBookSteps[1]['title'] ?? 'Pilih Tour Guide',
+            'how_to_book_step2_desc'  => $howToBookSteps[1]['desc'] ?? 'Pilih tour guide bersertifikat sesuai spesialisasi dan kebutuhan trip.',
+            'how_to_book_step3_title' => $howToBookSteps[2]['title'] ?? 'Atur Jadwal',
+            'how_to_book_step3_desc'  => $howToBookSteps[2]['desc'] ?? 'Tentukan tanggal, durasi, dan jumlah peserta tripmu.',
+            'how_to_book_step4_title' => $howToBookSteps[3]['title'] ?? 'Isi Data Diri',
+            'how_to_book_step4_desc'  => $howToBookSteps[3]['desc'] ?? 'Lengkapi informasi kontak dan permintaan khusus.',
+            'how_to_book_step5_title' => $howToBookSteps[4]['title'] ?? 'Cek Ringkasan',
+            'how_to_book_step5_desc'  => $howToBookSteps[4]['desc'] ?? 'Review total biaya dan detail trip sebelum submit.',
+            'how_to_book_step6_title' => $howToBookSteps[5]['title'] ?? 'Siap Berangkat! 🎉',
+            'how_to_book_step6_desc'  => $howToBookSteps[5]['desc'] ?? 'Tim kami menghubungimu dalam 1×24 jam untuk konfirmasi.',
 
             'hero_stat1_num'   => $heroStats['stat1_num'] ?? '50+',
             'hero_stat1_label' => $heroStats['stat1_label'] ?? 'Destinasi Lombok & Bali',
@@ -207,7 +221,7 @@ class HomeSettingsPage extends Page implements HasForms
                     ])->columns(2),
 
                 Section::make('📝 Cara Booking — Judul Section')
-                    ->description('Label dan judul pada section "Cara Booking Private Trip Mudah & Cepat" di halaman utama. Daftar 6 langkahnya masih tetap (tidak berubah).')
+                    ->description('Label dan judul pada section "Cara Booking Private Trip Mudah & Cepat" di halaman utama.')
                     ->schema([
                         TextInput::make('how_to_book_label')
                             ->label('Label Kecil (di atas judul)')
@@ -216,6 +230,52 @@ class HomeSettingsPage extends Page implements HasForms
                         TextInput::make('how_to_book_title')
                             ->label('Judul Section')
                             ->placeholder('Cara Booking Private Trip Mudah & Cepat'),
+                    ])->columns(2),
+
+                Section::make('📝 Cara Booking — 6 Langkah')
+                    ->description('Judul dan deskripsi dari masing-masing 6 langkah cara booking. Nomor urut (1-6) tetap dan tidak bisa diubah.')
+                    ->schema([
+                        TextInput::make('how_to_book_step1_title')
+                            ->label('Langkah 1 — Judul')
+                            ->placeholder('Pilih Destinasi'),
+                        Textarea::make('how_to_book_step1_desc')
+                            ->label('Langkah 1 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('how_to_book_step2_title')
+                            ->label('Langkah 2 — Judul')
+                            ->placeholder('Pilih Tour Guide'),
+                        Textarea::make('how_to_book_step2_desc')
+                            ->label('Langkah 2 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('how_to_book_step3_title')
+                            ->label('Langkah 3 — Judul')
+                            ->placeholder('Atur Jadwal'),
+                        Textarea::make('how_to_book_step3_desc')
+                            ->label('Langkah 3 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('how_to_book_step4_title')
+                            ->label('Langkah 4 — Judul')
+                            ->placeholder('Isi Data Diri'),
+                        Textarea::make('how_to_book_step4_desc')
+                            ->label('Langkah 4 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('how_to_book_step5_title')
+                            ->label('Langkah 5 — Judul')
+                            ->placeholder('Cek Ringkasan'),
+                        Textarea::make('how_to_book_step5_desc')
+                            ->label('Langkah 5 — Deskripsi')
+                            ->rows(2),
+
+                        TextInput::make('how_to_book_step6_title')
+                            ->label('Langkah 6 — Judul')
+                            ->placeholder('Siap Berangkat! 🎉'),
+                        Textarea::make('how_to_book_step6_desc')
+                            ->label('Langkah 6 — Deskripsi')
+                            ->rows(2),
                     ])->columns(2),
 
                 Section::make('📊 Statistik — Halaman Utama (Hero)')
@@ -300,6 +360,15 @@ class HomeSettingsPage extends Page implements HasForms
         SiteSetting::set('how_to_book_section', json_encode([
             'label' => $data['how_to_book_label'],
             'title' => $data['how_to_book_title'],
+        ]));
+
+        SiteSetting::set('how_to_book_steps', json_encode([
+            ['title' => $data['how_to_book_step1_title'], 'desc' => $data['how_to_book_step1_desc']],
+            ['title' => $data['how_to_book_step2_title'], 'desc' => $data['how_to_book_step2_desc']],
+            ['title' => $data['how_to_book_step3_title'], 'desc' => $data['how_to_book_step3_desc']],
+            ['title' => $data['how_to_book_step4_title'], 'desc' => $data['how_to_book_step4_desc']],
+            ['title' => $data['how_to_book_step5_title'], 'desc' => $data['how_to_book_step5_desc']],
+            ['title' => $data['how_to_book_step6_title'], 'desc' => $data['how_to_book_step6_desc']],
         ]));
 
         SiteSetting::set('hero_stats', json_encode([

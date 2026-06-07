@@ -255,6 +255,11 @@ export interface HowToBookSectionSettings {
   title?: string
 }
 
+export interface HowToBookStepSettings {
+  title?: string
+  desc?: string
+}
+
 export interface ValuesSectionSettings {
   label?: string
   title?: string
@@ -294,6 +299,7 @@ export interface SiteSettings {
   whyus_section?: WhyUsSectionSettings
   whyus_items?: WhyUsItemSettings[]
   how_to_book_section?: HowToBookSectionSettings
+  how_to_book_steps?: HowToBookStepSettings[]
   values_section?: ValuesSectionSettings
   values_items?: ValuesItemSettings[]
   about_cta?: AboutCtaSettings
