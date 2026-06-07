@@ -20,6 +20,8 @@ const FALLBACK_PHOTOS: GalleryPhoto[] = [
 
 const PHOTO_COUNT = 10
 
+const TILE_HEIGHTS = [320, 220, 260, 360, 200, 280, 240, 340, 220, 300]
+
 export default function GallerySection() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>(FALLBACK_PHOTOS)
 
@@ -45,14 +47,21 @@ export default function GallerySection() {
         </h2>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: 11,
-      }}>
+      <div className="columns-2 sm:columns-3 lg:columns-4" style={{ columnGap: 11 }}>
         {display.map((photo, i) => (
-          <div key={photo.id ?? i} style={{ borderRadius: 'var(--r-md)', overflow: 'hidden', position: 'relative', height: 220 }}>
-            <Image src={photo.image} alt={photo.caption ?? 'Gallery'} fill style={{ objectFit: 'cover' }} unoptimized />
+          <div key={photo.id ?? i} style={{
+            breakInside: 'avoid', marginBottom: 11,
+            borderRadius: 'var(--r-md)', overflow: 'hidden',
+            position: 'relative', height: TILE_HEIGHTS[i % TILE_HEIGHTS.length],
+          }}>
+            <Image
+              src={photo.image}
+              alt={photo.caption ?? 'Gallery'}
+              fill
+              style={{ objectFit: 'cover', transition: 'transform 0.4s' }}
+              className="hover:scale-105"
+              unoptimized
+            />
           </div>
         ))}
       </div>
