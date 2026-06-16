@@ -10,6 +10,7 @@ import { getDestinationReviews } from '@/lib/api'
 interface Props {
   dest: Destination
   onClose: () => void
+  forceCustom?: boolean
 }
 
 type Tab = 'deskripsi' | 'itinerary' | 'meeting' | 'ulasan'
@@ -22,9 +23,9 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-export default function DestinationModal({ dest, onClose }: Props) {
+export default function DestinationModal({ dest, onClose, forceCustom }: Props) {
   const image = dest.image ?? 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=720&q=80'
-  const isCustom = dest.trip_type?.slug === 'custom'
+  const isCustom = forceCustom || dest.trip_type?.slug === 'custom'
   const [activeTab, setActiveTab] = useState<Tab>('deskripsi')
   const [reviews, setReviews] = useState<Review[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(false)

@@ -13,9 +13,9 @@ const TRIP_TABS = [
   { key: 'custom', label: '🗺️ Custom Destinations' },
 ]
 
-function TripCard({ dest, onDetail }: { dest: Destination; onDetail: (d: Destination) => void }) {
+function TripCard({ dest, onDetail, forceCustom }: { dest: Destination; onDetail: (d: Destination) => void; forceCustom?: boolean }) {
   const image = dest.image ?? 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80'
-  const isCustom = dest.trip_type?.slug === 'custom'
+  const isCustom = forceCustom || dest.trip_type?.slug === 'custom'
 
   return (
     <div
@@ -103,6 +103,7 @@ export default function KatalogClient() {
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
   const [selectedDest, setSelectedDest] = useState<Destination | null>(null)
+  const [selectedDestIsCustom, setSelectedDestIsCustom] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
 
   const fetchDestinations = useCallback(async () => {
@@ -112,7 +113,7 @@ export default function KatalogClient() {
         search: search || undefined,
         city: location !== 'all' ? location : undefined,
         category: category || undefined,
-        trip_type: tripTypeTab !== 'all' ? tripTypeTab : undefined,
+        trip_type: tripTypeTab !== 'all' ? (tripTypeTab === 'custom' ? 'one-day' : tripTypeTab) : undefined,
         price_min: priceMin ? Number(priceMin) : undefined,
         price_max: priceMax ? Number(priceMax) : undefined,
       })
@@ -311,14 +312,21 @@ export default function KatalogClient() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(252px, 1fr))', gap: 18 }}>
-              {destinations.map(dest => <TripCard key={dest.id} dest={dest} onDetail={setSelectedDest} />)}
+              {destinations.map(dest => (
+                <TripCard
+                  key={dest.id}
+                  dest={dest}
+                  forceCustom={tripTypeTab === 'custom'}
+                  onDetail={d => { setSelectedDest(d); setSelectedDestIsCustom(tripTypeTab === 'custom') }}
+                />
+              ))}
             </div>
           )}
         </div>
       </div>
 
       {selectedDest && (
-        <DestinationModal dest={selectedDest} onClose={() => setSelectedDest(null)} />
+        <DestinationModal dest={selectedDest} onClose={() => setSelectedDest(null)} forceCustom={selectedDestIsCustom} />
       )}
 
       <style>{`
