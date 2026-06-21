@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class GuideResource extends JsonResource
 {
@@ -16,8 +17,12 @@ class GuideResource extends JsonResource
             'specialty' => $this->specialty,
             'specialty_label' => $this->specialty_label,
             'bio' => $this->bio,
-            'avatar' => $this->avatar,
-            'cover_image' => $this->cover_image,
+            'avatar' => $this->avatar
+                ? (str_starts_with($this->avatar, 'http') ? $this->avatar : url(Storage::url($this->avatar)))
+                : null,
+            'cover_image' => $this->cover_image
+                ? (str_starts_with($this->cover_image, 'http') ? $this->cover_image : url(Storage::url($this->cover_image)))
+                : null,
             'rating' => (float) $this->rating,
             'review_count' => (int) $this->review_count,
             'trips_done' => (int) $this->trips_done,
