@@ -46,9 +46,9 @@ export default function HowToBook() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: 20,
-      }}>
+      }} className="how-to-book-grid">
         {steps.map((step, i) => (
           <div key={i} style={{
             background: 'var(--white)', border: '1px solid var(--stroke)',
@@ -66,6 +66,10 @@ export default function HowToBook() {
           </div>
         ))}
       </div>
+      <style>{`
+        @media (max-width: 768px) { .how-to-book-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 480px) { .how-to-book-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   )
 }
