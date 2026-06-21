@@ -30,9 +30,11 @@ class GuideForm
                 Textarea::make('bio')
                     ->columnSpanFull(),
                 FileUpload::make('avatar')
-                    ->image(),
+                    ->image()
+                    ->disk('public'),
                 FileUpload::make('cover_image')
-                    ->image(),
+                    ->image()
+                    ->disk('public'),
                 TextInput::make('rating')
                     ->required()
                     ->numeric()
