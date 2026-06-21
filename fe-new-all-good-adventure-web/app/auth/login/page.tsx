@@ -1,10 +1,49 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { getSiteSettings } from '@/lib/api'
+import type { LoginPageSettings } from '@/lib/types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
+const DEFAULT: LoginPageSettings = {
+  background_image: null,
+  left_title: 'Selamat Datang!',
+  left_description: 'Login dan mulai petualangan private tripmu bersama kami.',
+  stat1_num: '50+',  stat1_label: 'Destinasi',
+  stat2_num: '4.9★', stat2_label: 'Rating',
+  stat3_num: '10K+', stat3_label: 'Traveler',
+  right_badge: '👋 Masuk ke akun kamu',
+  right_title: 'Halo!',
+  right_description: 'Masuk untuk melihat booking dan riwayat tripmu.',
+}
+
+const DEFAULT_BG = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80'
+
+function resolveUrl(path: string | null | undefined): string | null {
+  if (!path) return null
+  if (path.startsWith('http')) return path
+  return `${API_URL}/storage/${path}`
+}
+
 export default function LoginPage() {
+  const [s, setS] = useState<LoginPageSettings>(DEFAULT)
+
+  useEffect(() => {
+    getSiteSettings()
+      .then(res => { if (res.data?.login_page) setS({ ...DEFAULT, ...res.data.login_page }) })
+      .catch(() => {})
+  }, [])
+
+  const bgImage = resolveUrl(s.background_image) ?? DEFAULT_BG
+
+  const stats = [
+    { num: s.stat1_num ?? DEFAULT.stat1_num, label: s.stat1_label ?? DEFAULT.stat1_label },
+    { num: s.stat2_num ?? DEFAULT.stat2_num, label: s.stat2_label ?? DEFAULT.stat2_label },
+    { num: s.stat3_num ?? DEFAULT.stat3_num, label: s.stat3_label ?? DEFAULT.stat3_label },
+  ]
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }} className="auth-grid">
       {/* Visual Panel */}
@@ -12,7 +51,7 @@ export default function LoginPage() {
         style={{ background: 'linear-gradient(160deg,#0F1B2D,#1a3a5c)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 48 }}
         className="hidden md:flex"
       >
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.28 }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${bgImage}')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.28 }} />
         <Link href="/" style={{ position: 'absolute', top: 32, left: 48, zIndex: 1, display: 'flex', alignItems: 'center', gap: 10, color: '#fff', fontSize: 19, fontWeight: 800, textDecoration: 'none' }}>
           <span style={{ width: 32, height: 32, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             <img src="/logoTrip.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -20,13 +59,13 @@ export default function LoginPage() {
           All Good Adventure
         </Link>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{ color: '#fff', fontSize: 30, fontWeight: 800, lineHeight: 1.25, marginBottom: 10 }}>Selamat Datang!</h2>
-          <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 14.5, lineHeight: 1.7 }}>Login dan mulai petualangan private tripmu bersama kami.</p>
+          <h2 style={{ color: '#fff', fontSize: 30, fontWeight: 800, lineHeight: 1.25, marginBottom: 10 }}>{s.left_title}</h2>
+          <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 14.5, lineHeight: 1.7 }}>{s.left_description}</p>
           <div style={{ display: 'flex', gap: 28, marginTop: 28 }}>
-            {[{ num: '50+', label: 'Destinasi' }, { num: '4.9★', label: 'Rating' }, { num: '10K+', label: 'Traveler' }].map(s => (
-              <div key={s.label}>
-                <div style={{ color: '#fff', fontSize: 22, fontWeight: 800 }}>{s.num}</div>
-                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11.5, marginTop: 2 }}>{s.label}</div>
+            {stats.map(st => (
+              <div key={st.label}>
+                <div style={{ color: '#fff', fontSize: 22, fontWeight: 800 }}>{st.num}</div>
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11.5, marginTop: 2 }}>{st.label}</div>
               </div>
             ))}
           </div>
@@ -44,10 +83,10 @@ export default function LoginPage() {
             borderRadius: 'var(--r-sm)',
           }}>← Kembali ke Beranda</Link>
 
-          <p style={{ fontSize: 12.5, color: 'var(--body-2)', marginBottom: 7 }}>👋 Masuk ke akun kamu</p>
-          <h1 style={{ fontSize: 34, fontWeight: 800, color: 'var(--dark)', marginBottom: 7 }}>Halo!</h1>
+          <p style={{ fontSize: 12.5, color: 'var(--body-2)', marginBottom: 7 }}>{s.right_badge}</p>
+          <h1 style={{ fontSize: 34, fontWeight: 800, color: 'var(--dark)', marginBottom: 7 }}>{s.right_title}</h1>
           <p style={{ fontSize: 14.5, color: 'var(--body)', lineHeight: 1.65, marginBottom: 36 }}>
-            Masuk untuk melihat booking dan riwayat tripmu.
+            {s.right_description}
           </p>
 
           {/* Google Login Button */}

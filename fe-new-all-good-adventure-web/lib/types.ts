@@ -280,6 +280,21 @@ export interface TeamSectionSettings {
   title?: string
 }
 
+export interface LoginPageSettings {
+  background_image?: string | null
+  left_title?: string
+  left_description?: string
+  stat1_num?: string
+  stat1_label?: string
+  stat2_num?: string
+  stat2_label?: string
+  stat3_num?: string
+  stat3_label?: string
+  right_badge?: string
+  right_title?: string
+  right_description?: string
+}
+
 export interface FooterSettings {
   logo_image?: string | null
   description?: string
@@ -304,6 +319,7 @@ export interface SiteSettings {
   values_items?: ValuesItemSettings[]
   about_cta?: AboutCtaSettings
   team_section?: TeamSectionSettings
+  login_page?: LoginPageSettings
   footer?: FooterSettings
   [key: string]: unknown
 }
