@@ -372,7 +372,6 @@ export default function BookingClient() {
               </div>
               <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'thin' }}>
                 {guides.map(guide => {
-                  const avatar = guide.avatar ?? avatarFallback(guide.name)
                   const cover = guide.cover_image ?? null
                   return (
                     <div key={guide.id} style={{
@@ -394,16 +393,9 @@ export default function BookingClient() {
                             borderRadius: 50, backdropFilter: 'blur(4px)',
                           }}>{guide.specialty_label}</span>
                         )}
-                        <div style={{
-                          position: 'absolute', bottom: -20, left: 14, zIndex: 2,
-                          width: 48, height: 48, borderRadius: '50%', overflow: 'hidden',
-                          border: '3px solid var(--white)',
-                        }}>
-                          <Image src={avatar} alt={guide.name} width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
                       </div>
                       {/* Card body */}
-                      <div style={{ padding: '28px 14px 14px' }}>
+                      <div style={{ padding: '14px' }}>
                         <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--dark)', marginBottom: 2 }}>
                           {guide.name}
                           <span style={{ color: 'var(--primary)', marginLeft: 5, fontSize: 12 }}>✓</span>
@@ -418,10 +410,7 @@ export default function BookingClient() {
                           </div>
                         )}
                         {guide.bio && (
-                          <p style={{
-                            fontSize: 11.5, color: 'var(--body)', lineHeight: 1.6, marginBottom: 12,
-                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                          }}>{guide.bio}</p>
+                          <p style={{ fontSize: 11.5, color: 'var(--body)', lineHeight: 1.6, marginBottom: 12 }}>{guide.bio}</p>
                         )}
                         <div style={{
                           display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 4,
