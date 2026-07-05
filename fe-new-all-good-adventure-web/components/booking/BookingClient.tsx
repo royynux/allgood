@@ -465,36 +465,95 @@ export default function BookingClient() {
                 <input type="text" value={guideSearch} onChange={e => setGuideSearch(e.target.value)} placeholder="Cari nama guide..." style={{ ...S.input, paddingLeft: 40 }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
                 {guides.map(guide => {
                   const avatar = guide.avatar ?? avatarFallback(guide.name)
+                  const cover = guide.cover_image ?? null
                   const isSelected = state.guide?.id === guide.id
                   return (
                     <div key={guide.id} onClick={() => update({ guide: isSelected ? null : guide })} style={{
                       border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--stroke)'}`,
-                      borderRadius: 'var(--r-md)', padding: 16, cursor: 'pointer',
+                      borderRadius: 'var(--r-md)', overflow: 'hidden', cursor: 'pointer',
                       transition: 'all 0.22s', position: 'relative',
-                      background: isSelected ? 'var(--primary-light)' : 'var(--white)',
+                      background: 'var(--white)',
+                      boxShadow: isSelected ? '0 0 0 3px rgba(232,73,15,0.15)' : '0 1px 4px rgba(0,0,0,0.06)',
                     }}>
-                      {isSelected && (
-                        <span style={{
-                          position: 'absolute', top: 10, right: 10, width: 20, height: 20,
-                          background: 'var(--primary)', color: '#fff', borderRadius: '50%',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800,
-                        }}>✓</span>
-                      )}
-                      <div style={{ width: 52, height: 52, borderRadius: '50%', overflow: 'hidden', marginBottom: 11, border: '2px solid var(--stroke)' }}>
-                        <Image src={avatar} alt={guide.name} width={52} height={52} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      {/* Cover image */}
+                      <div style={{ position: 'relative', height: 110, background: 'linear-gradient(135deg,#1a3a5c,#0F1B2D)', overflow: 'hidden' }}>
+                        {cover && (
+                          <Image src={cover} alt={guide.name} fill style={{ objectFit: 'cover', opacity: 0.85 }} />
+                        )}
+                        {/* Specialty badge */}
+                        {guide.specialty_label && (
+                          <span style={{
+                            position: 'absolute', top: 10, left: 10, zIndex: 1,
+                            background: 'rgba(0,0,0,0.55)', color: '#fff',
+                            fontSize: 10.5, fontWeight: 700, padding: '3px 9px',
+                            borderRadius: 50, backdropFilter: 'blur(4px)',
+                          }}>{guide.specialty_label}</span>
+                        )}
+                        {/* Selected checkmark */}
+                        {isSelected && (
+                          <span style={{
+                            position: 'absolute', top: 10, right: 10, zIndex: 1,
+                            width: 22, height: 22, background: 'var(--primary)', color: '#fff',
+                            borderRadius: '50%', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', fontSize: 12, fontWeight: 800,
+                          }}>✓</span>
+                        )}
+                        {/* Avatar overlapping bottom of cover */}
+                        <div style={{
+                          position: 'absolute', bottom: -20, left: 14, zIndex: 2,
+                          width: 48, height: 48, borderRadius: '50%', overflow: 'hidden',
+                          border: '3px solid var(--white)',
+                        }}>
+                          <Image src={avatar} alt={guide.name} width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 3 }}>{guide.name}</div>
-                      <div style={{ fontSize: 11.5, color: 'var(--body-2)', marginBottom: 6 }}>
-                        📍 {guide.location}
-                        {guide.age != null && <> · 🎂 {guide.age} tahun</>}
+
+                      {/* Card body */}
+                      <div style={{ padding: '28px 14px 14px' }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--dark)', marginBottom: 2 }}>
+                          {guide.name}
+                          <span style={{ color: 'var(--primary)', marginLeft: 5, fontSize: 12 }}>✓</span>
+                        </div>
+                        <div style={{ fontSize: 11.5, color: 'var(--body-2)', marginBottom: 5 }}>📍 {guide.location}</div>
+                        <div style={{ fontSize: 12, color: 'var(--body-2)', marginBottom: 6 }}>
+                          ⭐ {guide.rating} <span style={{ color: 'var(--body-2)' }}>({guide.review_count} ulasan)</span>
+                        </div>
+                        {guide.languages?.length > 0 && (
+                          <div style={{ fontSize: 11, color: 'var(--body-2)', marginBottom: 8 }}>
+                            🗣️ {guide.languages.join(', ')}
+                          </div>
+                        )}
+                        {guide.bio && (
+                          <p style={{
+                            fontSize: 11.5, color: 'var(--body)', lineHeight: 1.6, marginBottom: 12,
+                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}>{guide.bio}</p>
+                        )}
+
+                        {/* Stats row */}
+                        <div style={{
+                          display: 'grid', gridTemplateColumns: 'repeat(3,1fr)',
+                          gap: 4, paddingTop: 10, borderTop: '1px solid var(--stroke)',
+                          textAlign: 'center',
+                        }}>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--dark)' }}>{guide.trips_done ?? '-'}+</div>
+                            <div style={{ fontSize: 10, color: 'var(--body-2)' }}>Trip</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--dark)' }}>{guide.years_experience ?? '-'}+</div>
+                            <div style={{ fontSize: 10, color: 'var(--body-2)' }}>Tahun</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--dark)' }}>{guide.rating} ⭐</div>
+                            <div style={{ fontSize: 10, color: 'var(--body-2)' }}>Rating</div>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: 12, color: 'var(--body-2)', marginBottom: 6 }}>⭐ {guide.rating} · {guide.review_count} ulasan</div>
-                      {guide.years_experience != null && (
-                        <div style={{ fontSize: 11.5, color: 'var(--body-2)' }}>🏅 {guide.years_experience} tahun pengalaman</div>
-                      )}
                     </div>
                   )
                 })}
