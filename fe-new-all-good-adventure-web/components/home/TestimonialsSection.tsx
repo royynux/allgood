@@ -56,10 +56,10 @@ export default function TestimonialsSection() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: 22,
-      }}>
-        {testimonials.map(t => (
+      }} className="testimonials-grid">
+        {testimonials.slice(0, 6).map(t => (
           <div key={t.id} style={{
             background: 'var(--white)', border: '1px solid var(--stroke)',
             borderRadius: 'var(--r-lg)', padding: 26,
@@ -90,6 +90,10 @@ export default function TestimonialsSection() {
           </div>
         ))}
       </div>
+      <style>{`
+        @media (max-width: 900px) { .testimonials-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 560px) { .testimonials-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   )
 }
