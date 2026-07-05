@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Script from 'next/script'
 import { useRouter } from 'next/navigation'
-import { getDestinations, getGuides, createBooking, createSnapToken, confirmPayment } from '@/lib/api'
-import type { Destination, Guide, BookingState } from '@/lib/types'
+import { getDestinations, getGuides, createBooking, createSnapToken, confirmPayment, getSiteSettings } from '@/lib/api'
+import type { Destination, Guide, BookingState, BookingSettings } from '@/lib/types'
 import { formatPrice, today, addDays, formatDate, avatarFallback } from '@/lib/utils'
 import { isLoggedIn, getUser, getToken } from '@/lib/auth'
 
@@ -132,6 +132,10 @@ export default function BookingClient() {
   const [stepSuccess, setStepSuccess] = useState<string | null>(null)
   const [paymentStatus, setPaymentStatus] = useState<null | 'success' | 'pending' | 'failed'>(null)
   const [createdBookingCode, setCreatedBookingCode] = useState('')
+  const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
+    custom_cta_title: 'Harga Dikonfirmasi Admin',
+    custom_cta_description: 'Tim kami akan menghubungimu dalam 1×24 jam dengan penawaran terbaik.',
+  })
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -141,6 +145,9 @@ export default function BookingClient() {
     const u = getUser()
     if (u) update({ name: u.name, email: u.email })
     getDestinations().then(r => setDestinations(r.data ?? [])).catch(() => {})
+    getSiteSettings().then(res => {
+      if (res.data?.booking_settings) setBookingSettings(s => ({ ...s, ...res.data.booking_settings }))
+    }).catch(() => {})
   }, [])
 
   const fetchGuides = useCallback(async () => {
@@ -898,8 +905,8 @@ export default function BookingClient() {
                       <div style={{ padding: '12px 22px', borderTop: '1px solid var(--stroke)', background: 'var(--white)' }}>
                         <div style={{ textAlign: 'center', padding: '10px 0' }}>
                           <div style={{ fontSize: 24, marginBottom: 6 }}>💬</div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 4 }}>Harga Dikonfirmasi Admin</div>
-                          <div style={{ fontSize: 12, color: 'var(--body-2)' }}>Tim kami akan menghubungimu dalam 1×24 jam dengan penawaran terbaik.</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--dark)', marginBottom: 4 }}>{bookingSettings.custom_cta_title}</div>
+                          <div style={{ fontSize: 12, color: 'var(--body-2)' }}>{bookingSettings.custom_cta_description}</div>
                         </div>
                       </div>
                     )}

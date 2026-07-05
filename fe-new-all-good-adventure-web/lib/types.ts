@@ -295,6 +295,11 @@ export interface LoginPageSettings {
   right_description?: string
 }
 
+export interface BookingSettings {
+  custom_cta_title?: string
+  custom_cta_description?: string
+}
+
 export interface FooterSettings {
   logo_image?: string | null
   description?: string
@@ -320,6 +325,7 @@ export interface SiteSettings {
   about_cta?: AboutCtaSettings
   team_section?: TeamSectionSettings
   login_page?: LoginPageSettings
+  booking_settings?: BookingSettings
   footer?: FooterSettings
   [key: string]: unknown
 }
