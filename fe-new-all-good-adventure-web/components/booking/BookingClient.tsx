@@ -521,9 +521,9 @@ export default function BookingClient() {
                         <div style={{ fontSize: 12, color: 'var(--body-2)', marginBottom: 6 }}>
                           ⭐ {guide.rating} <span style={{ color: 'var(--body-2)' }}>({guide.review_count} ulasan)</span>
                         </div>
-                        {guide.languages?.length > 0 && (
+                        {guide.languages && (
                           <div style={{ fontSize: 11, color: 'var(--body-2)', marginBottom: 8 }}>
-                            🗣️ {guide.languages.join(', ')}
+                            🗣️ {Array.isArray(guide.languages) ? guide.languages.join(', ') : guide.languages}
                           </div>
                         )}
                         {guide.bio && (
