@@ -363,7 +363,7 @@ export default function BookingClient() {
                 Tour Guide Tersedia
                 <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--body-2)', marginLeft: 8 }}>— pilih guide di langkah berikutnya</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+              <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'thin' }}>
                 {guides.map(guide => {
                   const avatar = guide.avatar ?? avatarFallback(guide.name)
                   const cover = guide.cover_image ?? null
@@ -372,6 +372,7 @@ export default function BookingClient() {
                       border: '1.5px solid var(--stroke)', borderRadius: 'var(--r-md)',
                       overflow: 'hidden', background: 'var(--white)',
                       boxShadow: '0 1px 4px rgba(0,0,0,0.06)', pointerEvents: 'none',
+                      minWidth: 240, maxWidth: 240, flexShrink: 0,
                     }}>
                       {/* Cover image */}
                       <div style={{ position: 'relative', height: 110, background: 'linear-gradient(135deg,#1a3a5c,#0F1B2D)', overflow: 'hidden' }}>
