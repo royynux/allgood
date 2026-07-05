@@ -22,7 +22,7 @@ use Filament\Tables\Table;
 
 class TestimonialResource extends Resource
 {
-    public const MAX_TESTIMONIALS = 4;
+    public const MAX_TESTIMONIALS = 6;
 
     protected static ?string $model = Testimonial::class;
 
